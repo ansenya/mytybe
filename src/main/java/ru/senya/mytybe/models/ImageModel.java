@@ -1,21 +1,28 @@
 package ru.senya.mytybe.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CurrentTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.Date;
 import java.util.Set;
-import java.util.UUID;
 
 @Data
 @Entity
 @Table(name = "images")
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class ImageModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonIgnore
     private Long id;
 
     private String path;
@@ -32,15 +39,19 @@ public class ImageModel {
 
     @ManyToOne
     @JoinColumn(name = "post_id")
+    @JsonIgnore
     private PostModel post;
 
     @OneToOne(mappedBy = "pfp")
+    @JsonIgnore
     private UserModel user;
 
     @OneToOne(mappedBy = "pfp")
+    @JsonIgnore
     private ChannelModel channel;
 
     @OneToOne(mappedBy = "thumbnail")
+    @JsonIgnore
     private VideoModel video;
 
     private boolean deleted = false;

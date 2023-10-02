@@ -1,7 +1,11 @@
 package ru.senya.mytybe.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CurrentTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -11,6 +15,9 @@ import java.util.Set;
 @Data
 @Entity
 @Table(name = "videos")
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class VideoModel {
 
     @Id
@@ -35,6 +42,7 @@ public class VideoModel {
 
     @ManyToOne
     @JoinColumn(name = "channel_id")
+    @JsonIgnore
     private ChannelModel channel;
 
     @ManyToOne
@@ -58,7 +66,6 @@ public class VideoModel {
 
     @ManyToMany(mappedBy = "dislikedVideos")
     private Set<UserModel> dislikedByUser;
-
 
 
     private boolean explicit = false;
