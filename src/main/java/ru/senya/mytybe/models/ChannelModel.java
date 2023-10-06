@@ -6,7 +6,10 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CurrentTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -25,7 +28,7 @@ public class ChannelModel {
 
     private String name;
 
-    private Integer videosAmount = videos.size();
+    private Integer videosAmount;
 
     private Integer followersAmount = 0;
 
@@ -49,6 +52,12 @@ public class ChannelModel {
     @ManyToMany(mappedBy = "subscriptions")
     @JsonIgnore
     private Set<UserModel> followers = new HashSet<>();
+
+    @CurrentTimestamp
+    private Date created;
+
+    @UpdateTimestamp
+    private Date updated;
 
     @Override
     public int hashCode() {

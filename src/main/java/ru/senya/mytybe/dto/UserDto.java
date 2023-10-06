@@ -12,6 +12,7 @@ public class UserDto {
     private String username;
     private String name;
     private String surname;
+    private String role;
     private String sex;
     private ImageModel pfp;
     private Integer age;
@@ -22,7 +23,8 @@ public class UserDto {
 //    private Set<VideoModel> likedVideos;
 //    private Set<VideoModel> dislikedVideos;
 //    private Set<PlaylistModel> playlists;
+    private boolean deleted;
+    private boolean locked;
     private Date created;
     private Date updated;
-    private boolean deleted;
 }

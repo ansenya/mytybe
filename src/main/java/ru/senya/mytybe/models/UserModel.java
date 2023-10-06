@@ -39,6 +39,8 @@ public class UserModel {
 
     private Integer age;
 
+    private String role = "user";
+
     @ManyToOne
     @JoinColumn(name = "country_id")
     private CountryModel country;
@@ -80,6 +82,7 @@ public class UserModel {
     private Date updated;
 
     private boolean deleted = false;
+    private boolean locked = false;
 
     @Override
     public int hashCode() {
