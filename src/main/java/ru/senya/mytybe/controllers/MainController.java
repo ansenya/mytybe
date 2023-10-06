@@ -1,6 +1,7 @@
 package ru.senya.mytybe.controllers;
 
 import com.google.gson.Gson;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ru.senya.mytybe.dto.UserDto;
 import ru.senya.mytybe.models.ChannelModel;
 import ru.senya.mytybe.models.UserModel;
 import ru.senya.mytybe.models.VideoModel;
@@ -28,7 +30,7 @@ public class MainController {
     final
     VideoRepository videoRepository;
 
-    Gson gson = new Gson();
+    ModelMapper modelMapper = new ModelMapper();
 
     @Autowired
     public MainController(UserRepository userRepository, ChannelRepository channelRepository, VideoRepository videoRepository) {
@@ -56,23 +58,60 @@ public class MainController {
     }
 
     @PostMapping("/create")
-    public UserModel create() {
+    public ResponseEntity<?> create() {
         UserModel user = userRepository.findById(1L).orElse(null);
-        ChannelModel[] channels = user.getChannels().toArray(ChannelModel[]::new);
+
+        ChannelModel channel = (ChannelModel) user.getChannels().toArray()[0];
 
         VideoModel video = VideoModel.builder()
-                .channel(channels[0])
-                .duration(123897123L)
-                .explicit(false)
-                .path("/path_to_video")
-                .stream(false)
+                .name("my cock")
+                .channel(channel)
                 .build();
 
-        videoRepository.save(video);
+        video = videoRepository.save(video);
+        channel.getVideos().add(video);
+        channelRepository.save(channel);
+//        ChannelModel channel = ChannelModel.builder()
+//                .user(user)
+//                .name("chlen")
+//                .build();
+//
+//        channel = channelRepository.save(channel);
+//
+//        user.getChannels().add(channel);
+
+//        user = userRepository.save(user);
+
+//        VideoModel video = VideoModel.builder()
+//                .build();
 
 
-        channels[0].getVideos().add(video);
-        channelRepository.save(channels[0]);
+//        UserModel user = UserModel.builder()
+//                .username("penis")
+//                .password("penis12312")
+//                .name("pipiska")
+//                .surname("penisovich")
+//                .sex("children")
+//                .age(16)
+//                .build();
+
+
+        UserDto userDto = modelMapper.map(user, UserDto.class);
+//        ChannelModel[] channels = user.getChannels().toArray(ChannelModel[]::new);
+
+//        VideoModel video = VideoModel.builder()
+//                .channel(channels[0])
+//                .duration(123897123L)
+//                .explicit(false)
+//                .path("/path_to_video")
+//                .stream(false)
+//                .build();
+//
+//        videoRepository.save(video);
+//
+//
+//        channels[0].getVideos().add(video);
+//        channelRepository.save(channels[0]);
 //
 //        ChannelModel channel = ChannelModel.builder()
 //                .name("Название канала")
@@ -85,7 +124,7 @@ public class MainController {
 //
 //        user = userRepository.save(user);
 
-        return user;
+        return ResponseEntity.ok(new Object[]{userDto});
     }
 
 

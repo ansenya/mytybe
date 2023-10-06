@@ -25,7 +25,7 @@ public class ChannelModel {
 
     private String name;
 
-    private Integer videosAmount = 0;
+    private Integer videosAmount = videos.size();
 
     private Integer followersAmount = 0;
 
@@ -36,11 +36,9 @@ public class ChannelModel {
     private ImageModel pfp; //todo: change to chp
 
     @OneToMany(mappedBy = "channel")
-    @JsonIgnore
     private Set<VideoModel> videos = new HashSet<>();
 
     @OneToMany(mappedBy = "channel")
-    @JsonIgnore
     private Set<PostModel> posts = new HashSet<>();
 
     @ManyToOne
