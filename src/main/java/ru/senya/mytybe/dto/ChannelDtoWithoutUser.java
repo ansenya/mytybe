@@ -2,14 +2,9 @@ package ru.senya.mytybe.dto;
 
 import lombok.Data;
 import ru.senya.mytybe.models.ImageModel;
-import ru.senya.mytybe.models.UserModel;
-import ru.senya.mytybe.models.VideoModel;
-
-import java.util.HashSet;
-import java.util.Set;
 
 @Data
-public class ChannelDto {
+public class ChannelDtoWithoutUser {
     private Long id;
 
     private String name;
@@ -26,7 +21,7 @@ public class ChannelDto {
 
 //    private Set<PostModel> posts = new HashSet<>();
 
-    private UserDtoWithoutChannels user;
+//    private UserDtoWithoutChannels user;
 
 //    private Set<UserModel> followers = new HashSet<>();
 }

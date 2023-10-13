@@ -28,7 +28,6 @@ public class VideoModel {
 
     private String description;
 
-
     private Long duration;
 
     private Long views = 0L;
@@ -67,6 +66,9 @@ public class VideoModel {
     @ManyToMany(mappedBy = "dislikedVideos")
     private Set<UserModel> dislikedByUser;
 
+    private String vid_uuid;
+
+    private boolean processed = false;
 
     private boolean explicit = false;
 

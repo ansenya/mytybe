@@ -48,7 +48,8 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("auth/register").permitAll()
-                        .anyRequest().authenticated()
+                        .requestMatchers("v/tag").permitAll()
+                        .anyRequest().permitAll()
                 )
                 .oauth2ResourceServer(configurer -> configurer.jwt(jwt -> jwt.decoder(jwtDecoder())))
                 .userDetailsService(userDetailsService)

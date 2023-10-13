@@ -32,7 +32,6 @@ public class ChannelModel {
 
     private Integer followersAmount = 0;
 
-    private boolean deleted = false;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "image_id", referencedColumnName = "id")
@@ -53,11 +52,21 @@ public class ChannelModel {
     @JsonIgnore
     private Set<UserModel> followers = new HashSet<>();
 
+    private boolean deleted = false;
+
     @CurrentTimestamp
     private Date created;
 
     @UpdateTimestamp
     private Date updated;
+
+    public Integer getFollowersAmount() {
+        return followers.size();
+    }
+
+    public Integer getVideosAmount() {
+        return videos.size();
+    }
 
     @Override
     public int hashCode() {

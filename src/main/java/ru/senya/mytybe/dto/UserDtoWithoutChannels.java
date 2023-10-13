@@ -1,13 +1,13 @@
 package ru.senya.mytybe.dto;
 
 import lombok.Data;
-import ru.senya.mytybe.models.*;
+import ru.senya.mytybe.models.CountryModel;
+import ru.senya.mytybe.models.ImageModel;
 
 import java.util.Date;
-import java.util.Set;
 
 @Data
-public class UserDto {
+public class UserDtoWithoutChannels {
     private Long id;
     private String username;
     private String name;
@@ -17,8 +17,8 @@ public class UserDto {
     private ImageModel pfp;
     private Integer age;
     private CountryModel country;
-    private Set<ChannelDtoWithoutUser> channels;
-//    private Set<UserModel> subscriptions;
+//    private Set<ChannelDto> channels;
+    //    private Set<UserModel> subscriptions;
 //    private Set<CommentModel> comments;
 //    private Set<VideoModel> likedVideos;
 //    private Set<VideoModel> dislikedVideos;

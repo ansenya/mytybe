@@ -1,8 +1,10 @@
 package ru.senya.mytybe.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -18,5 +20,11 @@ public class TagModel {
     private String tag;
 
     @ManyToMany(mappedBy = "tags")
+    @JsonIgnore
     private Set<VideoModel> videos;
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(tag);
+    }
 }
