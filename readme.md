@@ -1,67 +1,53 @@
-# Spring Service Endpoints
-
-**Prefix**: `/api`  
-**Port**: `6666`
+## Spring Service Endpoints
 
 ## Authentication
-
 - **Endpoint:** `/u/auth/login`
-    - **Method:** POST
-    - **Description:** Аутентификация пользователя.
+  - **Method:** POST
+  - **Description:** Аутентификация пользователя.
 
 - **Endpoint:** `/u/auth/register`
-    - **Method:** POST
-    - **Description:** Регистрация нового пользователя.
+  - **Method:** POST
+  - **Description:** Регистрация нового пользователя.
 
 ## User Endpoints
-
 - **Endpoint:** `/u/all`
-    - **Method:** GET
-    - **Description:** Получить информацию о всех пользователях.
+  - **Method:** GET
+  - **Description:** Получить информацию о всех пользователях.
 
 - **Endpoint:** `/u/user`
-    - **Method:** GET
-    - **Description:** Получить информацию о текущем пользователе.
+  - **Method:** GET
+  - **Description:** Получить информацию о текущем пользователе.
 
 ## Video Endpoints
-
 - **Endpoint:** `/v/all`
-    - **Method:** GET
-    - **Description:** Получить список всех видеозаписей.
-
-- **Endpoint:** `/v/c/all`
-    - **Method:** GET
-    - **Description:** Получить список видеозаписей по каналам.
-
-- **Endpoint:** `/v/video`
-    - **Method:** GET
-    - **Description:** Получить информацию о видеозаписи.
-
-- **Endpoint:** `/v/upload`
-    - **Method:** POST
-    - **Description:** Загрузить новое видео.
+  - **Method:** GET
+  - **Description:** Получить список всех видеозаписей (можно получить только по id канала. описание - в json postman).
 
 - **Endpoint:** `/v/tag`
-    - **Method:** POST
-    - **Description:** Служебный ендпоинт.
+  - **Method:** GET
+  - **Description:** Получить видеозаписи по тегам (служебный).
+
+- **Endpoint:** `/v/video`
+  - **Method:** GET
+  - **Description:** Получить информацию о видеозаписи.
+
+- **Endpoint:** `/v/video`
+  - **Method:** POST
+  - **Description:**  Загрузить видео.
 
 ## Channel Endpoints
-
 - **Endpoint:** `/c/all`
-    - **Method:** GET
-    - **Description:** Получить список всех каналов.
+  - **Method:** GET
+  - **Description:** Получить список всех каналов (можно получить только по id пользователя. описание - в json postman).
 
 - **Endpoint:** `/c/channel`
-    - **Method:** GET
-    - **Description:** Получить информацию о канале.
+  - **Method:** GET
+  - **Description:** Получить информацию о канале.
 
-- **Endpoint:** `/c/create`
-    - **Method:** POST
-    - **Description:** Создать новый канал.
+- **Endpoint:** `/c/channel`
+  - **Method:** POST
+  - **Description:** Создать новый канал.
 
-- **Endpoint:** `/c/u/all`
-    - **Method:** GET
-    - **Description:** Получить список каналов пользователя.
 
 # Flask Service Endpoints
 

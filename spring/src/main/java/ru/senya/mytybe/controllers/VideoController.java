@@ -62,54 +62,43 @@ public class VideoController {
     @GetMapping("all")
     public ResponseEntity<?> getAll(@RequestParam(value = "page", required = false) Integer pageNum,
                                     @RequestParam(value = "size", required = false, defaultValue = "10") int pageSize,
-                                    @RequestParam(value = "sort", required = false, defaultValue = "asc") String sort) {
+                                    @RequestParam(value = "sort", required = false, defaultValue = "asc") String sort,
+                                    @RequestParam(value = "channelId", required = false, defaultValue = "-1") Long channelId) {
         if (pageNum == null) {
             return ResponseEntity.badRequest().body("page is null");
         }
 
-        Sort.Direction direction;
+        if (channelId == -1) {
+            Sort.Direction direction;
 
-        if (Objects.equals(sort, "desc")) {
-            direction = Sort.Direction.ASC;
+            if (Objects.equals(sort, "desc")) {
+                direction = Sort.Direction.ASC;
+            } else {
+                direction = Sort.Direction.DESC;
+            }
+
+            PageRequest page = PageRequest.of(pageNum, pageSize, Sort.by(direction, "created"));
+            Page<VideoModel> videoPage = videoRepository.findAll(page);
+            Page<VideoDto> videoDtoPage = videoPage.map(videoModel -> modelMapper.map(videoModel, VideoDto.class));
+
+            return ResponseEntity.ok(videoDtoPage);
         } else {
-            direction = Sort.Direction.DESC;
+            Sort.Direction direction;
+
+            if (Objects.equals(sort, "desc")) {
+                direction = Sort.Direction.ASC;
+            } else {
+                direction = Sort.Direction.DESC;
+            }
+
+            PageRequest page = PageRequest.of(pageNum, pageSize, Sort.by(direction, "created"));
+            Page<VideoModel> videoPage = videoRepository.findAllByChannelId(channelId, page);
+            Page<VideoDto> videoDtoPage = videoPage.map(videoModel -> modelMapper.map(videoModel, VideoDto.class));
+
+            return ResponseEntity.ok(videoDtoPage);
         }
 
-        PageRequest page = PageRequest.of(pageNum, pageSize, Sort.by(direction, "created"));
-        Page<VideoModel> videoPage = videoRepository.findAll(page);
-        Page<VideoDto> videoDtoPage = videoPage.map(videoModel -> modelMapper.map(videoModel, VideoDto.class));
-
-        return ResponseEntity.ok(videoDtoPage);
     }
-
-    @GetMapping("c/all")
-    public ResponseEntity<?> getAllByChannelId(@RequestParam(value = "page", required = false) Integer pageNum,
-                                               @RequestParam(value = "size", required = false, defaultValue = "10") int pageSize,
-                                               @RequestParam(value = "sort", required = false, defaultValue = "asc") String sort,
-                                               @RequestParam(value = "uid", required = false) Long uid) {
-        if (pageNum == null) {
-            return ResponseEntity.badRequest().body("page is null");
-        }
-
-        if (uid == null) {
-            return ResponseEntity.badRequest().body("uid is null");
-        }
-
-        Sort.Direction direction;
-
-        if (Objects.equals(sort, "desc")) {
-            direction = Sort.Direction.ASC;
-        } else {
-            direction = Sort.Direction.DESC;
-        }
-
-        PageRequest page = PageRequest.of(pageNum, pageSize, Sort.by(direction, "created"));
-        Page<VideoModel> videoPage = videoRepository.findAll(page);
-        Page<VideoDto> videoDtoPage = videoPage.map(videoModel -> modelMapper.map(videoModel, VideoDto.class));
-
-        return ResponseEntity.ok(videoDtoPage);
-    }
-
 
     @GetMapping("video")
     public ResponseEntity<?> getOne(@RequestParam(value = "id", required = false) Long id) {
@@ -123,7 +112,7 @@ public class VideoController {
         return ResponseEntity.ok(video);
     }
 
-    @PostMapping("upload")
+    @PostMapping("video")
     public ResponseEntity<?> upload(@RequestParam(value = "video", required = false) MultipartFile file,
                                     @RequestParam(value = "channelId", required = false) Long channelId,
                                     @RequestParam(value = "videoName", required = false) String videoName,

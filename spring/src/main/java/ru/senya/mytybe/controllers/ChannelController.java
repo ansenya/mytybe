@@ -1,6 +1,8 @@
 package ru.senya.mytybe.controllers;
 
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -23,6 +25,8 @@ public class ChannelController {
     final
     UserRepository userRepository;
     ModelMapper modelMapper = new ModelMapper();
+
+    Logger logger = LoggerFactory.getLogger(ChannelController.class);
 
     public ChannelController(ChannelRepository channelRepository, UserRepository userRepository) {
         this.channelRepository = channelRepository;
@@ -50,62 +54,51 @@ public class ChannelController {
     @GetMapping("all")
     public ResponseEntity<?> getALl(@RequestParam(value = "page", required = false) Integer pageNum,
                                     @RequestParam(value = "size", required = false, defaultValue = "10") int pageSize,
-                                    @RequestParam(value = "sort", required = false, defaultValue = "asc") String sort) {
+                                    @RequestParam(value = "sort", required = false, defaultValue = "asc") String sort,
+                                    @RequestParam(value = "uid", required = false, defaultValue = "-1") Long uid) {
         if (pageNum == null) {
             return ResponseEntity.badRequest().body("page is null");
         }
 
-        Sort.Direction direction;
+        if (uid == -1) {
+            Sort.Direction direction;
 
-        if (Objects.equals(sort, "desc")) {
-            direction = Sort.Direction.ASC;
+            if (Objects.equals(sort, "desc")) {
+                direction = Sort.Direction.ASC;
+            } else {
+                direction = Sort.Direction.DESC;
+            }
+
+            PageRequest page = PageRequest.of(pageNum, pageSize, Sort.by(direction, "created"));
+            Page<ChannelModel> channelPage = channelRepository.findAll(page);
+
+            Page<ChannelDto> channelDtoPage = channelPage.map(user -> modelMapper.map(user, ChannelDto.class));
+
+            return ResponseEntity.ok(channelDtoPage);
         } else {
-            direction = Sort.Direction.DESC;
+            Sort.Direction direction;
+
+            if (Objects.equals(sort, "desc")) {
+                direction = Sort.Direction.ASC;
+            } else {
+                direction = Sort.Direction.DESC;
+            }
+
+            PageRequest page = PageRequest.of(pageNum, pageSize, Sort.by(direction, "created"));
+
+            Page<ChannelModel> channelPage = channelRepository.getAllByUserId(uid, page);
+
+            if (channelPage == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            Page<ChannelDto> channelDtoPage = channelPage.map(user -> modelMapper.map(user, ChannelDto.class));
+
+            return ResponseEntity.ok(channelDtoPage);
         }
-
-        PageRequest page = PageRequest.of(pageNum, pageSize, Sort.by(direction, "created"));
-        Page<ChannelModel> channelPage = channelRepository.findAll(page);
-
-        Page<ChannelDto> channelDtoPage = channelPage.map(user -> modelMapper.map(user, ChannelDto.class));
-
-        return ResponseEntity.ok(channelDtoPage);
     }
 
-    @GetMapping("u/all")
-    public ResponseEntity<?> getOneByUid(@RequestParam(value = "page", required = false) Integer pageNum,
-                                         @RequestParam(value = "size", required = false, defaultValue = "10") int pageSize,
-                                         @RequestParam(value = "sort", required = false, defaultValue = "asc") String sort,
-                                         @RequestParam(value = "uid", required = false) Long uid) {
-        if (uid == null) {
-            return ResponseEntity.badRequest().body("id is empty");
-        }
-
-        if (pageNum == null) {
-            return ResponseEntity.badRequest().body("page is null");
-        }
-
-        Sort.Direction direction;
-
-        if (Objects.equals(sort, "desc")) {
-            direction = Sort.Direction.ASC;
-        } else {
-            direction = Sort.Direction.DESC;
-        }
-
-        PageRequest page = PageRequest.of(pageNum, pageSize, Sort.by(direction, "created"));
-
-        Page<ChannelModel> channelPage = channelRepository.getAllByUserId(uid, page);
-
-        if (channelPage == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        Page<ChannelDto> channelDtoPage = channelPage.map(user -> modelMapper.map(user, ChannelDto.class));
-
-        return ResponseEntity.ok(channelDtoPage);
-    }
-
-    @PostMapping("create")
+    @PostMapping("channel")
     public ResponseEntity<?> create() {
         ChannelModel channel = ChannelModel.builder()
                 .name("piska")
@@ -116,7 +109,4 @@ public class ChannelController {
 
         return ResponseEntity.ok(new Object[]{userRepository.findById(3L).get(), modelMapper.map(channel, ChannelDto.class)});
     }
-
-
-
 }

@@ -26,7 +26,7 @@ public class VideoDto {
     private ImageModel thumbnail;
 
 
-//    private ChannelModel channel;
+    private ChannelDto channel;
 
     private CategoryModel category;
 
