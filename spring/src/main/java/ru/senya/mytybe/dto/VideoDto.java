@@ -8,6 +8,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 import ru.senya.mytybe.models.*;
 
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.Set;
 
 @Data
@@ -32,9 +33,9 @@ public class VideoDto {
 
     private String path;
 
-    private Set<CommentModel> comments;
+//    private LinkedList<CommentDto> comments;
 
-//    private Set<TagModel> tags;
+    private Set<TagModel> tags;
 
     private Set<PlaylistModel> playlists;
 

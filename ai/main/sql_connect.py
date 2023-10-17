@@ -1,7 +1,7 @@
 import sqlite3
 import time
 
-base_url = "serv/res/results.db"
+base_url = "res/results.db"
 
 
 def init_db():
@@ -25,7 +25,8 @@ def create_result(req_id, vtype):
 def get_result(req_id):
     conn = sqlite3.connect(base_url)
     cursor = conn.cursor()
-    res = str(cursor.execute('SELECT data FROM results WHERE id = ?', (req_id,)).fetchone())
+    res = cursor.execute('SELECT data FROM results WHERE id = ?', (req_id,)).fetchone()
+    print(res)
     conn.commit()
     conn.close()
     return res

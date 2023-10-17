@@ -105,3 +105,7 @@ def set_processed(req_id, tags):
 
     cursor.close()
     connection.close()
+
+
+set_processed("91a6e876-59b2-4be2-a17a-fb88102c4167",
+              "[('web site, website, internet site, site', 0.4986461102962494)]")

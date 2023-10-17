@@ -56,6 +56,7 @@ public class UserModel {
     private Set<ChannelModel> subscriptions;
 
     @OneToMany(mappedBy = "user")
+    @JsonIgnore
     private Set<CommentModel> comments;
 
     @ManyToMany

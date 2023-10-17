@@ -18,7 +18,9 @@ def upload_video():
 
     req_id = request.args['uuid']
 
-    video_path = "serv/videos/{}.mp4".format(req_id)
+    print(req_id)
+
+    video_path = f"videos/{req_id}.mp4"
     uploaded_file.save(video_path)
 
     create_result(req_id, uploaded_file.filename.split(".")[1])
@@ -49,11 +51,13 @@ def progress():
 @app.route('/result', methods=['GET'])
 def result():
     req_id = str(request.args.get('id'))
-    s = get_result(req_id).replace("'", '"').replace('("', "").replace('",)', "").replace("\\", "")
+    s = get_result(req_id)
+    a = OrderedDict()
+    a[s[0]] = s[1]
+    # s = s.replace("(", "").replace(")", "")
     if s == 'None':
         return {}, 425
-    return {'id': req_id, 'tags': [{tag: probability} for tag, probability in
-                                   json.loads(s).items()]}
+    return jsonify(s)
 
 
 @app.route('/video', methods=['GET'])
@@ -70,7 +74,7 @@ if __name__ == '__main__':
     def do_process(not_done_item):
         with semaphore:
             print(not_done_item)
-            process_video("serv/videos/{}.mp4".format(not_done_item[0]), not_done_item[0])
+            process_video("videos/{}.mp4".format(not_done_item[0]), not_done_item[0])
 
 
     processing_threads = []

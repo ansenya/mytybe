@@ -33,8 +33,8 @@ public class ChannelController {
         this.userRepository = userRepository;
     }
 
-    @GetMapping("channel")
-    public ResponseEntity<?> getOne(@RequestParam(value = "id", required = false) Long id) {
+    @GetMapping("channel/{id}")
+    public ResponseEntity<?> getOne(@PathVariable Long id) {
 
         if (id == null) {
             return ResponseEntity.badRequest().body("id is empty");

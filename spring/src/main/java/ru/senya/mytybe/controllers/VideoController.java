@@ -100,8 +100,8 @@ public class VideoController {
 
     }
 
-    @GetMapping("video")
-    public ResponseEntity<?> getOne(@RequestParam(value = "id", required = false) Long id) {
+    @GetMapping("video/{id}")
+    public ResponseEntity<?> getOne(@PathVariable Long id) {
 
         VideoModel video = videoRepository.findById(id).orElse(null);
 
@@ -175,7 +175,10 @@ public class VideoController {
                                     @RequestParam(value = "id", required = false) Long id) {
 
         TagModel tagModel = tagRepository.findByTag(tag);
-        VideoModel videoModel = videoRepository.findById(id).orElse(null);
+        VideoModel videoModel = videoRepository.findBy(id).orElse(null);
+
+        System.out.println(tagModel == null);
+        System.out.println(videoModel == null);
 
         if (tagModel == null || videoModel == null) {
             return ResponseEntity.status(404).build();
