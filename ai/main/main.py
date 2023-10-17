@@ -20,7 +20,7 @@ def upload_video():
 
     print(req_id)
 
-    video_path = f"videos/{req_id}.mp4"
+    video_path = f"../videos/{req_id}.mp4"
     uploaded_file.save(video_path)
 
     create_result(req_id, uploaded_file.filename.split(".")[1])
@@ -39,7 +39,7 @@ def upload_video():
 def progress():
     req_id = str(request.args.get('id'))
     pr = get_progress(req_id)
-
+    print(req_id)
     response = OrderedDict()
     response['id'] = req_id
     response['progress'] = pr[0]
@@ -74,7 +74,7 @@ if __name__ == '__main__':
     def do_process(not_done_item):
         with semaphore:
             print(not_done_item)
-            process_video("videos/{}.mp4".format(not_done_item[0]), not_done_item[0])
+            process_video("../videos/{}.mp4".format(not_done_item[0]), not_done_item[0])
 
 
     processing_threads = []

@@ -64,6 +64,7 @@ public class UserModel {
             name = "videos_liked",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "video_id"))
+    @JsonIgnore
     private Set<VideoModel> likedVideos;
 
     @ManyToMany

@@ -9,6 +9,7 @@ import ru.senya.mytybe.models.*;
 
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -37,11 +38,11 @@ public class VideoDto {
 
     private Set<TagModel> tags;
 
-    private Set<PlaylistModel> playlists;
+//    private Set<PlaylistModel> playlists;
 
-    private Set<UserModel> likedByUser;
+//    private Set<UserDto> likedByUser;
 
-    private Set<UserModel> dislikedByUser;
+//    private Set<UserModel> dislikedByUser;
 
     private String vid_uuid;
 
@@ -56,4 +57,12 @@ public class VideoDto {
     private Date created;
 
     private Date updated;
+
+    public List<String> getTags() {
+        List<String> good_tags = new LinkedList<>();
+        for (TagModel tagModel : tags) {
+            good_tags.add(tagModel.getTag());
+        }
+        return good_tags;
+    }
 }

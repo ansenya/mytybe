@@ -29,7 +29,7 @@ def process_video(video_path, req_id):
     tfms = transforms.Compose([transforms.Resize(224), transforms.ToTensor(),
                                transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]), ])
 
-    labels_map = json.load(open('efficientnet_pytorch/labels_map.txt'))
+    labels_map = json.load(open('../efficientnet_pytorch/labels_map.txt'))
     labels_map = [labels_map[str(i)] for i in range(1000)]
 
     start = time.time()
@@ -69,6 +69,8 @@ def process_video(video_path, req_id):
 
     insert_data(req_id, str(penis))
 
+    print(penis)
+
     set_processed(req_id, penis)
 
     return penis
@@ -100,12 +102,11 @@ def set_processed(req_id, tags):
     for p in tags:
         url = f"http://localhost:6666/api/v/tag?tag={p[0]}&id={vid_id}"
         response = requests.post(url)
-
         print(response.status_code)
 
     cursor.close()
     connection.close()
 
 
-set_processed("91a6e876-59b2-4be2-a17a-fb88102c4167",
-              "[('web site, website, internet site, site', 0.4986461102962494)]")
+# set_processed("1d91876e-89e5-4e9c-9a6b-51636c5407ae",
+#               ['web site, website, internet site, site', 0.4986461102962494])

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import ru.senya.mytybe.dto.ChannelDto;
+import ru.senya.mytybe.dto.LikesDto;
 import ru.senya.mytybe.dto.VideoDto;
 import ru.senya.mytybe.models.ChannelModel;
 import ru.senya.mytybe.models.TagModel;
@@ -100,18 +101,6 @@ public class VideoController {
 
     }
 
-    @GetMapping("video/{id}")
-    public ResponseEntity<?> getOne(@PathVariable Long id) {
-
-        VideoModel video = videoRepository.findById(id).orElse(null);
-
-        if (video == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        return ResponseEntity.ok(video);
-    }
-
     @PostMapping("video")
     public ResponseEntity<?> upload(@RequestParam(value = "video", required = false) MultipartFile file,
                                     @RequestParam(value = "channelId", required = false) Long channelId,
@@ -167,7 +156,80 @@ public class VideoController {
         video = videoRepository.save(video);
         user = userRepository.save(user);
 
-        return ResponseEntity.ok(video);
+        return ResponseEntity.ok(modelMapper.map(video, VideoDto.class));
+    }
+
+    @GetMapping("video/{id}")
+    public ResponseEntity<?> getOne(@PathVariable Long id) {
+
+        VideoModel video = videoRepository.findById(id).orElse(null);
+
+        if (video == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+
+        return ResponseEntity.ok().body(modelMapper.map(video, VideoDto.class));
+    }
+
+
+    @PutMapping("video/{id}")
+    public ResponseEntity<?> like(@PathVariable Long id, @RequestParam("like") Boolean like, Authentication authentication) {
+        VideoModel video = videoRepository.findById(id).orElse(null);
+        UserModel user = userRepository.findByUsername(authentication.getName());
+
+        if (video == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        if (like) {
+            user.getLikedVideos().add(video);
+            user.getDislikedVideos().remove(video);
+
+            video.getLikedByUser().add(user);
+            video.getDislikedByUser().remove(user);
+        }
+        else {
+            user.getDislikedVideos().add(video);
+            user.getLikedVideos().remove(video);
+
+            video.getDislikedByUser().add(user);
+            video.getLikedByUser().remove(user);
+        }
+
+        user = userRepository.save(user);
+
+        video = videoRepository.save(video);
+
+        return ResponseEntity.ok(modelMapper.map(video, VideoDto.class));
+    }
+
+    @GetMapping("video/{id}/likes")
+    public ResponseEntity<?> getLiked(@PathVariable Long id, @RequestParam("page") int page, @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize){
+        VideoModel video = videoRepository.findById(id).orElse(null);
+        if (video == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        LikesDto likesDto = modelMapper.map(video, LikesDto.class);
+        likesDto.setPage(1);
+        likesDto.setPageSize(pageSize);
+
+        return ResponseEntity.ok(likesDto);
+    }
+
+
+    @GetMapping("eta")
+    public ResponseEntity<?> getEta(@RequestParam(value = "id") Long id) {
+        VideoModel videoModel = videoRepository.findById(id).orElse(null);
+
+        if (videoModel == null) {
+            return ResponseEntity.notFound().build();
+        }
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Content-Type", "application/json");
+
+        return ResponseEntity.ok().headers(headers).body(requestEta(videoModel.getVid_uuid()));
     }
 
     @PostMapping("tag")
@@ -175,7 +237,8 @@ public class VideoController {
                                     @RequestParam(value = "id", required = false) Long id) {
 
         TagModel tagModel = tagRepository.findByTag(tag);
-        VideoModel videoModel = videoRepository.findBy(id).orElse(null);
+        System.out.println(tag);
+        VideoModel videoModel = videoRepository.findById(id).orElse(null);
 
         System.out.println(tagModel == null);
         System.out.println(videoModel == null);
@@ -192,6 +255,13 @@ public class VideoController {
         videoModel = videoRepository.save(videoModel);
 
         return ResponseEntity.ok(videoModel);
+    }
+
+    private String requestEta(String uuid) {
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> response = restTemplate.getForEntity("http://localhost:8642/progress?id=" + uuid, String.class);
+
+        return response.getBody();
     }
 
     private String processVideo(String path, String uuid) {
