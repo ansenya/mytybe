@@ -6,3 +6,4 @@ Flask
 gunicorn
 Flask-Celery
 mysql-connector-python
+moviepy

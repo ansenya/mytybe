@@ -4,14 +4,13 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import org.modelmapper.ModelMapper;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.parameters.P;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
@@ -24,15 +23,15 @@ import ru.senya.mytybe.models.ChannelModel;
 import ru.senya.mytybe.models.TagModel;
 import ru.senya.mytybe.models.UserModel;
 import ru.senya.mytybe.models.VideoModel;
+import ru.senya.mytybe.recs.VideoRecommendationSystem;
 import ru.senya.mytybe.repos.ChannelRepository;
 import ru.senya.mytybe.repos.TagRepository;
 import ru.senya.mytybe.repos.UserRepository;
 import ru.senya.mytybe.repos.VideoRepository;
 
 import java.io.*;
-import java.util.HashMap;
-import java.util.Objects;
-import java.util.UUID;
+import java.net.ConnectException;
+import java.util.*;
 
 @RestController
 @RequestMapping("v")
@@ -64,41 +63,90 @@ public class VideoController {
     public ResponseEntity<?> getAll(@RequestParam(value = "page", required = false) Integer pageNum,
                                     @RequestParam(value = "size", required = false, defaultValue = "10") int pageSize,
                                     @RequestParam(value = "sort", required = false, defaultValue = "asc") String sort,
-                                    @RequestParam(value = "channelId", required = false, defaultValue = "-1") Long channelId) {
+                                    @RequestParam(value = "channelId", required = false, defaultValue = "-1") Long channelId,
+                                    Authentication authentication) {
+
+        UserModel userModel = userRepository.findByUsername(authentication.getName());
+
+//        userModel.getLastViewed().clear();
+//        userRepository.save(userModel);
+
+        VideoRecommendationSystem recommendationSystem = new VideoRecommendationSystem(videoRepository.getAll());
+
+        List<VideoModel> history = new ArrayList<>();
+
+        history.addAll(userModel.getLastViewed());
+
+        List<VideoDto> recs = recommendationSystem.recommendVideos(history).stream().map(videoModel -> modelMapper.map(videoModel, VideoDto.class)).toList();
+
         if (pageNum == null) {
             return ResponseEntity.badRequest().body("page is null");
         }
 
-        if (channelId == -1) {
-            Sort.Direction direction;
+        Sort.Direction direction;
 
-            if (Objects.equals(sort, "desc")) {
-                direction = Sort.Direction.ASC;
-            } else {
-                direction = Sort.Direction.DESC;
-            }
-
-            PageRequest page = PageRequest.of(pageNum, pageSize, Sort.by(direction, "created"));
-            Page<VideoModel> videoPage = videoRepository.findAll(page);
-            Page<VideoDto> videoDtoPage = videoPage.map(videoModel -> modelMapper.map(videoModel, VideoDto.class));
-
-            return ResponseEntity.ok(videoDtoPage);
+        if (Objects.equals(sort, "asc")) {
+            direction = Sort.Direction.ASC;
         } else {
-            Sort.Direction direction;
+            direction = Sort.Direction.DESC;
+        }
+        PageRequest page = PageRequest.of(pageNum, pageSize, Sort.by(direction, "created"));
 
-            if (Objects.equals(sort, "desc")) {
-                direction = Sort.Direction.ASC;
-            } else {
-                direction = Sort.Direction.DESC;
-            }
-
-            PageRequest page = PageRequest.of(pageNum, pageSize, Sort.by(direction, "created"));
-            Page<VideoModel> videoPage = videoRepository.findAllByChannelId(channelId, page);
-            Page<VideoDto> videoDtoPage = videoPage.map(videoModel -> modelMapper.map(videoModel, VideoDto.class));
-
-            return ResponseEntity.ok(videoDtoPage);
+        Page<VideoModel> videoPage;
+        if (channelId == -1) {
+            videoPage = findAllWithSpecificIdsAndOrder(recs.stream().map(VideoDto::getId).toList(), page);
+        } else {
+            videoPage = videoRepository.findAllByChannelId(channelId, page);
         }
 
+        Page<VideoDto> videoDtoPage = videoPage.map(videoModel -> modelMapper.map(videoModel, VideoDto.class));
+
+        return ResponseEntity.ok(videoDtoPage);
+    }
+
+    public Page<VideoModel> findAllWithSpecificIdsAndOrder(List<Long> specificIds, Pageable pageable) {
+        List<VideoModel> resultList;
+        if (specificIds.isEmpty()) {
+            return videoRepository.findAll(pageable);
+        } else {
+            List<VideoModel> inSpecificIds = videoRepository.findInSpecificIds(specificIds);
+            List<VideoModel> notInSpecificIds = videoRepository.findNotInSpecificIds(specificIds);
+
+//            inSpecificIds.sort((o1, o2) -> {
+//                if (o1.getViews() > o2.getViews()) {
+//                    return -1;
+//                } else if (o1.getViews() < o2.getViews()) {
+//                    return 1;
+//                }
+//                return 0;
+//            });
+//
+//            notInSpecificIds.sort((o1, o2) -> {
+//                if (o1.getViews() > o2.getViews()) {
+//                    return -1;
+//                } else if (o1.getViews() < o2.getViews()) {
+//                    return 1;
+//                }
+//                return 0;
+//            });
+//
+//            for (VideoModel i: inSpecificIds){
+//                System.out.println(i.getId());
+//            }
+//
+//            for (VideoModel i: notInSpecificIds){
+//                System.out.println(i.getId());
+//            }
+
+            inSpecificIds.addAll(notInSpecificIds);
+
+            int fromIndex = (int) pageable.getOffset();
+            int toIndex = Math.min((fromIndex + pageable.getPageSize()), inSpecificIds.size());
+
+            resultList = inSpecificIds.subList(fromIndex, toIndex);
+        }
+
+        return new PageImpl<>(resultList, pageable, resultList.size());
     }
 
     @PostMapping("video")
@@ -118,6 +166,7 @@ public class VideoController {
         ChannelModel channel = channelRepository.findById(channelId).orElse(null);
         UserModel user = userRepository.findByUsername(authentication.getName());
 
+
         if (channel == null) {
             return ResponseEntity.badRequest().body("channel does not exist");
         }
@@ -132,25 +181,31 @@ public class VideoController {
             return ResponseEntity.badRequest().body("not a video");
         }
 
+        String uuid = String.valueOf(UUID.randomUUID());
         File destFile;
         try {
-            destFile = convertMultipartFileToFile(file);
+            destFile = convertMultipartFileToFile(file, uuid);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
-        String uuid = String.valueOf(UUID.randomUUID());
-
-        HashMap<String, String> result = gson.fromJson(processVideo(destFile.getPath(), uuid),
-                new TypeToken<HashMap<String, String>>() {
-                }.getType());
+        HashMap<String, String> result;
+        try {
+            result = gson.fromJson(processVideo(destFile.getPath(), uuid),
+                    new TypeToken<HashMap<String, String>>() {
+                    }.getType());
+        } catch (ConnectException exception) {
+            File delete = new File("src/main/resources/videos/" + uuid + ".mp4");
+            delete.delete();
+            return ResponseEntity.status(418).body("upload is not available");
+        }
 
         VideoModel video = VideoModel.builder()
                 .name(videoName)
                 .channel(channel)
                 .description(description)
                 .vid_uuid(uuid)
-                .path("http://localhost:8642/video?id=" + result.get("id"))
+                .path(result.get("id"))
                 .build();
 
         video = videoRepository.save(video);
@@ -160,21 +215,29 @@ public class VideoController {
     }
 
     @GetMapping("video/{id}")
-    public ResponseEntity<?> getOne(@PathVariable Long id) {
+    public ResponseEntity<?> getOne(@PathVariable Long id, Authentication authentication) {
+        UserModel userModel = userRepository.findByUsername(authentication.getName());
 
         VideoModel video = videoRepository.findById(id).orElse(null);
+
 
         if (video == null) {
             return ResponseEntity.notFound().build();
         }
 
+        video.setViews(video.getViews() + 1);
+        video = videoRepository.save(video);
+
+        userModel.getLastViewed().add(video);
+        userRepository.save(userModel);
 
         return ResponseEntity.ok().body(modelMapper.map(video, VideoDto.class));
     }
 
 
     @PutMapping("video/{id}")
-    public ResponseEntity<?> like(@PathVariable Long id, @RequestParam("like") Boolean like, Authentication authentication) {
+    public ResponseEntity<?> like(@PathVariable Long id, @RequestParam("like") Boolean like, Authentication
+            authentication) {
         VideoModel video = videoRepository.findById(id).orElse(null);
         UserModel user = userRepository.findByUsername(authentication.getName());
 
@@ -188,8 +251,7 @@ public class VideoController {
 
             video.getLikedByUser().add(user);
             video.getDislikedByUser().remove(user);
-        }
-        else {
+        } else {
             user.getDislikedVideos().add(video);
             user.getLikedVideos().remove(video);
 
@@ -205,7 +267,8 @@ public class VideoController {
     }
 
     @GetMapping("video/{id}/likes")
-    public ResponseEntity<?> getLiked(@PathVariable Long id, @RequestParam("page") int page, @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize){
+    public ResponseEntity<?> getLiked(@PathVariable Long id, @RequestParam("page") int page,
+                                      @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize) {
         VideoModel video = videoRepository.findById(id).orElse(null);
         if (video == null) {
             return ResponseEntity.notFound().build();
@@ -237,11 +300,7 @@ public class VideoController {
                                     @RequestParam(value = "id", required = false) Long id) {
 
         TagModel tagModel = tagRepository.findByTag(tag);
-        System.out.println(tag);
         VideoModel videoModel = videoRepository.findById(id).orElse(null);
-
-        System.out.println(tagModel == null);
-        System.out.println(videoModel == null);
 
         if (tagModel == null || videoModel == null) {
             return ResponseEntity.status(404).build();
@@ -264,7 +323,7 @@ public class VideoController {
         return response.getBody();
     }
 
-    private String processVideo(String path, String uuid) {
+    private String processVideo(String path, String uuid) throws ConnectException {
         RestTemplate restTemplate = new RestTemplate();
 
         String serverUrl = "http://localhost:8642/process?uuid=" + uuid;
@@ -278,12 +337,11 @@ public class VideoController {
         body.add("video", fileResource);
 
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
-        ResponseEntity<String> response = restTemplate.postForEntity(serverUrl, requestEntity, String.class);
-
-        if (response.getStatusCode().is2xxSuccessful()) {
-            System.out.println("Файл успешно отправлен.");
-        } else {
-            System.out.println("Ошибка при отправке файла. Код ответа: " + response.getStatusCode());
+        ResponseEntity<String> response;
+        try {
+            response = restTemplate.postForEntity(serverUrl, requestEntity, String.class);
+        } catch (Exception e) {
+            throw new ConnectException();
         }
 
         return response.getBody();
@@ -294,8 +352,8 @@ public class VideoController {
         return name.endsWith(".mp4") || name.endsWith(".avi");
     }
 
-    private File convertMultipartFileToFile(MultipartFile multipartFile) throws IOException {
-        File file = new File("src/main/resources/videos/" + multipartFile.getOriginalFilename());
+    private File convertMultipartFileToFile(MultipartFile multipartFile, String uuid) throws IOException {
+        File file = new File("src/main/resources/videos/" + uuid + ".mp4");
 
         try (OutputStream os = new FileOutputStream(file); InputStream is = multipartFile.getInputStream()) {
             byte[] buffer = new byte[1024];

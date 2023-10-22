@@ -4,6 +4,7 @@ import lombok.Data;
 import ru.senya.mytybe.models.*;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -18,6 +19,8 @@ public class UserDto {
     private Integer age;
     private CountryModel country;
     private Set<ChannelDtoWithoutUser> channels;
+    private List<VideoModel> lastViewed;
+
 //    private Set<UserModel> subscriptions;
 //    private Set<CommentModel> comments;
 //    private Set<VideoModel> likedVideos;

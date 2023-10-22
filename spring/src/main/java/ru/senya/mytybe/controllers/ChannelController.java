@@ -7,10 +7,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import ru.senya.mytybe.dto.ChannelDto;
 import ru.senya.mytybe.dto.UserDtoWithoutChannels;
 import ru.senya.mytybe.models.ChannelModel;
+import ru.senya.mytybe.models.UserModel;
 import ru.senya.mytybe.repos.ChannelRepository;
 import ru.senya.mytybe.repos.UserRepository;
 
@@ -99,14 +101,16 @@ public class ChannelController {
     }
 
     @PostMapping("channel")
-    public ResponseEntity<?> create() {
+    public ResponseEntity<?> create(@RequestParam(value = "name") String name, Authentication authentication) {
+        UserModel userModel = userRepository.findByUsername(authentication.getName());
+
         ChannelModel channel = ChannelModel.builder()
-                .name("piska")
-                .user(userRepository.findById(3L).get())
+                .name(name)
+                .user(userModel)
                 .build();
 
         channel = channelRepository.save(channel);
 
-        return ResponseEntity.ok(new Object[]{userRepository.findById(3L).get(), modelMapper.map(channel, ChannelDto.class)});
+        return ResponseEntity.ok(modelMapper.map(channel, ChannelDto.class));
     }
 }

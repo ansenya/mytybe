@@ -10,7 +10,10 @@ import org.hibernate.annotations.CurrentTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
+
+import static ru.senya.mytybe.MytybeApplication.IP;
 
 @Data
 @Entity
@@ -55,7 +58,7 @@ public class VideoModel {
             name = "videos_tags",
             joinColumns = @JoinColumn(name = "video_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id"))
-    private Set<TagModel> tags;
+    private Set<TagModel> tags = new HashSet<>();
 
     @ManyToMany(mappedBy = "videos")
     private Set<PlaylistModel> playlists;
@@ -81,4 +84,15 @@ public class VideoModel {
 
     @UpdateTimestamp
     private Date updated;
+
+    public Long getViews() {
+        if (views == null) {
+            return 0L;
+        }
+        return views;
+    }
+
+    public String getPath() {
+        return "http://" + IP + ":6666/api/watch?fileName=" + path;
+    }
 }

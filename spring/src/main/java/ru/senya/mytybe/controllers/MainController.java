@@ -38,13 +38,6 @@ public class MainController {
         this.channelRepository = channelRepository;
         this.videoRepository = videoRepository;
     }
-
-    @GetMapping("/watch")
-    public String watchVideo(@RequestParam String video, Model model) {
-        model.addAttribute("video", video);
-        return "video";
-    }
-
     @GetMapping("/all")
     public ResponseEntity<Page<UserModel>> getAll() {
         PageRequest page = PageRequest.of(0, 10);

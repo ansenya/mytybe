@@ -1,10 +1,6 @@
 package ru.senya.mytybe.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.*;
 import lombok.Data;
-import org.hibernate.annotations.CurrentTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 import ru.senya.mytybe.models.*;
 
 import java.util.Date;
@@ -27,12 +23,12 @@ public class VideoDto {
 
     private ImageModel thumbnail;
 
-
     private ChannelDto channel;
 
     private CategoryModel category;
 
     private String path;
+
 
 //    private LinkedList<CommentDto> comments;
 
@@ -44,7 +40,7 @@ public class VideoDto {
 
 //    private Set<UserModel> dislikedByUser;
 
-    private String vid_uuid;
+//    private String vid_uuid;
 
     private boolean processed;
 

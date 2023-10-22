@@ -1,7 +1,6 @@
 package ru.senya.mytybe.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -73,6 +72,14 @@ public class UserModel {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "video_id"))
     private Set<VideoModel> dislikedVideos;
+
+    @ManyToMany
+    @JoinTable(
+            name = "videos_watched",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "video_id"))
+    @JsonIgnore
+    private Set<VideoModel> lastViewed;
 
     @OneToMany(mappedBy = "owner")
     private Set<PlaylistModel> playlists;

@@ -9,7 +9,7 @@ from sql_connect import *
 
 app = Flask(__name__)
 
-semaphore = BoundedSemaphore(3)
+semaphore = BoundedSemaphore(4)
 
 
 @app.route('/process', methods=['POST'])
@@ -17,8 +17,6 @@ def upload_video():
     uploaded_file = request.files['video']
 
     req_id = request.args['uuid']
-
-    print(req_id)
 
     video_path = f"../videos/{req_id}.mp4"
     uploaded_file.save(video_path)
@@ -41,7 +39,7 @@ def progress():
     pr = get_progress(req_id)
     print(req_id)
     response = OrderedDict()
-    response['id'] = req_id
+    # response['id'] = req_id
     response['progress'] = pr[0]
     response['eta'] = pr[1]
 

@@ -7,6 +7,8 @@ from efficientnet_pytorch import EfficientNet
 import json
 import mysql.connector
 
+from moviepy.editor import VideoFileClip
+
 from sql_connect import *
 
 
@@ -69,9 +71,10 @@ def process_video(video_path, req_id):
 
     insert_data(req_id, str(penis))
 
-    print(penis)
+    # print(penis)
 
     set_processed(req_id, penis)
+    set_time(req_id)
 
     return penis
 
@@ -102,11 +105,34 @@ def set_processed(req_id, tags):
     for p in tags:
         url = f"http://localhost:6666/api/v/tag?tag={p[0]}&id={vid_id}"
         response = requests.post(url)
-        print(response.status_code)
+        # print(response.status_code)
 
     cursor.close()
     connection.close()
 
 
-# set_processed("1d91876e-89e5-4e9c-9a6b-51636c5407ae",
-#               ['web site, website, internet site, site', 0.4986461102962494])
+def set_time(req_id):
+    video = VideoFileClip(f"../videos/{req_id}.mp4")
+    duration = video.duration
+
+    host = "localhost"
+    user = "newuser"
+    password = ""
+    database = "tube"
+
+    connection = mysql.connector.connect(
+        host=host,
+        user=user,
+        password=password,
+        database=database
+    )
+
+    cursor = connection.cursor()
+
+    cursor.execute("UPDATE videos SET duration = %s WHERE vid_uuid = %s",
+                   (int(duration), req_id))
+    connection.commit()
+
+    cursor.close()
+    connection.close()
+

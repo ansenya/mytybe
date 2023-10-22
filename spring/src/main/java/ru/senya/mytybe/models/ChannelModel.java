@@ -32,7 +32,6 @@ public class ChannelModel {
 
     private Integer followersAmount = 0;
 
-
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "image_id", referencedColumnName = "id")
     private ImageModel pfp; //todo: change to chp
@@ -61,7 +60,11 @@ public class ChannelModel {
     private Date updated;
 
     public Integer getFollowersAmount() {
-        return followers.size();
+        try {
+            return followers.size();
+        } catch (Exception e){
+            return 0;
+        }
     }
 
     public Integer getVideosAmount() {

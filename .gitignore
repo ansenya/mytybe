@@ -4,6 +4,10 @@ build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/
 !**/src/test/**/build/
+spring/src/main/resources/videos/
+ai/videos/
+ai/venv/
+ai/res/results.db
 
 ### STS ###
 .apt_generated
