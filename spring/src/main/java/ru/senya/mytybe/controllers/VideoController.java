@@ -326,7 +326,7 @@ public class VideoController {
     private String processVideo(String path, String uuid) throws ConnectException {
         RestTemplate restTemplate = new RestTemplate();
 
-        String serverUrl = "http://localhost:8642/process?uuid=" + uuid;
+        String serverUrl = "http://176.99.146.176:8642/process?uuid=" + uuid;
 
         FileSystemResource fileResource = new FileSystemResource(path);
 
