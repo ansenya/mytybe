@@ -10,7 +10,9 @@ import ru.senya.mytybe.models.VideoModel;
 
 import java.util.List;
 
-public interface VideoRepository extends JpaRepository<VideoModel, Long> {
+public interface
+
+VideoRepository extends JpaRepository<VideoModel, Long> {
     Page<VideoModel> findAllByChannelId(Long id, Pageable pageable);
 
     @Query(value = "SELECT * FROM videos", nativeQuery = true)

@@ -68,7 +68,11 @@ public class ChannelModel {
     }
 
     public Integer getVideosAmount() {
-        return videos.size();
+        try {
+            return videos.size();
+        } catch (NullPointerException e){
+            return 0;
+        }
     }
 
     @Override

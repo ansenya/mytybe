@@ -58,7 +58,7 @@ public class VideoModel {
             name = "videos_tags",
             joinColumns = @JoinColumn(name = "video_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id"))
-    private Set<TagModel> tags = new HashSet<>();
+    private Set<TagModel> tags;
 
     @ManyToMany(mappedBy = "videos")
     private Set<PlaylistModel> playlists;

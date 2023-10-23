@@ -205,6 +205,7 @@ public class VideoController {
                 .channel(channel)
                 .description(description)
                 .vid_uuid(uuid)
+                .tags(new HashSet<>())
                 .path(result.get("id"))
                 .build();
 
