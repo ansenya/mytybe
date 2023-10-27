@@ -4,6 +4,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -39,8 +40,15 @@ public class AuthController {
     @GetMapping("/login")
     public ResponseEntity<?> token(Authentication authentication, HttpServletRequest request) {
         logger.info("GET request from '{}' to '/auth/token'", request.getRemoteAddr());
-        if (!authentication.isAuthenticated()) return ResponseEntity.status(401).build();
-        return ResponseEntity.ok(new Object[]{modelMapper.map(userRepository.findByUsername(authentication.getName()), UserDto.class), new TokenModel(tokenService.generateToken(authentication))});
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Access-Control-Allow-Origin", "*");
+
+        if (!authentication.isAuthenticated()) return ResponseEntity.status(401).headers(headers).build();
+
+
+        return ResponseEntity.ok().headers(headers).body(new Object[]{modelMapper.map(userRepository.findByUsername(authentication.getName()), UserDto.class),
+                new TokenModel(tokenService.generateToken(authentication))});
     }
 
     @PostMapping("/register")
