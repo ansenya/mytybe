@@ -9,7 +9,7 @@
   - **Method:** POST
   - **Description:** Регистрация нового пользователя.
 
-## User Endpoints
+## UserPage Endpoints
 - **Endpoint:** `/u/all`
   - **Method:** GET
   - **Description:** Получить информацию о всех пользователях.
@@ -35,7 +35,7 @@
   - **Method:** POST
   - **Description:**  Загрузить видео.
 
-## Channel Endpoints
+## ChannelPage Endpoints
 - **Endpoint:** `/c/all`
   - **Method:** GET
   - **Description:** Получить список всех каналов (можно получить только по id пользователя. описание - в json postman).

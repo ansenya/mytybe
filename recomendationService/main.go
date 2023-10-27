@@ -18,7 +18,7 @@ type UserModel struct {
 	Age int
 	//Role string
 	//Country CountryModel
-	Channels []ChannelModel `gorm:"ForeignKey:UserID"`
+	ChannelsPage []ChannelModel `gorm:"ForeignKey:UserID"`
 	//Subscriptions  []ChannelModel  `gorm:"many2many:subscriptions"`
 	//Comments       []CommentModel  `gorm:"ForeignKey:UserID"`
 	//LikedVideos    []VideoModel    `gorm:"many2many:videos_liked"`
@@ -42,7 +42,7 @@ type ImageModel struct {
 type CountryModel struct {
 	ID      int64 `gorm:"primary_key"`
 	Country string
-	Users   []UserModel `gorm:"ForeignKey:CountryID"`
+	UsersPage   []UserModel `gorm:"ForeignKey:CountryID"`
 }
 
 type ChannelModel struct {
@@ -51,9 +51,9 @@ type ChannelModel struct {
 	//VideosAmount int
 	// FollowersAmount можно вычислять на лету
 	//Pfp       ImageModel   `gorm:"ForeignKey:PfpID"`
-	//Videos    []VideoModel `gorm:"ForeignKey:ChannelID"`
+	//VideosPage    []VideoModel `gorm:"ForeignKey:ChannelID"`
 	//Posts     []PostModel  `gorm:"ForeignKey:ChannelID"`
-	User UserModel `gorm:"ForeignKey:UserID"`
+	UserPage UserModel `gorm:"ForeignKey:UserID"`
 	//Followers []UserModel  `gorm:"many2many:subscriptions"`
 	//Deleted   bool
 	//Created   time.Time
@@ -65,7 +65,7 @@ type CommentModel struct {
 	Text    string
 	Deleted bool
 	Video   VideoModel `gorm:"ForeignKey:VideoID"`
-	User    UserModel  `gorm:"ForeignKey:UserID"`
+	UserPage    UserModel  `gorm:"ForeignKey:UserID"`
 	Created time.Time
 	Updated time.Time
 }
@@ -78,7 +78,7 @@ type VideoModel struct {
 	Views          int64
 	Thumbnail      ImageModel     `gorm:"ForeignKey:ThumbnailID"`
 	Comments       []CommentModel `gorm:"ForeignKey:VideoID"`
-	Channel        ChannelModel   `gorm:"ForeignKey:ChannelID"`
+	ChannelPage        ChannelModel   `gorm:"ForeignKey:ChannelID"`
 	Category       CategoryModel  `gorm:"ForeignKey:CategoryID"`
 	Path           string
 	Tags           []TagModel      `gorm:"many2many:videos_tags"`
@@ -97,7 +97,7 @@ type VideoModel struct {
 type PlaylistModel struct {
 	ID     int64        `gorm:"primary_key"`
 	Owner  UserModel    `gorm:"ForeignKey:OwnerID"`
-	Videos []VideoModel `gorm:"many2many:videos_playlists"`
+	VideosPage []VideoModel `gorm:"many2many:videos_playlists"`
 }
 
 type TagModel struct {
@@ -133,7 +133,7 @@ type PollModel struct {
 type PollElement struct {
 	ID     int64 `gorm:"primary_key"`
 	Answer string
-	User   UserModel `gorm:"ForeignKey:UserID"`
+	UserPage   UserModel `gorm:"ForeignKey:UserID"`
 }
 
 func main() {

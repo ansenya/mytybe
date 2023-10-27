@@ -1,0 +1,51 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+main {
+    width: 100vw;
+    margin-top: 5px;
+    display: flex;
+    justify-content: center;
+}
+
+.main__content {
+    margin: auto;
+    width: 80%;
+    min-width: 400px;
+}
+
+header {
+    position: sticky;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 200px;
+    background-color: transparent;
+}
+
+nav {
+    width: 80%;
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+    height: 100%;
+    align-items: center;
+}
+
+
+nav ul {
+    list-style: none;
+    display: flex;
+    gap: 5px;
+    justify-content: space-between;
+}
+
+
+
+
+
+
+
