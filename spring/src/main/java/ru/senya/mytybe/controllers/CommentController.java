@@ -22,6 +22,7 @@ import java.util.Objects;
 
 
 @RequestMapping("com")
+@RestController
 public class CommentController extends BaseController{
 
     final UserRepository userRepository;

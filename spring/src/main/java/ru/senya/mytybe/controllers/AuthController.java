@@ -37,8 +37,6 @@ public class AuthController {
 
     @GetMapping("/login")
     public ResponseEntity<?> token(Authentication authentication, HttpServletRequest request) {
-        logger.info("GET request from '{}' to '/auth/token'", request.getRemoteAddr());
-
         HttpHeaders headers = new HttpHeaders();
         headers.add("Access-Control-Allow-Origin", "*");
 

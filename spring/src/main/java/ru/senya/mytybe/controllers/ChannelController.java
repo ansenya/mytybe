@@ -20,6 +20,7 @@ import java.util.Objects;
 
 
 @RequestMapping("c")
+@RestController
 public class ChannelController extends BaseController {
     final
     ChannelRepository channelRepository;

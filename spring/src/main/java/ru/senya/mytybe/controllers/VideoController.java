@@ -34,6 +34,7 @@ import java.net.ConnectException;
 import java.util.*;
 
 @RequestMapping("v")
+@RestController
 public class VideoController extends BaseController{
 
     final

@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 
 
 @RequestMapping("/u")
+@RestController
 public class UserController extends BaseController {
 
     UserRepository userRepository;
