@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import static ru.senya.mytybe.MytybeApplication.IP;
+import static ru.senya.mytybe.MytybeApplication.PORT;
 
 @Data
 @Entity
@@ -93,6 +94,6 @@ public class VideoModel {
     }
 
     public String getPath() {
-        return "http://" + IP + ":6666/api/watch?fileName=" + path;
+        return "http://" + IP + ":" + PORT + "/api/static/vid?fileName=" + path;
     }
 }

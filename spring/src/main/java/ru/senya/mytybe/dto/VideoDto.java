@@ -21,7 +21,7 @@ public class VideoDto {
 
     private Long views = 0L;
 
-    private ImageModel thumbnail;
+    private ImageModelDto thumbnail;
 
     private ChannelDto channel;
 

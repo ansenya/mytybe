@@ -39,7 +39,6 @@ public class SecurityConfig {
     private final CustomUserDetailsService userDetailsService;
     private final RsaKeyProperties rsaKeys;
 
-
     @Autowired
     public SecurityConfig(CustomUserDetailsService userDetailsService, RsaKeyProperties rsaKeys) {
         this.userDetailsService = userDetailsService;
@@ -56,6 +55,7 @@ public class SecurityConfig {
                         .requestMatchers("auth/register").permitAll()
                         .requestMatchers("v/tag").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS).permitAll()
+                        .requestMatchers("/static/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(configurer -> configurer.jwt(jwt -> jwt.decoder(jwtDecoder())))

@@ -10,7 +10,11 @@ import org.hibernate.annotations.CurrentTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.Date;
+import java.util.Objects;
 import java.util.Set;
+
+import static ru.senya.mytybe.MytybeApplication.IP;
+import static ru.senya.mytybe.MytybeApplication.PORT;
 
 @Data
 @Entity
@@ -56,10 +60,15 @@ public class ImageModel {
 
     private boolean deleted = false;
 
+
+
     @Data
     @Entity
     @Table(name = "types")
-    static class ImageType {
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ImageType {
         @Id
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         Long id;
@@ -68,5 +77,10 @@ public class ImageModel {
 
         @OneToMany(mappedBy = "type")
         private Set<ImageModel> image;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

@@ -15,6 +15,7 @@ import java.net.URL;
 public class MytybeApplication {
 
     public static String IP;
+    public static String PORT = "1984";
 
     static {
         try {
