@@ -19,7 +19,7 @@ public class UserDto {
     private Integer age;
     private CountryModel country;
     private Set<ChannelDtoWithoutUser> channels;
-    private List<VideoModel> lastViewed;
+//    private List<VideoModel> lastViewed;
 
 //    private Set<UserModel> subscriptions;
 //    private Set<CommentModel> comments;
