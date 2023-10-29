@@ -1,4 +1,4 @@
-package ru.senya.mytybe.jwt;
+package ru.senya.mytybe.security;
 
 
 import org.springframework.boot.context.properties.ConfigurationProperties;

@@ -1,4 +1,4 @@
-package ru.senya.mytybe.jwt.cfg;
+package ru.senya.mytybe.security.cfg;
 
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
@@ -24,8 +24,8 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import ru.senya.mytybe.jwt.RsaKeyProperties;
-import ru.senya.mytybe.jwt.details.CustomUserDetailsService;
+import ru.senya.mytybe.security.RsaKeyProperties;
+import ru.senya.mytybe.security.details.CustomUserDetailsService;
 
 @Configuration
 @EnableWebSecurity
@@ -49,6 +49,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("auth/register").permitAll()
                         .requestMatchers("v/tag").permitAll()
+                        .requestMatchers(HttpMethod.OPTIONS).permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(configurer -> configurer.jwt(jwt -> jwt.decoder(jwtDecoder())))

@@ -33,9 +33,8 @@ import java.io.*;
 import java.net.ConnectException;
 import java.util.*;
 
-@RestController
 @RequestMapping("v")
-public class VideoController {
+public class VideoController extends BaseController{
 
     final
     UserRepository userRepository;
@@ -67,6 +66,7 @@ public class VideoController {
                                     Authentication authentication) {
 
         UserModel userModel = userRepository.findByUsername(authentication.getName());
+
 
 //        userModel.getLastViewed().clear();
 //        userRepository.save(userModel);

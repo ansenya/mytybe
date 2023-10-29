@@ -20,9 +20,9 @@ import ru.senya.mytybe.repos.VideoRepository;
 
 import java.util.Objects;
 
-@RestController
+
 @RequestMapping("com")
-public class CommentController {
+public class CommentController extends BaseController{
 
     final UserRepository userRepository;
     final VideoRepository videoRepository;

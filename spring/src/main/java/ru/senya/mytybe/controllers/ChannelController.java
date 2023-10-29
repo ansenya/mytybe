@@ -19,9 +19,8 @@ import ru.senya.mytybe.repos.UserRepository;
 import java.util.Objects;
 
 
-@RestController
 @RequestMapping("c")
-public class ChannelController {
+public class ChannelController extends BaseController {
     final
     ChannelRepository channelRepository;
     final

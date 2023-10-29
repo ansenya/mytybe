@@ -10,17 +10,15 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import ru.senya.mytybe.dto.UserDto;
-import ru.senya.mytybe.jwt.TokenService;
+import ru.senya.mytybe.security.TokenService;
 import ru.senya.mytybe.models.TokenModel;
 import ru.senya.mytybe.models.UserModel;
 import ru.senya.mytybe.models.UserRequest;
 import ru.senya.mytybe.repos.UserRepository;
 
-import java.util.HashMap;
 
-
-@RestController
 @RequestMapping("/u/auth")
+@RestController
 public class AuthController {
 
     Logger logger = LoggerFactory.getLogger(AuthController.class);

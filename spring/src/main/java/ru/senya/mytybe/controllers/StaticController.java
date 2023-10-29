@@ -14,8 +14,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-@RestController
-public class StaticController {
+
+public class StaticController extends BaseController{
 
     @GetMapping("watch")
     public ResponseEntity<byte[]> serveVideo(@RequestParam(value = "fileName") String videoFileName) throws IOException {

@@ -18,9 +18,9 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 
-@RestController
+
 @RequestMapping("/u")
-public class UserController {
+public class UserController extends BaseController {
 
     UserRepository userRepository;
     ModelMapper modelMapper = new ModelMapper();

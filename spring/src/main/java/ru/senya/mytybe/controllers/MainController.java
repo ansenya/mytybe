@@ -38,6 +38,7 @@ public class MainController {
         this.channelRepository = channelRepository;
         this.videoRepository = videoRepository;
     }
+
     @GetMapping("/all")
     public ResponseEntity<Page<UserModel>> getAll() {
         PageRequest page = PageRequest.of(0, 10);

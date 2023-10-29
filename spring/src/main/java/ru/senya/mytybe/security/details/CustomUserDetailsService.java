@@ -1,4 +1,4 @@
-package ru.senya.mytybe.jwt.details;
+package ru.senya.mytybe.security.details;
 
 
 import org.springframework.security.core.userdetails.UserDetails;
