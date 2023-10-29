@@ -21,7 +21,7 @@ public class StaticController extends BaseController{
 
     @GetMapping("vid")
     public ResponseEntity<byte[]> serveVideo(@RequestParam(value = "fileName") String videoFileName) throws IOException {
-        Path videoPath = Path.of("/home/senya/IdeaProjects/mytybe/spring/src/main/resources/videos", videoFileName + ".mp4");
+        Path videoPath = Path.of("src/main/resources/videos", videoFileName + ".mp4");
 
         if (!videoPath.toFile().exists()) {
             return ResponseEntity.notFound().build();
@@ -39,7 +39,7 @@ public class StaticController extends BaseController{
 
     @GetMapping("img")
     public ResponseEntity<byte[]> serveImg(@RequestParam(value = "fileName") String imgFileName) throws IOException {
-        Path filepath = Paths.get("/home/senya/IdeaProjects/mytybe/spring/src/main/resources/images", imgFileName + ".jpg");
+        Path filepath = Paths.get("src/main/resources/images", imgFileName + ".jpg");
 
         if (!filepath.toFile().exists()) {
             return ResponseEntity.notFound().build();

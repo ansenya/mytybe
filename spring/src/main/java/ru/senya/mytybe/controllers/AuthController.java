@@ -37,13 +37,11 @@ public class AuthController {
 
     @GetMapping("/login")
     public ResponseEntity<?> token(Authentication authentication, HttpServletRequest request) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("Access-Control-Allow-Origin", "*");
 
-        if (!authentication.isAuthenticated()) return ResponseEntity.status(401).headers(headers).build();
+        if (!authentication.isAuthenticated()) return ResponseEntity.status(401).build();
 
 
-        return ResponseEntity.ok().headers(headers).body(new Object[]{modelMapper.map(userRepository.findByUsername(authentication.getName()), UserDto.class),
+        return ResponseEntity.ok().body(new Object[]{modelMapper.map(userRepository.findByUsername(authentication.getName()), UserDto.class),
                 new TokenModel(tokenService.generateToken(authentication))});
     }
 
