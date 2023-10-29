@@ -1,5 +1,7 @@
 import {createSlice, PayloadAction} from "@reduxjs/toolkit";
-import {AuthResponse, IUser} from "../../models";
+
+import {IUser, IToken} from "../../models";
+
 
 interface AuthState {
     user: IUser | null,
@@ -13,11 +15,11 @@ const authSlice = createSlice({
     name: "auth",
     initialState,
     reducers: {
-        setAuth(state, payload: PayloadAction<AuthResponse>){
-            state.user = payload.payload.user
-            localStorage.setItem('jwtoken', payload.payload.token)
+        setAuth(state, payload: PayloadAction<[IUser, IToken]>){
+            state.user = payload.payload[0]
+            localStorage.setItem('jwtoken', payload.payload[1].token)
         },
-        clearAuth(state, payload: PayloadAction){
+        clearAuth(state){
             state = initialState
             localStorage.removeItem('jwtoken')
         }

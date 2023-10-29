@@ -11,6 +11,7 @@ import ChannelPage from "./pages/channelPage";
 import ErrorPage from "./pages/errorPage";
 import RegistrationPage from "./pages/registrationPage";
 import LoginPage from "./pages/loginPage";
+import RequireAuth from "./auth/RequireAuth";
 
 
 const App = () => {
@@ -18,7 +19,11 @@ const App = () => {
         <>
             <Routes>
                 <Route path="/" element={<Layout></Layout>}>
-                    <Route index element={<VideosPage/>}></Route>
+                    <Route index element={
+                        <RequireAuth>
+                            <VideosPage/>
+                        </RequireAuth>
+                    }></Route>
                     <Route path=":id" element={<VideoPage/>}></Route>
                     <Route path="login" element={<LoginPage/>}></Route>
                     <Route path="register" element={<RegistrationPage/>}></Route>

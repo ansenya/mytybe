@@ -25,10 +25,11 @@ export interface Channel {
     pfp?: any;
 }
 
-export interface AuthResponse {
-    user: IUser,
-    token: string;
+
+export interface IToken {
+    token: string
 }
+
 
 export interface AuthCredentials {
     username: string,

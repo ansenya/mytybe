@@ -1,14 +1,17 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {useLocation, useNavigate} from "react-router-dom";
 import {useAppSelector} from "../hooks/redux";
 import {useLoginQuery} from "../store/api/serverApi";
 import {ClickableInputOrButton} from "@testing-library/user-event/utils/click/isClickableInput";
+import {useActions} from "../hooks/actions";
 
 const LoginPage = () => {
 
     const location = useLocation();
     const navigate = useNavigate();
     const pathFrom = location.state?.from?.pathname
+
+    const {setAuth} = useActions()
 
     const [username, setUsername] = useState<string>('')
     const [password, setPassword] = useState<string>('')
@@ -20,17 +23,24 @@ const LoginPage = () => {
             password
         },
         {
-            skip: !isSubmitted
+            skip: !isSubmitted,
         }
     )
 
+    useEffect(() => {
+        if (!isLoading && data !== undefined ){
+            setAuth(data)
+            navigate(pathFrom || '/', {replace: true})
+        }
+        if (isError){
+            setIsSubmitted(false)
+            setUsername('')
+            setPassword('')
+        }
+    }, [isLoading])
+
     const onClick = (e: React.MouseEvent<ClickableInputOrButton>) => {
         setIsSubmitted(true)
-        if (isError){
-            console.log(error)
-            return
-        }
-        console.log(data?.token)
     }
 
     return (

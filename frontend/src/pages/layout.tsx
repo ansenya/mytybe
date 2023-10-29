@@ -1,7 +1,10 @@
 import React from 'react';
 import {Outlet, NavLink} from 'react-router-dom'
+import {useActions} from "../hooks/actions";
 
 const Layout = () => {
+    const {clearAuth} = useActions()
+
     return (
         <div>
             <header>
@@ -15,7 +18,7 @@ const Layout = () => {
                     </ul>
 
                     <button className="button primary">Sign in</button>
-                    <button className="button secondary">Sign up</button>
+                    <button className="button secondary" onClick={() => clearAuth()}>Sign up</button>
 
                 </nav>
             </header>

@@ -1,12 +1,11 @@
 import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/query/react";
-import {AuthResponse, AuthCredentials} from '../../models'
+import {AuthCredentials, IToken, IUser} from '../../models'
 
 
 export const serverApi = createApi({
     reducerPath: 'server',
     baseQuery: fetchBaseQuery({
-        baseUrl: "http://5.180.174.71:1984/",
-
+        baseUrl: "http://5.180.174.71:1984/api/",
     }),
     endpoints: build => ({
         getUsers: build.query({
@@ -26,14 +25,13 @@ export const serverApi = createApi({
                 }
             })
         }),
-        login: build.query<AuthResponse, AuthCredentials>({
+        login: build.query<[IUser, IToken], AuthCredentials>({
             query: ({username, password}) => ({
                 url: `u/auth/login`,
                 headers: {
                     Authorization: `Basic ${btoa(`${username}:${password}`)}`
-                },
-
-            })
+                }
+            }),
         })
     })
 })
