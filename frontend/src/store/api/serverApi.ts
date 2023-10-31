@@ -1,5 +1,8 @@
 import {createApi, fetchBaseQuery} from "@reduxjs/toolkit/query/react";
-import {AuthCredentials, IToken, IUser} from '../../models'
+import {IUser} from '../../models'
+import {AuthCredentials, IToken} from "../../models/AuthModels";
+import {VideosRequest, VideosResponse} from "../../models/VideoModels";
+
 
 
 export const serverApi = createApi({
@@ -17,11 +20,14 @@ export const serverApi = createApi({
                 }
             })
         }),
-        getUserById: build.query<any, number>({
+        getUserById: build.query<IUser, number>({
             query: (id: number) => ({
                 url: `u/user`,
                 params: {
                     id: id
+                },
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("jwtoken")}`
                 }
             })
         }),
@@ -32,6 +38,19 @@ export const serverApi = createApi({
                     Authorization: `Basic ${btoa(`${username}:${password}`)}`
                 }
             }),
+        }),
+        getVideos: build.query<VideosResponse, VideosRequest>({
+            query: ({sort, page, size}) => ({
+                url: `v/all`,
+                params: {
+                    page,
+                    sort,
+                    size
+                },
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem("jwtoken")}`
+                }
+            })
         })
     })
 })
@@ -39,7 +58,9 @@ export const serverApi = createApi({
 export const {
     useLoginQuery,
     useGetUsersQuery,
-    useGetUserByIdQuery
+    useGetUserByIdQuery,
+    useLazyGetUserByIdQuery,
+    useGetVideosQuery
 } = serverApi
 
 

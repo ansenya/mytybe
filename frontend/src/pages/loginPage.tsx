@@ -1,6 +1,5 @@
 import React, {useEffect, useState} from 'react';
 import {useLocation, useNavigate} from "react-router-dom";
-import {useAppSelector} from "../hooks/redux";
 import {useLoginQuery} from "../store/api/serverApi";
 import {ClickableInputOrButton} from "@testing-library/user-event/utils/click/isClickableInput";
 import {useActions} from "../hooks/actions";

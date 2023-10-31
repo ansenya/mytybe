@@ -1,7 +1,6 @@
 import React from 'react';
 import {Routes, Route} from 'react-router-dom'
 import Layout from "./pages/layout";
-import "./App.css"
 import VideosPage from "./pages/videosPage";
 import ChannelsPage from "./pages/channelsPage";
 import UsersPage from "./pages/usersPage";
@@ -11,7 +10,7 @@ import ChannelPage from "./pages/channelPage";
 import ErrorPage from "./pages/errorPage";
 import RegistrationPage from "./pages/registrationPage";
 import LoginPage from "./pages/loginPage";
-import RequireAuth from "./auth/RequireAuth";
+import RequireAuth from "./hoc/RequireAuth";
 
 
 const App = () => {

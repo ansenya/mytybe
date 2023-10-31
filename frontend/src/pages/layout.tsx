@@ -1,9 +1,13 @@
 import React from 'react';
-import {Outlet, NavLink} from 'react-router-dom'
+import {Outlet, NavLink, useNavigate} from 'react-router-dom'
 import {useActions} from "../hooks/actions";
 
 const Layout = () => {
+
+    const navigate = useNavigate()
+
     const {clearAuth} = useActions()
+
 
     return (
         <div>
@@ -17,8 +21,20 @@ const Layout = () => {
                         <li className="nav__item"><NavLink to="users">users</NavLink></li>
                     </ul>
 
-                    <button className="button primary">Sign in</button>
-                    <button className="button secondary" onClick={() => clearAuth()}>Sign up</button>
+
+
+                    <div>
+
+                        {localStorage.getItem("username") ? (
+                            <div>
+                                {localStorage.getItem("username")}
+                                <button className="button secondary" onClick={() => clearAuth()}>Sign out</button>
+                            </div>
+                        ) : (
+                            <button className="button primary" onClick={() => navigate("/login")}>Sign in</button>
+                        )}
+
+                    </div>
 
                 </nav>
             </header>
