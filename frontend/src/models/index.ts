@@ -33,9 +33,9 @@ export interface IVideo {
     views: number;
     thumbnail: Thumbnail;
     channel: IChannel;
-    category?: any;
+    category?: string;
     path: string;
-    tags: any[];
+    tags: string[];
     processed: boolean;
     explicit: boolean;
     deleted: boolean;

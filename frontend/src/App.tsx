@@ -12,6 +12,8 @@ import RegistrationPage from "./pages/registrationPage";
 import LoginPage from "./pages/loginPage";
 import RequireAuth from "./hoc/RequireAuth";
 
+import "./App.scss"
+
 
 const App = () => {
     return (

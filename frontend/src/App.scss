@@ -1,0 +1,198 @@
+$background-color: #030014;
+$primary-color: #6002ee;
+$secondary-color: #00022F;
+$text-color: #fef9ec;
+$border-color: #1D1A2C;
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto&display=swap');
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: $background-color;
+  font-family: 'Roboto Thin', sans-serif;
+  overflow: hidden;
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  border-bottom: $border-color 2px solid;
+  height: 60px;
+  background: transparent;
+
+   .navbar{
+     width: 97%;
+     margin: auto;
+     display: flex;
+     justify-content: space-between;
+     align-items: center;
+     height: 100%;
+
+     &__center {
+
+       flex: 1;
+       display: flex;
+       justify-content: center;
+
+       .search__bar {
+
+         img{
+           user-select: none;
+           height: 15px
+         }
+
+         .input-active {
+           box-shadow: 0 0 6px $primary-color;
+         }
+
+         min-width: 600px;
+         min-height: 33px;
+         background: $secondary-color;
+         display: flex;
+         padding: 0 8px;
+         border: $primary-color 3px solid;
+         border-radius: 10px;
+         align-items: center;
+
+         input{
+           background: transparent;
+           color: $primary-color;
+           margin-left: 10px;
+           height: 100%;
+           flex: 1;
+           border: none;
+           outline: none;
+           font-size: 20px;
+           font-weight: bolder;
+
+           &::selection {
+             font-size: 20px;
+             text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+             animation: caret-blink 1s infinite;
+           }
+
+
+           &:hover{
+             cursor: text;
+           }
+         }
+
+       }
+     }
+
+     .btns{
+       display: flex;
+       gap: 6px;
+
+       &__signin{
+         min-height: 30px;
+         min-width: 90px;
+         text-align: center;
+         background: $primary-color;
+         color: $text-color;
+         border: none;
+         border-radius: 10px;
+         font-weight: bolder;
+       }
+       &__signup {
+         min-height: 30px;
+         min-width: 90px;
+         text-align: center;
+         background: $secondary-color;
+         color: $text-color;
+         border: none;
+         border-radius: 10px;
+         font-weight: bolder;
+       }
+     }
+
+     &__menu {
+       display: flex;
+       gap: 6px;
+       height: 100%;
+       align-items: center;
+
+       img {
+         user-select: none;
+         height: 35px;
+         width: 40px;
+         margin-bottom: 2px;
+       }
+       span{
+         color: $text-color;
+         font-size: 30px;
+         font-weight: bolder;
+       }
+     }
+
+   }
+
+}
+
+.main{
+  width: 97%;
+  margin: 5px auto;
+
+  .content__block {
+    width: 100%;
+    border-bottom: $border-color 2px solid;
+    padding-bottom: 10px;
+    margin: 10px 0;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .video {
+    width: 250px;
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+
+    &__thumbnail{
+
+      width: 100%;
+      border-radius: 10px;
+      user-select: none;
+
+    }
+
+    &__name {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      .avatar {
+        width: 40px;
+        height: 32px;
+        border-radius: 50%;
+        user-select: none;
+      }
+
+      div {
+        overflow: hidden;
+
+        span {
+          font-weight: bolder;
+          font-size: 16px;
+          color: $text-color;
+        }
+      }
+    }
+
+  }
+
+}
+
+
+@keyframes caret-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
