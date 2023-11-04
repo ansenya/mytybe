@@ -11,11 +11,36 @@ from moviepy.editor import VideoFileClip
 
 from sql_connect import *
 
+print(torch.cuda.is_available())
+
 
 def process_video(video_path, req_id):
-    model = EfficientNet.from_pretrained('efficientnet-b0')
+    video_capture = cv2.VideoCapture(video_path)
+    total_frames = 2 * int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
+    start = time.time()
+    video_capture.release()
 
-    t = ''
+    finish = []
+    for i in process_ef(start, total_frames, video_path, req_id):
+        finish.append(i)
+    for i in list(process_yolo(start, total_frames, video_path, req_id)):
+        finish.append(i)
+
+    print(finish)
+
+    insert_data(req_id, str(finish))
+    set_processed(req_id, finish)
+
+    # insert_data(req_id, str(piska))
+    # set_processed(req_id, list(piska))
+
+    set_time(req_id)
+
+
+def process_ef(start, total_frames, video_path, req_id):
+    model = EfficientNet.from_pretrained('efficientnet-b0')
+    video_capture = cv2.VideoCapture(video_path)
+
     if torch.cuda.is_available():
         t = 'cuda'
     else:
@@ -23,8 +48,6 @@ def process_video(video_path, req_id):
 
     model = model.to(t)
 
-    video_capture = cv2.VideoCapture(video_path)
-    total_frames = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
     k = 0
     tags = {}
 
@@ -34,7 +57,6 @@ def process_video(video_path, req_id):
     labels_map = json.load(open('../efficientnet_pytorch/labels_map.txt'))
     labels_map = [labels_map[str(i)] for i in range(1000)]
 
-    start = time.time()
     while 1:
         ret, frame = video_capture.read()
 
@@ -44,6 +66,9 @@ def process_video(video_path, req_id):
         except ZeroDivisionError:
             pass
         k += 1
+
+        # if k > 100:
+        #     break
 
         if not ret:
             break
@@ -65,23 +90,58 @@ def process_video(video_path, req_id):
             elif tags[labels_map[idx]] < prob:
                 tags[labels_map[idx]] = prob
 
-    video_capture.release()
-
-    penis = [item for item in sorted(tags.items(), key=lambda item: item[1], reverse=True) if item[1] >= 0.3]
-
-    insert_data(req_id, str(penis))
-
-    # print(penis)
-
-    set_processed(req_id, penis)
-    set_time(req_id)
+    penis = [item[0] for item in sorted(tags.items(), key=lambda item: item[1], reverse=True) if item[1] >= 0.5]
 
     return penis
 
 
+def process_yolo(start, total_frames, video_path, req_id):
+    # print(cv2.getBuildInformation())
+    video_capture = cv2.VideoCapture(video_path)
+
+    tags = set()
+
+    Conf_threshold = 0.4
+    NMS_threshold = 0.4
+
+    with open('fclasses.txt', 'r') as f:
+        class_name = [cname.strip() for cname in f.readlines()]
+    net = cv2.dnn.readNet('yolov4-tiny.weights', 'yolov4-tiny.cfg')
+    net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
+    net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA_FP16)
+
+    model = cv2.dnn_DetectionModel(net)
+    model.setInputParams(size=(416, 416), scale=1 / 255, swapRB=True)
+
+    k = total_frames / 2
+    while True:
+        ret, frame = video_capture.read()
+
+        try:
+            increase_progress(req_id, total_frames / (k / (time.time() - start)) - (time.time() - start),
+                              "{:.2f}%".format(k * 100 / total_frames))
+        except ZeroDivisionError:
+            pass
+        k += 1
+
+        # if k > 100:
+        #     break
+
+        if not ret:
+            break
+        classes, scores, boxes = model.detect(frame, Conf_threshold, NMS_threshold)
+        for (classid, score, box) in zip(classes, scores, boxes):
+            if score >= 0.5:
+                tags.add(class_name[classid])
+
+    video_capture.release()
+
+    return tags
+
+
 def set_processed(req_id, tags):
-    host = "localhost"
-    user = "newuser"
+    host = "5.180.174.71"
+    user = "user"
     password = ""
     database = "tube"
 
@@ -103,9 +163,12 @@ def set_processed(req_id, tags):
     vid_id = int(cursor.fetchone()[0])
 
     for p in tags:
-        url = f"http://localhost:6666/api/v/tag?tag={p[0]}&id={vid_id}"
+        url = f"http://localhost:1984/api/v/tag?tag={p}&id={vid_id}"
         response = requests.post(url)
-        # print(response.status_code)
+        print(response.status_code)
+
+    url = f"http://localhost:1984/api/v/done?id={vid_id}"
+    requests.post(url)
 
     cursor.close()
     connection.close()
@@ -115,8 +178,8 @@ def set_time(req_id):
     video = VideoFileClip(f"../videos/{req_id}.mp4")
     duration = video.duration
 
-    host = "localhost"
-    user = "newuser"
+    host = "5.180.174.71"
+    user = "user"
     password = ""
     database = "tube"
 
@@ -135,4 +198,3 @@ def set_time(req_id):
 
     cursor.close()
     connection.close()
-

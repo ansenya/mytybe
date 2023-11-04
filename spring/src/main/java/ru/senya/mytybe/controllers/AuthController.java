@@ -4,17 +4,18 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import ru.senya.mytybe.dto.UserDto;
+import ru.senya.mytybe.models.jpa.ImageModel;
+import ru.senya.mytybe.repos.jpa.ImagesRepository;
 import ru.senya.mytybe.security.TokenService;
-import ru.senya.mytybe.models.TokenModel;
-import ru.senya.mytybe.models.UserModel;
-import ru.senya.mytybe.models.UserRequest;
-import ru.senya.mytybe.repos.UserRepository;
+import ru.senya.mytybe.models.jpa.TokenModel;
+import ru.senya.mytybe.models.jpa.UserModel;
+import ru.senya.mytybe.models.jpa.UserRequest;
+import ru.senya.mytybe.repos.jpa.UserRepository;
 
 
 @RequestMapping("/u/auth")
@@ -25,13 +26,15 @@ public class AuthController {
 
     final TokenService tokenService;
     final UserRepository userRepository;
+    final ImagesRepository imagesRepository;
     final PasswordEncoder passwordEncoder;
 
     ModelMapper modelMapper = new ModelMapper();
 
-    public AuthController(TokenService tokenService, UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public AuthController(TokenService tokenService, UserRepository userRepository, ImagesRepository imagesRepository, PasswordEncoder passwordEncoder) {
         this.tokenService = tokenService;
         this.userRepository = userRepository;
+        this.imagesRepository = imagesRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -57,7 +60,13 @@ public class AuthController {
             return ResponseEntity.status(406).body("Password must contain than 7 or more letters");
         }
 
+
         UserModel user = new UserModel();
+
+        ImageModel pfp = ImageModel.builder()
+                .type("pfp")
+                .user(user)
+                .build();
 
         user.setUsername(userRequest.getUsername());
         user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
@@ -65,9 +74,13 @@ public class AuthController {
         user.setSurname(userRequest.getSurname());
         user.setSurname(userRequest.getSex());
         user.setAge(userRequest.getAge());
-//        user.setCountry(userRequest.getCountry());
+        user.setCountry("ru");
+        user.setSex(userRequest.getSex());
+        user.setPfp(pfp);
 
         user = userRepository.save(user);
+
+        imagesRepository.save(pfp);
 
         return ResponseEntity.ok(modelMapper.map(user, UserDto.class));
     }

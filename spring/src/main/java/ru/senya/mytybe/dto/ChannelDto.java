@@ -1,12 +1,7 @@
 package ru.senya.mytybe.dto;
 
 import lombok.Data;
-import ru.senya.mytybe.models.ImageModel;
-import ru.senya.mytybe.models.UserModel;
-import ru.senya.mytybe.models.VideoModel;
-
-import java.util.HashSet;
-import java.util.Set;
+import ru.senya.mytybe.models.jpa.ImageModel;
 
 @Data
 public class ChannelDto {
@@ -20,7 +15,7 @@ public class ChannelDto {
 
     private boolean deleted = false;
 
-    private ImageModel pfp; //todo: change to chp
+    private ImageModel chp;
 
 //    private Set<VideoModel> videos = new HashSet<>();
 
@@ -28,5 +23,9 @@ public class ChannelDto {
 
     private UserDtoWithoutChannels user;
 
-//    private Set<UserModel> followers = new HashSet<>();
+    public String getChp() {
+        return chp.getPath();
+    }
+
+    //    private Set<UserModel> followers = new HashSet<>();
 }

@@ -7,16 +7,14 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 import ru.senya.mytybe.dto.CommentDto;
-import ru.senya.mytybe.dto.VideoDto;
-import ru.senya.mytybe.models.CommentModel;
-import ru.senya.mytybe.models.UserModel;
-import ru.senya.mytybe.models.VideoModel;
-import ru.senya.mytybe.repos.CommentRepository;
-import ru.senya.mytybe.repos.UserRepository;
-import ru.senya.mytybe.repos.VideoRepository;
+import ru.senya.mytybe.models.jpa.CommentModel;
+import ru.senya.mytybe.models.jpa.UserModel;
+import ru.senya.mytybe.models.jpa.VideoModel;
+import ru.senya.mytybe.repos.jpa.CommentRepository;
+import ru.senya.mytybe.repos.jpa.UserRepository;
+import ru.senya.mytybe.repos.jpa.VideoRepository;
 
 import java.util.Objects;
 

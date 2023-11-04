@@ -1,4 +1,4 @@
-package ru.senya.mytybe.models;
+package ru.senya.mytybe.models.jpa;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -30,11 +30,11 @@ public class ChannelModel {
 
     private Integer videosAmount;
 
-    private Integer followersAmount = 0;
+    private Integer followersAmount;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "image_id", referencedColumnName = "id")
-    private ImageModel pfp; //todo: change to chp
+    private ImageModel chp;
 
     @OneToMany(mappedBy = "channel")
     private Set<VideoModel> videos = new HashSet<>();
@@ -58,6 +58,7 @@ public class ChannelModel {
 
     @UpdateTimestamp
     private Date updated;
+
 
     public Integer getFollowersAmount() {
         try {

@@ -9,33 +9,31 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.parameters.P;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
-import ru.senya.mytybe.dto.ChannelDto;
 import ru.senya.mytybe.dto.LikesDto;
 import ru.senya.mytybe.dto.VideoDto;
-import ru.senya.mytybe.models.ChannelModel;
-import ru.senya.mytybe.models.TagModel;
-import ru.senya.mytybe.models.UserModel;
-import ru.senya.mytybe.models.VideoModel;
+import ru.senya.mytybe.models.es.EsVideoModel;
+import ru.senya.mytybe.models.jpa.*;
 import ru.senya.mytybe.recs.VideoRecommendationSystem;
-import ru.senya.mytybe.repos.ChannelRepository;
-import ru.senya.mytybe.repos.TagRepository;
-import ru.senya.mytybe.repos.UserRepository;
-import ru.senya.mytybe.repos.VideoRepository;
+import ru.senya.mytybe.repos.es.ElasticVideoRepository;
+import ru.senya.mytybe.repos.jpa.ChannelRepository;
+import ru.senya.mytybe.repos.jpa.TagRepository;
+import ru.senya.mytybe.repos.jpa.UserRepository;
+import ru.senya.mytybe.repos.jpa.VideoRepository;
+import ru.senya.mytybe.services.VideoService;
 
 import java.io.*;
-import java.net.ConnectException;
 import java.util.*;
 
 @RequestMapping("v")
 @RestController
-public class VideoController extends BaseController{
+public class VideoController extends BaseController {
 
     final
     UserRepository userRepository;
@@ -45,17 +43,23 @@ public class VideoController extends BaseController{
     ChannelRepository channelRepository;
     final
     TagRepository tagRepository;
+    final
+    ElasticVideoRepository elasticVideoRepository;
+
+    final VideoService videoService;
 
     final Gson gson = new Gson();
 
     ModelMapper modelMapper = new ModelMapper();
 
 
-    public VideoController(UserRepository userRepository, VideoRepository videoRepository, ChannelRepository channelRepository, TagRepository tagRepository) {
+    public VideoController(UserRepository userRepository, VideoRepository videoRepository, ChannelRepository channelRepository, TagRepository tagRepository, ElasticVideoRepository elasticVideoRepository, VideoService videoService) {
         this.userRepository = userRepository;
         this.videoRepository = videoRepository;
         this.channelRepository = channelRepository;
         this.tagRepository = tagRepository;
+        this.elasticVideoRepository = elasticVideoRepository;
+        this.videoService = videoService;
     }
 
 
@@ -74,11 +78,7 @@ public class VideoController extends BaseController{
 
         VideoRecommendationSystem recommendationSystem = new VideoRecommendationSystem(videoRepository.getAll());
 
-        List<VideoModel> history = new ArrayList<>();
-
-        history.addAll(userModel.getLastViewed());
-
-        List<VideoDto> recs = recommendationSystem.recommendVideos(history).stream().map(videoModel -> modelMapper.map(videoModel, VideoDto.class)).toList();
+        List<VideoDto> recs = recommendationSystem.recommendVideos(userModel).stream().map(videoModel -> modelMapper.map(videoModel, VideoDto.class)).toList();
 
         if (pageNum == null) {
             return ResponseEntity.badRequest().body("page is null");
@@ -95,7 +95,7 @@ public class VideoController extends BaseController{
 
         Page<VideoModel> videoPage;
         if (channelId == -1) {
-            videoPage = findAllWithSpecificIdsAndOrder(recs.stream().map(VideoDto::getId).toList(), page);
+            videoPage = videoService.getAll(recs.stream().map(VideoDto::getId).toList(), page);
         } else {
             videoPage = videoRepository.findAllByChannelId(channelId, page);
         }
@@ -103,51 +103,6 @@ public class VideoController extends BaseController{
         Page<VideoDto> videoDtoPage = videoPage.map(videoModel -> modelMapper.map(videoModel, VideoDto.class));
 
         return ResponseEntity.ok(videoDtoPage);
-    }
-
-    public Page<VideoModel> findAllWithSpecificIdsAndOrder(List<Long> specificIds, Pageable pageable) {
-        List<VideoModel> resultList;
-        if (specificIds.isEmpty()) {
-            return videoRepository.findAll(pageable);
-        } else {
-            List<VideoModel> inSpecificIds = videoRepository.findInSpecificIds(specificIds);
-            List<VideoModel> notInSpecificIds = videoRepository.findNotInSpecificIds(specificIds);
-
-//            inSpecificIds.sort((o1, o2) -> {
-//                if (o1.getViews() > o2.getViews()) {
-//                    return -1;
-//                } else if (o1.getViews() < o2.getViews()) {
-//                    return 1;
-//                }
-//                return 0;
-//            });
-//
-//            notInSpecificIds.sort((o1, o2) -> {
-//                if (o1.getViews() > o2.getViews()) {
-//                    return -1;
-//                } else if (o1.getViews() < o2.getViews()) {
-//                    return 1;
-//                }
-//                return 0;
-//            });
-//
-//            for (VideoModel i: inSpecificIds){
-//                System.out.println(i.getId());
-//            }
-//
-//            for (VideoModel i: notInSpecificIds){
-//                System.out.println(i.getId());
-//            }
-
-            inSpecificIds.addAll(notInSpecificIds);
-
-            int fromIndex = (int) pageable.getOffset();
-            int toIndex = Math.min((fromIndex + pageable.getPageSize()), inSpecificIds.size());
-
-            resultList = inSpecificIds.subList(fromIndex, toIndex);
-        }
-
-        return new PageImpl<>(resultList, pageable, resultList.size());
     }
 
     @PostMapping("video")
@@ -195,17 +150,22 @@ public class VideoController extends BaseController{
             result = gson.fromJson(processVideo(destFile.getPath(), uuid),
                     new TypeToken<HashMap<String, String>>() {
                     }.getType());
-        } catch (ConnectException exception) {
+        } catch (Exception exception) {
             File delete = new File("src/main/resources/videos/" + uuid + ".mp4");
             delete.delete();
             return ResponseEntity.status(418).body("upload is not available");
         }
+
+        ImageModel thumbnail = ImageModel.builder()
+                .type("th")
+                .build();
 
         VideoModel video = VideoModel.builder()
                 .name(videoName)
                 .channel(channel)
                 .description(description)
                 .vid_uuid(uuid)
+                .thumbnail(thumbnail)
                 .tags(new HashSet<>())
                 .path(result.get("id"))
                 .build();
@@ -301,7 +261,8 @@ public class VideoController extends BaseController{
     public ResponseEntity<?> setTag(@RequestParam(value = "tag", required = false) String tag,
                                     @RequestParam(value = "id", required = false) Long id) {
 
-        TagModel tagModel = tagRepository.findByTag(tag);
+        System.out.println(tag);
+        TagModel tagModel = tagRepository.findByEnTag(tag);
         VideoModel videoModel = videoRepository.findById(id).orElse(null);
 
         if (tagModel == null || videoModel == null) {
@@ -318,6 +279,23 @@ public class VideoController extends BaseController{
         return ResponseEntity.ok(videoModel);
     }
 
+    @PostMapping("done")
+    public ResponseEntity<?> setDone(@RequestParam(value = "id", required = false) Long id) {
+        VideoModel videoModel = videoRepository.findById(id).orElse(null);
+
+        if (videoModel == null) {
+            return ResponseEntity.status(404).build();
+        }
+
+        EsVideoModel esVideoModel = modelMapper.map(videoModel, EsVideoModel.class);
+
+        esVideoModel = elasticVideoRepository.save(esVideoModel);
+
+        System.out.println(gson.toJson(esVideoModel));
+
+        return ResponseEntity.ok(esVideoModel);
+    }
+
     private String requestEta(String uuid) {
         RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<String> response = restTemplate.getForEntity("http://localhost:8642/progress?id=" + uuid, String.class);
@@ -325,10 +303,15 @@ public class VideoController extends BaseController{
         return response.getBody();
     }
 
-    private String processVideo(String path, String uuid) throws ConnectException {
-        RestTemplate restTemplate = new RestTemplate();
+    private String processVideo(String path, String uuid) {
+        int timeout = 10000;
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setReadTimeout(timeout);
+        factory.setConnectTimeout(timeout);
 
-        String serverUrl = "http://176.99.146.176:8642/process?uuid=" + uuid;
+        RestTemplate restTemplate = new RestTemplate(factory);
+
+        String serverUrl = "http://localhost:8642/process?uuid=" + uuid;
 
         FileSystemResource fileResource = new FileSystemResource(path);
 
@@ -339,13 +322,7 @@ public class VideoController extends BaseController{
         body.add("video", fileResource);
 
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
-        ResponseEntity<String> response;
-        try {
-            response = restTemplate.postForEntity(serverUrl, requestEntity, String.class);
-        } catch (Exception e) {
-            throw new ConnectException();
-        }
-
+        ResponseEntity<String> response = restTemplate.postForEntity(serverUrl, requestEntity, String.class);
         return response.getBody();
     }
 

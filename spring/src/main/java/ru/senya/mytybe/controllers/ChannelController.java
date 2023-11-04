@@ -11,10 +11,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import ru.senya.mytybe.dto.ChannelDto;
 import ru.senya.mytybe.dto.UserDtoWithoutChannels;
-import ru.senya.mytybe.models.ChannelModel;
-import ru.senya.mytybe.models.UserModel;
-import ru.senya.mytybe.repos.ChannelRepository;
-import ru.senya.mytybe.repos.UserRepository;
+import ru.senya.mytybe.models.jpa.ChannelModel;
+import ru.senya.mytybe.models.jpa.ImageModel;
+import ru.senya.mytybe.models.jpa.UserModel;
+import ru.senya.mytybe.repos.jpa.ChannelRepository;
+import ru.senya.mytybe.repos.jpa.ImagesRepository;
+import ru.senya.mytybe.repos.jpa.UserRepository;
 
 import java.util.Objects;
 
@@ -26,13 +28,16 @@ public class ChannelController extends BaseController {
     ChannelRepository channelRepository;
     final
     UserRepository userRepository;
+    final
+    ImagesRepository imagesRepository;
     ModelMapper modelMapper = new ModelMapper();
 
     Logger logger = LoggerFactory.getLogger(ChannelController.class);
 
-    public ChannelController(ChannelRepository channelRepository, UserRepository userRepository) {
+    public ChannelController(ChannelRepository channelRepository, UserRepository userRepository, ImagesRepository imagesRepository) {
         this.channelRepository = channelRepository;
         this.userRepository = userRepository;
+        this.imagesRepository = imagesRepository;
     }
 
     @GetMapping("channel/{id}")
@@ -104,12 +109,19 @@ public class ChannelController extends BaseController {
     public ResponseEntity<?> create(@RequestParam(value = "name") String name, Authentication authentication) {
         UserModel userModel = userRepository.findByUsername(authentication.getName());
 
+
+        ImageModel chp = ImageModel.builder()
+                .type("th")
+                .build();
+
         ChannelModel channel = ChannelModel.builder()
                 .name(name)
                 .user(userModel)
+                .chp(chp)
                 .build();
 
         channel = channelRepository.save(channel);
+        imagesRepository.save(chp);
 
         return ResponseEntity.ok(modelMapper.map(channel, ChannelDto.class));
     }

@@ -1,10 +1,9 @@
-package ru.senya.mytybe.models;
+package ru.senya.mytybe.models.jpa;
 
 import jakarta.persistence.*;
 import lombok.Data;
 
 import java.util.Set;
-import java.util.UUID;
 
 @Data
 @Entity

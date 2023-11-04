@@ -1,12 +1,10 @@
-package ru.senya.mytybe.repos;
+package ru.senya.mytybe.repos.jpa;
 
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import ru.senya.mytybe.models.VideoModel;
+import ru.senya.mytybe.models.jpa.VideoModel;
 
 import java.util.List;
 

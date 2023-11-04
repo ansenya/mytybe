@@ -1,4 +1,4 @@
-package ru.senya.mytybe.models;
+package ru.senya.mytybe.models.jpa;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

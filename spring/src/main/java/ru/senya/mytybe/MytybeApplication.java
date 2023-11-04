@@ -3,6 +3,7 @@ package ru.senya.mytybe;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import ru.senya.mytybe.security.RsaKeyProperties;
 
 import java.io.BufferedReader;
@@ -12,6 +13,7 @@ import java.net.URL;
 
 @SpringBootApplication
 @EnableConfigurationProperties(RsaKeyProperties.class)
+@EnableJpaRepositories(basePackages = "ru.senya.mytybe.repos.jpa")
 public class MytybeApplication {
 
     public static String IP;

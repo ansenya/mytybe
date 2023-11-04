@@ -52,8 +52,9 @@ public class SecurityConfig {
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("auth/register").permitAll()
+                        .requestMatchers("u/auth/register").permitAll()
                         .requestMatchers("v/tag").permitAll()
+                        .requestMatchers("v/done").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS).permitAll()
                         .requestMatchers("/static/**").permitAll()
                         .anyRequest().authenticated()

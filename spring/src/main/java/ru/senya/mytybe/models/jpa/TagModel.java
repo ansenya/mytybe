@@ -1,4 +1,4 @@
-package ru.senya.mytybe.models;
+package ru.senya.mytybe.models.jpa;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -6,7 +6,6 @@ import lombok.Data;
 
 import java.util.Objects;
 import java.util.Set;
-import java.util.UUID;
 
 @Data
 @Entity
@@ -18,7 +17,9 @@ public class TagModel {
     private Long id;
 
     @Column(unique = true)
-    private String tag;
+    private String enTag;
+
+    private String ruTag;
 
     @ManyToMany(mappedBy = "tags")
     @JsonIgnore
@@ -26,6 +27,6 @@ public class TagModel {
 
     @Override
     public int hashCode() {
-        return Objects.hash(tag);
+        return Objects.hash(enTag);
     }
 }

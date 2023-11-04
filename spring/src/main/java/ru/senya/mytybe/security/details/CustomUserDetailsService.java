@@ -5,8 +5,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import ru.senya.mytybe.models.UserModel;
-import ru.senya.mytybe.repos.UserRepository;
+import ru.senya.mytybe.models.jpa.UserModel;
+import ru.senya.mytybe.repos.jpa.UserRepository;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {

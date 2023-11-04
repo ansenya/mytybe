@@ -1,4 +1,4 @@
-package ru.senya.mytybe.models;
+package ru.senya.mytybe.models.jpa;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -10,7 +10,6 @@ import org.hibernate.annotations.CurrentTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.Date;
-import java.util.HashSet;
 import java.util.Set;
 
 import static ru.senya.mytybe.MytybeApplication.IP;
@@ -70,9 +69,14 @@ public class VideoModel {
     @ManyToMany(mappedBy = "dislikedVideos")
     private Set<UserModel> dislikedByUser;
 
+    @ManyToMany(mappedBy = "recommendedVideos")
+    private Set<UserModel> recommendations;
+
     private String vid_uuid;
 
     private boolean processed = false;
+
+    private boolean small = false;
 
     private boolean explicit = false;
 

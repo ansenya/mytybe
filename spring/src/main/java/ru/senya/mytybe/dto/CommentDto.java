@@ -1,12 +1,9 @@
 package ru.senya.mytybe.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CurrentTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import ru.senya.mytybe.models.UserModel;
-import ru.senya.mytybe.models.VideoModel;
 
 import java.util.Date;
 

@@ -1,10 +1,9 @@
 package ru.senya.mytybe.dto;
 
 import lombok.Data;
-import ru.senya.mytybe.models.*;
+import ru.senya.mytybe.models.jpa.ImageModel;
 
 import java.util.Date;
-import java.util.List;
 import java.util.Set;
 
 @Data
@@ -17,7 +16,7 @@ public class UserDto {
     private String sex;
     private ImageModel pfp;
     private Integer age;
-    private CountryModel country;
+    private String country;
     private Set<ChannelDtoWithoutUser> channels;
 //    private List<VideoModel> lastViewed;
 
@@ -30,4 +29,8 @@ public class UserDto {
     private boolean locked;
     private Date created;
     private Date updated;
+
+    public String getPfp() {
+        return pfp.getPath();
+    }
 }

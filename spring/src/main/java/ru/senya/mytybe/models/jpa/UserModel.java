@@ -1,4 +1,4 @@
-package ru.senya.mytybe.models;
+package ru.senya.mytybe.models.jpa;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -40,9 +40,7 @@ public class UserModel {
 
     private String role = "user";
 
-    @ManyToOne
-    @JoinColumn(name = "country_id")
-    private CountryModel country;
+    private String country;
 
     @OneToMany(mappedBy = "user")
     private Set<ChannelModel> channels = new HashSet<>();
@@ -83,6 +81,13 @@ public class UserModel {
 
     @OneToMany(mappedBy = "owner")
     private Set<PlaylistModel> playlists;
+
+    @ManyToMany
+    @JoinTable(
+            name = "recommendations",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "video_id"))
+    private Set<VideoModel> recommendedVideos;
 
     @CurrentTimestamp
     private Date created;

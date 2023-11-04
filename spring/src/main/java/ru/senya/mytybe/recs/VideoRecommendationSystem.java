@@ -1,7 +1,8 @@
 package ru.senya.mytybe.recs;
 
-import ru.senya.mytybe.models.TagModel;
-import ru.senya.mytybe.models.VideoModel;
+import ru.senya.mytybe.models.jpa.TagModel;
+import ru.senya.mytybe.models.jpa.UserModel;
+import ru.senya.mytybe.models.jpa.VideoModel;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -14,12 +15,24 @@ public class VideoRecommendationSystem {
         this.videoPool = videoPool;
     }
 
-    public List<VideoModel> recommendVideos(List<VideoModel> userHistory) {
-        userHistory = getLastNElements(userHistory, 100); // последние 100 видео из истории просмотров. на их основе формируются рекомендации.
+    public List<VideoModel> recommendVideos(UserModel user) {
+        
+        List<VideoModel> userHistory = getLastNElements(user.getLastViewed().stream().toList(), 100); // последние 100 видео из истории просмотров. на их основе формируются рекомендации.
+        List<VideoModel> likedVideos = getLastNElements(user.getLikedVideos().stream().toList(), 100);
+        List<VideoModel> dislikedVideos = getLastNElements(user.getDislikedVideos().stream().toList(), 100);
 
-        Set<TagModel> userTags = userHistory.stream()
-                        .flatMap(video -> video.getTags().stream())
-                        .collect(Collectors.toSet());
+
+        Set<TagModel> tagsFromUserHistory = userHistory.stream()
+                .flatMap(video -> video.getTags().stream())
+                .collect(Collectors.toSet());
+
+        Set<TagModel> tagsFromLikedVideos = likedVideos.stream()
+                .flatMap(video -> video.getTags().stream())
+                .collect(Collectors.toSet());
+
+        Set<TagModel> tagsFromDislikedVideos = dislikedVideos.stream()
+                .flatMap(video -> video.getTags().stream())
+                .collect(Collectors.toSet());
 
         /*
             выше мы в hashSet записываем все теги видоео, которые находятся в истории просмотров.
@@ -45,7 +58,7 @@ public class VideoRecommendationSystem {
             теги хранятся по "тег" - "популярность"
          */
 
-        List<TagModel> sortedTags = userTags.stream()
+        List<TagModel> sortedTags = tagsFromUserHistory.stream()
                 .sorted(Comparator.comparingInt(tagPopularity::get).reversed())
                 .toList();
 
@@ -59,7 +72,7 @@ public class VideoRecommendationSystem {
         Set<VideoModel> recommendedVideos = new HashSet<>();
         for (TagModel tag : sortedTags) {
             for (VideoModel video : videoPool) {
-                if (video.getTags().contains(tag) && !userHistory.contains(video)) {
+                if (video.getTags().contains(tag) && !userHistory.contains(video) && !dislikedVideos.contains(video)) {
                     recommendedVideos.add(video);
                 }
             }

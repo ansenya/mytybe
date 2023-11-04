@@ -6,17 +6,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 import ru.senya.mytybe.dto.UserDto;
-import ru.senya.mytybe.models.UserModel;
-import ru.senya.mytybe.repos.UserRepository;
+import ru.senya.mytybe.models.jpa.UserModel;
+import ru.senya.mytybe.repos.jpa.UserRepository;
 
-import java.time.chrono.IsoChronology;
-import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
-
 
 
 @RequestMapping("/u")

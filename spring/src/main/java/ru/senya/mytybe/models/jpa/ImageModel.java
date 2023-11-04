@@ -1,4 +1,4 @@
-package ru.senya.mytybe.models;
+package ru.senya.mytybe.models.jpa;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -11,7 +11,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.Date;
 import java.util.Objects;
-import java.util.Set;
 
 import static ru.senya.mytybe.MytybeApplication.IP;
 import static ru.senya.mytybe.MytybeApplication.PORT;
@@ -31,9 +30,7 @@ public class ImageModel {
 
     private String path;
 
-    @ManyToOne
-    @JoinColumn(name = "type_id")
-    private ImageType type;
+    private String type;
 
     @CurrentTimestamp
     private Date created;
@@ -50,7 +47,7 @@ public class ImageModel {
     @JsonIgnore
     private UserModel user;
 
-    @OneToOne(mappedBy = "pfp")
+    @OneToOne(mappedBy = "chp")
     @JsonIgnore
     private ChannelModel channel;
 
@@ -60,23 +57,12 @@ public class ImageModel {
 
     private boolean deleted = false;
 
+    public static ImageModelBuilder builder() {
+        return new ImageModelBuilder().path("def");
+    }
 
-
-    @Data
-    @Entity
-    @Table(name = "types")
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public static class ImageType {
-        @Id
-        @GeneratedValue(strategy = GenerationType.IDENTITY)
-        Long id;
-
-        private String type;
-
-        @OneToMany(mappedBy = "type")
-        private Set<ImageModel> image;
+    public String getPath() {
+        return "http://" + IP + ":" + PORT + "/api/static/img?fileName=" + path;
     }
 
     @Override
