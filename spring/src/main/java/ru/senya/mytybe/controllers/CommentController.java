@@ -3,37 +3,44 @@ package ru.senya.mytybe.controllers;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import ru.senya.mytybe.dto.CommentDto;
+import ru.senya.mytybe.models.jpa.ChannelModel;
 import ru.senya.mytybe.models.jpa.CommentModel;
 import ru.senya.mytybe.models.jpa.UserModel;
 import ru.senya.mytybe.models.jpa.VideoModel;
+import ru.senya.mytybe.repos.jpa.ChannelRepository;
 import ru.senya.mytybe.repos.jpa.CommentRepository;
 import ru.senya.mytybe.repos.jpa.UserRepository;
 import ru.senya.mytybe.repos.jpa.VideoRepository;
 
+import java.util.List;
 import java.util.Objects;
 
 
 @RequestMapping("com")
 @RestController
-public class CommentController extends BaseController{
+public class CommentController extends BaseController {
 
     final UserRepository userRepository;
     final VideoRepository videoRepository;
     final CommentRepository commentRepository;
+    final ChannelRepository channelRepository;
+
 
     ModelMapper modelMapper = new ModelMapper();
 
     @Autowired
-    public CommentController(UserRepository userRepository, VideoRepository videoRepository, CommentRepository commentRepository) {
+    public CommentController(UserRepository userRepository, VideoRepository videoRepository, CommentRepository commentRepository, ChannelRepository channelRepository) {
         this.userRepository = userRepository;
         this.videoRepository = videoRepository;
         this.commentRepository = commentRepository;
+        this.channelRepository = channelRepository;
     }
 
 
@@ -41,13 +48,11 @@ public class CommentController extends BaseController{
     public ResponseEntity<?> getAll(@RequestParam(value = "page", required = false) Integer pageNum,
                                     @RequestParam(value = "size", required = false, defaultValue = "10") int pageSize,
                                     @RequestParam(value = "sort", required = false, defaultValue = "asc") String sort,
-                                    @RequestParam(value = "videoId", required = false, defaultValue = "-1") Long videoId) {
+                                    @RequestParam(value = "videoId", required = false, defaultValue = "-1") Long videoId,
+                                    @RequestParam(value = "commentId", required = false) Long commentID) {
+
         if (pageNum == null) {
             return ResponseEntity.badRequest().body("page is null");
-        }
-
-        if (videoId == null) {
-            return ResponseEntity.badRequest().body("videoId is null");
         }
 
         Sort.Direction direction;
@@ -57,12 +62,34 @@ public class CommentController extends BaseController{
         } else {
             direction = Sort.Direction.DESC;
         }
-
         PageRequest page = PageRequest.of(pageNum, pageSize, Sort.by(direction, "created"));
-        Page<CommentModel> commentPage = commentRepository.findAll(page);
-        Page<CommentDto> commentDtoPage = commentPage.map(commentModel -> modelMapper.map(commentModel, CommentDto.class));
 
-        return ResponseEntity.ok(commentDtoPage);
+        if (commentID == null){
+            if (!videoRepository.existsById(videoId)) {
+                return ResponseEntity.status(404).build();
+            }
+            Page<CommentModel> commentPage = commentRepository.findAllByVideo(page, videoRepository.getReferenceById(videoId));
+            Page<CommentDto> commentDtoPage = commentPage.map(commentModel -> modelMapper.map(commentModel, CommentDto.class));
+            return ResponseEntity.ok(commentDtoPage);
+        } else {
+            if (!commentRepository.existsById(commentID)) {
+                return ResponseEntity.status(404).body("comment is null");
+            }
+
+            List<CommentDto> comments =
+                    commentRepository.findById(commentRepository.getReferenceById(commentID).getId()).get().getNextComments().stream().map(commentModel -> modelMapper.map(commentModel, CommentDto.class)).toList();
+//            Page<CommentDto> commentDtoPage = commentPage.map(commentModel -> modelMapper.map(commentModel, CommentDto.class));
+
+            int fromIndex = (int) page.getOffset();
+            int toIndex = Math.min((fromIndex + page.getPageSize()), comments.size());
+
+//            resultList = inSpecificIds.subList(fromIndex, toIndex);
+//
+            return ResponseEntity.ok(new PageImpl<>(comments.subList(fromIndex, toIndex), page, comments.size()));
+
+//            return ResponseEntity.ok(commentDtoPage);
+        }
+
     }
 
 
@@ -83,37 +110,79 @@ public class CommentController extends BaseController{
 
     @PostMapping("/comment")
     public ResponseEntity<?> leaveComment(@RequestParam(value = "text", required = false) String text,
-                                          @RequestParam(value = "videoId", required = false) Long id,
+                                          @RequestParam(value = "commentId", required = false) Long commentId,
+                                          @RequestParam(value = "channelId", required = false) Long channelId,
+                                          @RequestParam(value = "videoId", required = false) Long videoId,
                                           Authentication authentication) {
         if (text == null || text.isBlank()) {
             return ResponseEntity.badRequest().body("text is required");
         }
 
-        if (id == null) {
-            return ResponseEntity.badRequest().body("id is required");
+        if (videoId == null && commentId == null) {
+            return ResponseEntity.badRequest().body("either videoId or commentId is required");
         }
 
-        UserModel userModels = userRepository.findByUsername(authentication.getName());
-
-        VideoModel videoModel = videoRepository.findById(id).orElse(null);
-
-        if (videoModel == null) {
-            return ResponseEntity.badRequest().body("video is null");
+        ChannelModel channelModel = null;
+        if (channelId != null){
+            channelModel = channelRepository.findById(channelId).orElse(null);
         }
 
-        CommentModel commentModel = CommentModel.builder()
-                .video(videoModel)
-                .user(userModels)
-                .text(text)
-                .build();
+        UserModel userModel = userRepository.findByUsername(authentication.getName());
+
+        if (videoId != null) {
+            VideoModel videoModel = videoRepository.findById(videoId).orElse(null);
+
+            if (videoModel == null) {
+                return ResponseEntity.badRequest().body("video is null");
+            }
 
 
-        videoModel.getComments().add(commentModel);
+            CommentModel commentModel = CommentModel.builder()
+                    .video(videoModel)
+                    .user(userModel)
+                    .text(text)
+                    .build();
 
-        videoRepository.save(videoModel);
-        commentModel = commentRepository.save(commentModel);
+            if (channelModel != null){
+                commentModel.setChannel(channelModel);
+            }
 
-        return ResponseEntity.ok(modelMapper.map(commentModel, CommentDto.class));
+
+            videoModel.getComments().add(commentModel);
+
+            videoRepository.save(videoModel);
+            commentModel = commentRepository.save(commentModel);
+
+            return ResponseEntity.ok(modelMapper.map(commentModel, CommentDto.class));
+        } else {
+            if (channelModel == null){
+                return ResponseEntity.badRequest().body("channel is null");
+            }
+
+            CommentModel commentModel = commentRepository.findById(commentId).orElse(null);
+
+            if (commentModel == null) {
+                return ResponseEntity.badRequest().body("comment is null");
+            }
+
+            CommentModel nextComment = CommentModel.builder()
+                    .video(null)
+                    .user(userModel)
+                    .channel(channelModel)
+                    .prevComment(commentModel)
+                    .text(text)
+                    .build();
+
+            nextComment = commentRepository.save(nextComment);
+
+            commentModel.getNextComments().add(nextComment);
+
+            commentModel = commentRepository.save(commentModel);
+
+            return ResponseEntity.ok(modelMapper.map(commentModel, CommentDto.class));
+
+        }
     }
+
 
 }

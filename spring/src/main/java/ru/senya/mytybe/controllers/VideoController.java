@@ -70,8 +70,12 @@ public class VideoController extends BaseController {
                                     @RequestParam(value = "channelId", required = false, defaultValue = "-1") Long channelId,
                                     Authentication authentication) {
 
-        UserModel userModel = userRepository.findByUsername(authentication.getName());
 
+        if (pageNum == null) {
+            return ResponseEntity.badRequest().body("page is null");
+        }
+
+        UserModel userModel = userRepository.findByUsername(authentication.getName());
 
 //        userModel.getLastViewed().clear();
 //        userRepository.save(userModel);
@@ -79,10 +83,6 @@ public class VideoController extends BaseController {
         VideoRecommendationSystem recommendationSystem = new VideoRecommendationSystem(videoRepository.getAll());
 
         List<VideoDto> recs = recommendationSystem.recommendVideos(userModel).stream().map(videoModel -> modelMapper.map(videoModel, VideoDto.class)).toList();
-
-        if (pageNum == null) {
-            return ResponseEntity.badRequest().body("page is null");
-        }
 
         Sort.Direction direction;
 

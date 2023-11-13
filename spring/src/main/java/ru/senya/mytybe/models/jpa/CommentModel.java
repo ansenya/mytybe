@@ -1,6 +1,5 @@
 package ru.senya.mytybe.models.jpa;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -11,6 +10,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.util.Date;
 import java.util.Objects;
+import java.util.Set;
 
 @Data
 @Entity
@@ -30,13 +30,22 @@ public class CommentModel {
 
     @ManyToOne
     @JoinColumn(name = "video_id")
-    @JsonIgnore
     private VideoModel video;
+
+    @OneToMany(mappedBy = "prevComment")
+    private Set<CommentModel> nextComments;
+
+    @ManyToOne
+    @JoinColumn(name = "comment_id")
+    private CommentModel prevComment;
 
     @ManyToOne
     @JoinColumn(name = "user_id")
     private UserModel user;
 
+    @ManyToOne
+    @JoinColumn(name = "channel_id")
+    private ChannelModel channel;
 
     @CurrentTimestamp
     private Date created;

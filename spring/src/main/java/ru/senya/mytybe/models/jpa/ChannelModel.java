@@ -51,6 +51,10 @@ public class ChannelModel {
     @JsonIgnore
     private Set<UserModel> followers = new HashSet<>();
 
+    @OneToMany(mappedBy = "channel")
+    @JsonIgnore
+    private Set<CommentModel> comments;
+
     private boolean deleted = false;
 
     @CurrentTimestamp

@@ -59,7 +59,7 @@ public class VideoDto {
         return thumbnail.getPath();
     }
 
-    public List<String> getTags() {
+    private List<String> getTags() {
         List<String> good_tags = new LinkedList<>();
         for (TagModel tagModel : tags) {
             good_tags.add(tagModel.getEnTag());
