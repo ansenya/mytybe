@@ -145,7 +145,8 @@ body {
     padding-bottom: 10px;
     margin: 10px 0;
     display: flex;
-    justify-content: space-between;
+    justify-content: left;
+    gap: 40px;
   }
 
   .video {
@@ -153,7 +154,8 @@ body {
     background: transparent;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: space-between;
+    gap: 7px;
 
     &__thumbnail{
 
@@ -170,8 +172,8 @@ body {
       gap: 10px;
 
       .avatar {
-        width: 40px;
-        height: 32px;
+        width: 35px;
+        height: 35px;
         border-radius: 50%;
         user-select: none;
       }

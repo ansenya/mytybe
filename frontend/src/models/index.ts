@@ -31,7 +31,7 @@ export interface IVideo {
     description: string;
     duration?: any;
     views: number;
-    thumbnail: Thumbnail;
+    thumbnail: string;
     channel: IChannel;
     category?: string;
     path: string;
@@ -44,14 +44,6 @@ export interface IVideo {
     updated: string;
 }
 
-
-export interface Thumbnail {
-    path: string;
-    type: string;
-    created: string;
-    updated: string;
-    deleted: boolean;
-}
 
 
 

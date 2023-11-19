@@ -8,12 +8,14 @@ interface VideoLineProps {
 }
 
 const VideoLine = ({videos, categoryName}: VideoLineProps) => {
+
+
     return (
         <div className="content__block">
             {videos.map(video =>
                 <VideoCard
                     key={video.id}
-                    thumbnail={video.thumbnail.path}
+                    thumbnail={video.thumbnail}
                     name={video.name}
                     channel={video.channel}
                 />

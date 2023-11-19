@@ -12,9 +12,9 @@ const VideoCard = ({thumbnail, name, channel}: VideoCardProps) => {
     return (
         <div className="video">
 
-            <img src={thumbnail} alt="vidosik))" className="video__thumbnail" draggable={false}/>\
+            <img src={thumbnail} alt="vidosik))" className="video__thumbnail" draggable={false} loading="eager"/>
             <div className="video__name">
-                <img src={ChannelAvatar} alt="avatarka))" className="avatar" draggable={false}/>
+                <img src={ChannelAvatar} alt="avatarka))" className="avatar" draggable={false} />
                 <div>
                     <span>{name}</span>
                 </div>
