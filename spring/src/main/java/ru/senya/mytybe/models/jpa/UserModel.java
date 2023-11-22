@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CurrentTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.redis.core.RedisHash;
 
 import java.util.*;
 
@@ -101,5 +102,13 @@ public class UserModel {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        UserModel userModel = (UserModel) o;
+        return deleted == userModel.deleted && locked == userModel.locked && Objects.equals(id, userModel.id) && Objects.equals(username, userModel.username) && Objects.equals(password, userModel.password) && Objects.equals(name, userModel.name) && Objects.equals(surname, userModel.surname) && Objects.equals(sex, userModel.sex) && Objects.equals(pfp, userModel.pfp) && Objects.equals(age, userModel.age) && Objects.equals(role, userModel.role) && Objects.equals(country, userModel.country) && Objects.equals(channels, userModel.channels) && Objects.equals(subscriptions, userModel.subscriptions) && Objects.equals(comments, userModel.comments) && Objects.equals(likedVideos, userModel.likedVideos) && Objects.equals(dislikedVideos, userModel.dislikedVideos) && Objects.equals(lastViewed, userModel.lastViewed) && Objects.equals(playlists, userModel.playlists) && Objects.equals(recommendedVideos, userModel.recommendedVideos) && Objects.equals(created, userModel.created) && Objects.equals(updated, userModel.updated);
     }
 }

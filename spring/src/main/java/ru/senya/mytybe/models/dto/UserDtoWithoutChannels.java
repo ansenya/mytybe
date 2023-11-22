@@ -1,4 +1,4 @@
-package ru.senya.mytybe.dto;
+package ru.senya.mytybe.models.dto;
 
 import lombok.Data;
 import ru.senya.mytybe.models.jpa.ImageModel;
@@ -13,7 +13,7 @@ public class UserDtoWithoutChannels {
     private String surname;
     private String role;
     private String sex;
-    private ImageModel pfp;
+    private ImageDto pfp;
     private Integer age;
     private String country;
 //    private Set<ChannelDto> channels;
@@ -28,6 +28,6 @@ public class UserDtoWithoutChannels {
     private Date updated;
 
     public String getPfp() {
-        return pfp.getPath();
+        return pfp.getFalsePath();
     }
 }

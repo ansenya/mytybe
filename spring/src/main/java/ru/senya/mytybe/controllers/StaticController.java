@@ -34,12 +34,12 @@ public class StaticController extends BaseController{
         headers.setContentLength(videoData.length);
         headers.setContentDispositionFormData(videoFileName, videoFileName);
 
-        return new ResponseEntity<>(videoData, headers, 200);
+        return new ResponseEntity<>(videoData, headers, HttpStatus.OK);
     }
 
     @GetMapping("img")
     public ResponseEntity<byte[]> serveImg(@RequestParam(value = "fileName") String imgFileName) throws IOException {
-        Path filepath = Paths.get("src/main/resources/images", imgFileName + ".jpg");
+        Path filepath = Paths.get("src/main/resources/images", imgFileName);
 
         if (!filepath.toFile().exists()) {
             return ResponseEntity.notFound().build();

@@ -16,15 +16,16 @@ print(torch.cuda.is_available())
 
 def process_video(video_path, req_id):
     video_capture = cv2.VideoCapture(video_path)
-    total_frames = 2 * int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
+    total_frames = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
+    # total_frames = 2 * int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
     start = time.time()
     video_capture.release()
 
     finish = []
     for i in process_ef(start, total_frames, video_path, req_id):
         finish.append(i)
-    for i in list(process_yolo(start, total_frames, video_path, req_id)):
-        finish.append(i)
+    # for i in list(process_yolo(start, total_frames, video_path, req_id)):
+    #     finish.append(i)
 
     print(finish)
 

@@ -1,7 +1,5 @@
-package ru.senya.mytybe.dto;
+package ru.senya.mytybe.models.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 

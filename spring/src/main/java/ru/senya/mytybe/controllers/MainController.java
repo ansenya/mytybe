@@ -1,14 +1,17 @@
 package ru.senya.mytybe.controllers;
 
+import com.google.gson.Gson;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.senya.mytybe.models.dto.VideoDto;
 import ru.senya.mytybe.models.jpa.VideoModel;
-import ru.senya.mytybe.models.es.EsVideoModel;
+import ru.senya.mytybe.models.redis.RedisVideoModel;
 import ru.senya.mytybe.repos.es.ElasticVideoRepository;
 import ru.senya.mytybe.repos.jpa.*;
+import ru.senya.mytybe.repos.redis.RedisVideoRepository;
 
 @RestController
 public class MainController {
@@ -22,6 +25,10 @@ public class MainController {
     VideoRepository videoRepository;
     final
     ImagesRepository imagesRepository;
+    final
+    RedisVideoRepository redisVideoRepository;
+
+    private final RedisTemplate<String, Object> redisTemplate;
 
 
     final
@@ -30,68 +37,37 @@ public class MainController {
     ModelMapper modelMapper = new ModelMapper();
 
     @Autowired
-    public MainController(UserRepository userRepository, ChannelRepository channelRepository, VideoRepository videoRepository, ImagesRepository imagesRepository, ElasticVideoRepository elasticsearchRepository) {
+    public MainController(UserRepository userRepository, ChannelRepository channelRepository, VideoRepository videoRepository, ImagesRepository imagesRepository, RedisVideoRepository redisVideoRepository, RedisTemplate<String, Object> redisTemplate, ElasticVideoRepository elasticsearchRepository) {
         this.userRepository = userRepository;
         this.channelRepository = channelRepository;
         this.videoRepository = videoRepository;
         this.imagesRepository = imagesRepository;
+        this.redisVideoRepository = redisVideoRepository;
+        this.redisTemplate = redisTemplate;
         this.elasticsearchRepository = elasticsearchRepository;
     }
 
 
-//    @GetMapping("penis")
-//    public ResponseEntity<?> penis() {
-//        ImageModel.ImageType imageType = ImageModel.ImageType.builder()
-//                .type("thumbnail")
-//                .build();
-//
-//        return ResponseEntity.ok(imageTypeRepository.save(imageType));
-//    }
-
-//    @GetMapping("test")
-//    public ResponseEntity<?> test() {
-//
-//        ImageModel.ImageType imageType = imageTypeRepository.findById(1L).get();
-//
-//
-//        List<VideoModel> videoModels = videoRepository.getAll();
-//
-//        for (VideoModel videoModel : videoModels) {
-//
-//            ImageModel imageModel = ImageModel.builder()
-//                    .type(imageType)
-//                    .path("def")
-//                    .video(videoModel)
-//                    .build();
-//
-//            videoModel.setThumbnail(imageModel);
-//
-//            imagesRepository.save(imageModel);
-//
-//            videoRepository.save(videoModel);
-//        }
-//
-//
-//        return ResponseEntity.ok(videoModels.stream().map(videoModel -> modelMapper.map(videoModel, VideoDto.class)));
-//    }
-
-
-    @GetMapping("test2")
-    public ResponseEntity<?> test2() {
-        EsVideoModel esVideoModel;
-
-        VideoModel videoModel = videoRepository.findById(6L).get();
-
-        esVideoModel = modelMapper.map(videoModel, EsVideoModel.class);
-
-        elasticsearchRepository.save(esVideoModel);
-
-        return ResponseEntity.ok(esVideoModel);
+    @GetMapping("test")
+    public ResponseEntity<?> getTest() {
+        return ResponseEntity.ok(redisVideoRepository.findAll());
     }
 
-    @GetMapping("test3")
-    public ResponseEntity<?> test3() {
-        return ResponseEntity.ok(elasticsearchRepository.find("фв", PageRequest.of(0, 10)));
+    @PostMapping("test")
+    public ResponseEntity<?> postTest() {
+        VideoModel videoModel = videoRepository.findById(1L).orElse(null);
+
+        RedisVideoModel redisVideoModel = modelMapper.map(videoModel, RedisVideoModel.class);
+
+        redisVideoRepository.save(redisVideoModel);
+
+        return ResponseEntity.ok(redisVideoModel);
+    }
+
+    @DeleteMapping("test")
+    public ResponseEntity<?> deleteTest() {
+        redisVideoRepository.deleteAll();
+        return ResponseEntity.ok().build();
     }
 
 }

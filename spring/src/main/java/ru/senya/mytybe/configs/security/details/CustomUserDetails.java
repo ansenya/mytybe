@@ -1,4 +1,4 @@
-package ru.senya.mytybe.security.details;
+package ru.senya.mytybe.configs.security.details;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

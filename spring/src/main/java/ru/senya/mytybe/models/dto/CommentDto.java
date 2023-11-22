@@ -1,10 +1,6 @@
-package ru.senya.mytybe.dto;
+package ru.senya.mytybe.models.dto;
 
-import jakarta.persistence.*;
 import lombok.Data;
-import org.hibernate.annotations.CurrentTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-import ru.senya.mytybe.models.jpa.CommentModel;
 
 import java.util.*;
 

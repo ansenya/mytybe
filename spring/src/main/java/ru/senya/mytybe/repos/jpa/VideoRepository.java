@@ -18,11 +18,6 @@ VideoRepository extends JpaRepository<VideoModel, Long> {
 
 
     @Query(value = "SELECT * FROM videos vm " +
-            "WHERE vm.id IN (:specificIds) ",
-            nativeQuery = true)
-    Page<VideoModel> findAllWithSpecificIdsAndOrder(List<Long> specificIds, Pageable pageable);
-
-    @Query(value = "SELECT * FROM videos vm " +
             "WHERE vm.id IN (:specificIds)" +
             "ORDER BY vm.created DESC",
             nativeQuery = true)
@@ -34,6 +29,6 @@ VideoRepository extends JpaRepository<VideoModel, Long> {
             nativeQuery = true)
     List<VideoModel> findNotInSpecificIds(List<Long> specificIds);
 
-    @Query(value = "SELECT * FROM videos WHERE id > 20", nativeQuery = true)
-    List<VideoModel> customQuery();
+    @Query(value = "select * from videos order by views DESC limit 100", nativeQuery = true)
+    List<VideoModel> getTheMostPopular();
 }

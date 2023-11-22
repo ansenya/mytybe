@@ -1,4 +1,4 @@
-package ru.senya.mytybe.security;
+package ru.senya.mytybe.configs.security;
 
 
 import org.springframework.boot.context.properties.ConfigurationProperties;

@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CurrentTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.redis.core.RedisHash;
 
 import java.util.Date;
 import java.util.Objects;
@@ -21,6 +22,7 @@ import static ru.senya.mytybe.MytybeApplication.PORT;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+
 public class ImageModel {
 
     @Id
@@ -61,9 +63,9 @@ public class ImageModel {
         return new ImageModelBuilder().path("def");
     }
 
-    public String getPath() {
-        return "http://" + IP + ":" + PORT + "/api/static/img?fileName=" + path;
-    }
+//    public String getPath() {
+//        return "http://" + IP + ":" + PORT + "/api/static/img?fileName=" + path;
+//    }
 
     @Override
     public int hashCode() {

@@ -1,4 +1,4 @@
-package ru.senya.mytybe.dto;
+package ru.senya.mytybe.models.dto;
 
 import lombok.Data;
 import ru.senya.mytybe.models.jpa.ImageModel;
@@ -15,7 +15,7 @@ public class ChannelDtoWithoutUser {
 
     private boolean deleted = false;
 
-    private ImageModel pfp; //todo: change to chp
+    private ImageDto pfp; //todo: change to chp
 
 //    private Set<VideoModel> videos = new HashSet<>();
 
@@ -24,4 +24,8 @@ public class ChannelDtoWithoutUser {
 //    private UserDtoWithoutChannels user;
 
 //    private Set<UserModel> followers = new HashSet<>();
+
+    public String getChp() {
+        return pfp.getFalsePath();
+    }
 }

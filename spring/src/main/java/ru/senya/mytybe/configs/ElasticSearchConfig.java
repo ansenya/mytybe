@@ -1,4 +1,4 @@
-package ru.senya.mytybe.search;
+package ru.senya.mytybe.configs.security;
 
 
 import org.elasticsearch.client.RestHighLevelClient;
@@ -12,7 +12,6 @@ import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 
 @Configuration
-@EnableElasticsearchRepositories(basePackages = "ru.senya.mytybe.repos.es")
 public class ElasticSearchConfig {
 
     @Value("${elasticsearch.url}")

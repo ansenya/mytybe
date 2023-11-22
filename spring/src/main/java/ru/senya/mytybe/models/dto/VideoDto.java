@@ -1,14 +1,9 @@
-package ru.senya.mytybe.dto;
+package ru.senya.mytybe.models.dto;
 
 import lombok.Data;
 import ru.senya.mytybe.models.jpa.CategoryModel;
-import ru.senya.mytybe.models.jpa.ImageModel;
-import ru.senya.mytybe.models.jpa.TagModel;
 
 import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
 
 @Data
 public class VideoDto {
@@ -23,7 +18,7 @@ public class VideoDto {
 
     private Long views = 0L;
 
-    private ImageModel thumbnail;
+    private ImageDto thumbnail;
 
     private ChannelDto channel;
 
@@ -33,7 +28,7 @@ public class VideoDto {
 
 //    private LinkedList<CommentDto> comments;
 
-    private Set<TagModel> tags;
+//    private Set<TagModel> tags;
 
 //    private Set<PlaylistModel> playlists;
 
@@ -56,15 +51,15 @@ public class VideoDto {
     private Date updated;
 
     public String getThumbnail() {
-        return thumbnail.getPath();
+        return thumbnail.getFalsePath();
     }
 
-    private List<String> getTags() {
-        List<String> good_tags = new LinkedList<>();
-        for (TagModel tagModel : tags) {
-            good_tags.add(tagModel.getEnTag());
-            good_tags.add(tagModel.getRuTag());
-        }
-        return good_tags;
-    }
+//    public List<String> getTags() {
+//        List<String> good_tags = new LinkedList<>();
+//        for (TagModel tagModel : tags) {
+//            good_tags.add(tagModel.getEnTag());
+//            good_tags.add(tagModel.getRuTag());
+//        }
+//        return good_tags;
+//    }
 }

@@ -8,8 +8,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CurrentTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.data.redis.core.RedisHash;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 import static ru.senya.mytybe.MytybeApplication.IP;
@@ -33,7 +35,7 @@ public class VideoModel {
 
     private Long duration;
 
-    private Long views = 0L;
+    private Long views;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "image_id")
@@ -58,7 +60,7 @@ public class VideoModel {
             name = "videos_tags",
             joinColumns = @JoinColumn(name = "video_id"),
             inverseJoinColumns = @JoinColumn(name = "tag_id"))
-    private Set<TagModel> tags;
+    private Set<TagModel> tags = new HashSet<>();
 
     @ManyToMany(mappedBy = "videos")
     private Set<PlaylistModel> playlists;
@@ -97,7 +99,4 @@ public class VideoModel {
         return views;
     }
 
-    public String getPath() {
-        return "http://" + IP + ":" + PORT + "/api/static/vid?fileName=" + path;
-    }
 }

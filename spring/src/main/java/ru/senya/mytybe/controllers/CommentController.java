@@ -9,7 +9,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import ru.senya.mytybe.dto.CommentDto;
+import ru.senya.mytybe.models.dto.CommentDto;
 import ru.senya.mytybe.models.jpa.ChannelModel;
 import ru.senya.mytybe.models.jpa.CommentModel;
 import ru.senya.mytybe.models.jpa.UserModel;
@@ -78,18 +78,12 @@ public class CommentController extends BaseController {
 
             List<CommentDto> comments =
                     commentRepository.findById(commentRepository.getReferenceById(commentID).getId()).get().getNextComments().stream().map(commentModel -> modelMapper.map(commentModel, CommentDto.class)).toList();
-//            Page<CommentDto> commentDtoPage = commentPage.map(commentModel -> modelMapper.map(commentModel, CommentDto.class));
 
             int fromIndex = (int) page.getOffset();
             int toIndex = Math.min((fromIndex + page.getPageSize()), comments.size());
 
-//            resultList = inSpecificIds.subList(fromIndex, toIndex);
-//
             return ResponseEntity.ok(new PageImpl<>(comments.subList(fromIndex, toIndex), page, comments.size()));
-
-//            return ResponseEntity.ok(commentDtoPage);
         }
-
     }
 
 
