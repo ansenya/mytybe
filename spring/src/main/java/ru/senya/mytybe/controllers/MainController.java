@@ -5,8 +5,13 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import ru.senya.mytybe.models.dto.ImageDto;
+import ru.senya.mytybe.models.dto.UserDto;
 import ru.senya.mytybe.models.dto.VideoDto;
+import ru.senya.mytybe.models.jpa.ImageModel;
+import ru.senya.mytybe.models.jpa.UserModel;
 import ru.senya.mytybe.models.jpa.VideoModel;
 import ru.senya.mytybe.models.redis.RedisVideoModel;
 import ru.senya.mytybe.repos.es.ElasticVideoRepository;
@@ -68,6 +73,31 @@ public class MainController {
     public ResponseEntity<?> deleteTest() {
         redisVideoRepository.deleteAll();
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("test2")
+    public ResponseEntity<?> pfp(Authentication authentication) {
+        UserModel userModel = userRepository.findByUsername(authentication.getName());
+
+//        ImageModel pfp = ImageModel.builder()
+//                .type("pfp")
+//                .user(userModel)
+//                .build();
+//        imagesRepository.save(pfp);;
+//
+//        userModel.setPfp(pfp);
+//
+//        userRepository.save(userModel);
+
+        System.out.println(new Gson().toJson(modelMapper.map(userModel.getPfp(), ImageDto.class)));
+
+        UserDto userDto = modelMapper.map(userModel, UserDto.class);
+
+        System.out.println(new Gson().toJson(userDto));
+
+//        System.out.println(userDto.getPfp());
+
+        return ResponseEntity.ok(userDto);
     }
 
 }

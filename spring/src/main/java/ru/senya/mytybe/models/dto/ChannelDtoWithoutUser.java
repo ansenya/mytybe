@@ -15,7 +15,7 @@ public class ChannelDtoWithoutUser {
 
     private boolean deleted = false;
 
-    private ImageDto pfp; //todo: change to chp
+    private ImageDto chp;
 
 //    private Set<VideoModel> videos = new HashSet<>();
 
@@ -26,6 +26,6 @@ public class ChannelDtoWithoutUser {
 //    private Set<UserModel> followers = new HashSet<>();
 
     public String getChp() {
-        return pfp.getFalsePath();
+        return chp.getFalsePath();
     }
 }
