@@ -52,7 +52,7 @@ public class SecurityConfig {
                         .requestMatchers("v/done").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS).permitAll()
                         .requestMatchers("/static/**").permitAll()
-                        .anyRequest().permitAll()
+                        .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(configurer -> configurer.jwt(jwt -> jwt.decoder(jwtDecoder())))
                 .userDetailsService(userDetailsService)

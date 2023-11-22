@@ -13,6 +13,8 @@ import ru.senya.mytybe.repos.jpa.UserRepository;
 import ru.senya.mytybe.services.VideoService;
 
 import java.io.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 
 @RestController
@@ -35,9 +37,11 @@ public class ThumbnailsController {
                                           @PathVariable Long id,
                                           Authentication authentication) {
         VideoModel videoModel = videoService.findById(id);
+
         if (videoModel == null) {
             return ResponseEntity.status(404).body("video is null");
         }
+
         if (!videoModel.getChannel().getUser().getId().equals(userRepository.findByUsername(authentication.getName()).getId())) {
             return ResponseEntity.status(403).build();
         }
@@ -46,9 +50,14 @@ public class ThumbnailsController {
             return ResponseEntity.status(404).body("th should be the photo, not the video");
         }
 
+        if (videoModel.getThumbnail().getPath().equals(videoModel.getVid_uuid())) {
+            File old = new File("src/main/resources/images", videoModel.getThumbnail().getPath());
+            old.delete();
+        }
+
         File destFile;
         try {
-            destFile = convertMultipartFileToFile(th, videoModel.getVid_uuid() + "." + th.getContentType().split("/")[1]);
+            destFile = convertMultipartFileToFile(th, videoModel.getPath() + "." + th.getContentType().split("/")[1]);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -56,7 +65,7 @@ public class ThumbnailsController {
         ImageModel thumbnail = ImageModel.builder()
                 .video(videoModel)
                 .type("th")
-                .path(videoModel.getVid_uuid() + "." + th.getContentType().split("/")[1])
+                .path(videoModel.getPath() + "." + th.getContentType().split("/")[1])
                 .build();
 
         thumbnail = imagesRepository.save(thumbnail);

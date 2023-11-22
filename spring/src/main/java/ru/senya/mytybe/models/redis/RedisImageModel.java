@@ -18,6 +18,7 @@ public class RedisImageModel {
     private String path;
 
     private String type;
+    private String vid_uuid;
 
     private Date created;
 
