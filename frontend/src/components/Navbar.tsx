@@ -1,24 +1,33 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { isTemplateHead } from 'typescript';
 import menuIcon from "../assets/menu-svgrepo-com (1) 1.svg"
 import searchIcon from "../assets/search-alt-svgrepo-com (3) 1.svg"
+import NavbarMainContent from './NavbarMainContent';
+import CButton from './UI/CButton/CButton';
 
 const Navbar = () => {
+    const [isSmallScreen, setIsSmallScreen] = useState<boolean>(window.innerWidth < 576) 
+    const [searchBarVisible, setSearchBarVisible] = useState<boolean>(false)
+
+    const handleResize = () => {
+      setIsSmallScreen(window.innerWidth < 576)
+    } 
+
+    useEffect(() => {
+      window.addEventListener("resize", handleResize)
+      return () => {
+        window.removeEventListener("resize", handleResize)
+      }
+    }, [])
     return (
         <div className="navbar">
-            <div className="navbar__menu">
-                <img src={menuIcon} alt="иконочка))" draggable={false}/>
-                <span>MyTubeVideo</span>
-            </div>
-            <div className="navbar__center">
-                <div className="search__bar">
-                    <img src={searchIcon} alt="иконочка))" draggable={false}/>
-                    <input type="text"/>
-                </div>
-            </div>
-            <div className="btns">
-                <button className="btns__signin">Sign in</button>
-                <button className="btns__signup">Sign out</button>
-            </div>
+          {
+            (searchBarVisible && isSmallScreen)
+            ?
+            <div></div>
+            :
+            <NavbarMainContent setSearchBarVisible={setSearchBarVisible} isSmallScreen={isSmallScreen}/> 
+          }
         </div>
     );
 };

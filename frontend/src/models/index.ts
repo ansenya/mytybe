@@ -5,7 +5,7 @@ export interface IUser {
     surname: string;
     role: string;
     sex: string;
-    pfp: any;
+    pfp: string;
     age: number;
     country: any;
     channels: IChannel[];
@@ -22,7 +22,7 @@ export interface IChannel {
     videosAmount: number;
     followersAmount: number;
     deleted: boolean;
-    pfp?: any;
+    chp: string;
 }
 
 export interface IVideo {

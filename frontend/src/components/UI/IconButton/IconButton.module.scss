@@ -1,0 +1,20 @@
+@import "../../../variables";
+.iconButton {
+  box-sizing: border-box;
+  background-color: $background-color;
+  min-height: 30px;
+  border: none;
+  display: flex;
+  margin-right: 6px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  img {
+    user-select: none;
+    height: 15px;
+  }
+  width: 30px;
+}
+.iconButton:hover {
+  background-color: $border-color;
+}

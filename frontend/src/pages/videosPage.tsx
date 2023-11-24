@@ -3,6 +3,7 @@ import {useAppSelector} from "../hooks/redux";
 import {useGetVideosQuery} from "../store/api/serverApi";
 import {IVideo} from "../models";
 import VideoLine from "../components/VideoLine"
+import CButton from '../components/UI/CButton/CButton';
 
 const VideosPage = () => {
 
