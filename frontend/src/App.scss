@@ -90,6 +90,49 @@ body {
       }
     }
 
+    .search__smartphone {
+      img {
+        user-select: none;
+        height: 15px;
+      }
+
+      .input-active {
+        box-shadow: 0 0 6px $primary-color;
+      }
+
+      margin-left: 6px;
+      min-height: 33px;
+      flex: 1;
+      display: flex;
+      padding: 0 8px;
+      border: $primary-color 3px solid;
+      border-radius: 10px;
+      align-items: center;
+
+      input {
+        background: transparent;
+        color: $primary-color;
+        margin-left: 10px;
+        height: 100%;
+        width: 100%;
+        flex: 1;
+        border: none;
+        outline: none;
+        font-size: 20px;
+        font-weight: bolder;
+
+        &::selection {
+          font-size: 20px;
+          text-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+          animation: caret-blink 1s infinite;
+        }
+
+        &:hover {
+          cursor: text;
+        }
+      }
+    }
+
     .btns {
       display: flex;
       gap: 6px;
@@ -97,15 +140,10 @@ body {
 
     &__menu {
       display: flex;
-      gap: 6px;
+      gap: 3px;
       height: 100%;
       align-items: center;
 
-      img {
-        user-select: none;
-        height: 20px;
-        margin-bottom: 2px;
-      }
       span {
         color: $text-color;
         font-size: 25px;

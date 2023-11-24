@@ -3,6 +3,7 @@ import { isTemplateHead } from 'typescript';
 import menuIcon from "../assets/menu-svgrepo-com (1) 1.svg"
 import searchIcon from "../assets/search-alt-svgrepo-com (3) 1.svg"
 import NavbarMainContent from './NavbarMainContent';
+import NavSearchbar from './NavSearchbar';
 import CButton from './UI/CButton/CButton';
 
 const Navbar = () => {
@@ -12,6 +13,12 @@ const Navbar = () => {
     const handleResize = () => {
       setIsSmallScreen(window.innerWidth < 576)
     } 
+
+    useEffect(() => {
+      if (!isSmallScreen && searchBarVisible){
+        setSearchBarVisible(false);
+      }
+    }, [isSmallScreen])
 
     useEffect(() => {
       window.addEventListener("resize", handleResize)
@@ -24,7 +31,7 @@ const Navbar = () => {
           {
             (searchBarVisible && isSmallScreen)
             ?
-            <div></div>
+            <NavSearchbar setSearchBarVisible={setSearchBarVisible}/>
             :
             <NavbarMainContent setSearchBarVisible={setSearchBarVisible} isSmallScreen={isSmallScreen}/> 
           }

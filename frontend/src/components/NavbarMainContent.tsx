@@ -1,6 +1,7 @@
-import React, { FC } from "react";
+import React, { FC, useEffect } from "react";
 import menuIcon from "../assets/menu-svgrepo-com (1) 1.svg";
 import searchIcon from "../assets/search-alt-svgrepo-com (3) 1.svg";
+import { useAppSelector } from "../hooks/redux";
 import CButton from "./UI/CButton/CButton";
 import IconButton from "./UI/IconButton/IconButton";
 
@@ -13,10 +14,15 @@ const NavbarMainContent: FC<MainContentProps> = ({
   setSearchBarVisible,
   isSmallScreen,
 }) => {
+  const {user} = useAppSelector(state => state.auth)
+
+  useEffect(() => {
+    console.log(user?.name)
+  }, [])
   return (
     <>
       <div className="navbar__menu">
-        <img src={menuIcon} alt="иконочка))" draggable={false} />
+        <IconButton icon={menuIcon}/>
         <span>Spot</span>
       </div>
       <div className="navbar__center">

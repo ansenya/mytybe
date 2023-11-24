@@ -15,17 +15,15 @@ const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-    setAuth(state, payload: PayloadAction<[IUser, IToken]>) {
-      state.user = payload.payload[0];
-      localStorage.setItem("jwtoken", payload.payload[1].token);
-      localStorage.setItem("id", payload.payload[0].id.toString());
-      localStorage.setItem("username", payload.payload[0].username);
+    setUser(state, payload: PayloadAction<IUser>){
+      state.user = payload.payload
+    },
+    setToken(state, payload: PayloadAction<IToken>) {
+      localStorage.setItem("jwtoken", payload.payload.token);
     },
     clearAuth(state) {
       state = initialState;
       localStorage.removeItem("jwtoken");
-      localStorage.removeItem("id");
-      localStorage.removeItem("username");
     },
   },
 });

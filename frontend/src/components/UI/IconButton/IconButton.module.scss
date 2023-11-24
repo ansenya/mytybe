@@ -2,7 +2,7 @@
 .iconButton {
   box-sizing: border-box;
   background-color: $background-color;
-  min-height: 30px;
+  min-height: 35px;
   border: none;
   display: flex;
   margin-right: 6px;
@@ -13,7 +13,7 @@
     user-select: none;
     height: 15px;
   }
-  width: 30px;
+  width: 35px;
 }
 .iconButton:hover {
   background-color: $border-color;

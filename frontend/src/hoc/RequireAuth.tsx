@@ -1,21 +1,32 @@
-import React, {FC} from 'react';
-import {Navigate, useLocation} from "react-router-dom";
+import React, { FC, useEffect } from "react";
+import { Navigate, useLocation } from "react-router-dom";
+import { useActions } from "../hooks/actions";
+import { useGetAuthQuery } from "../store/api/serverApi";
 
 interface RequireAuthProps {
-    children?: React.ReactElement
+  children?: React.ReactElement;
 }
 
+const RequireAuth: FC<RequireAuthProps> = ({ children }) => {
+  const { setUser } = useActions();
+  const location = useLocation();
 
-export const RequireAuth = ({children}: RequireAuthProps) => {
-    let auth = false;
-    const location = useLocation()
+  const { isLoading, isError, data } = useGetAuthQuery();
 
-
-    if (!localStorage.getItem("jwtoken")){
-        return <Navigate to="/login" state={{from: location}}/>
+  useEffect(() => {
+    if (data) {
+      console.log(data[0].name)
+      setUser(data[0]);
     }
+  }, [data, setUser]);
 
-    return <>{children}</>
+  if (isLoading) {
+    return <div>Loading...</div>;
+  } else if (isError || !localStorage.getItem("jwtoken")) {
+    return <Navigate to="/login" state={{ from: location }} />;
+  } else {
+    return <>{children}</>;
+  }
 };
 
 export default RequireAuth;
