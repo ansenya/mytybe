@@ -48,6 +48,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers("u/auth/register").permitAll()
+                        .requestMatchers("u/auth/login").permitAll()
                         .requestMatchers("v/tag").permitAll()
                         .requestMatchers("v/done").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS).permitAll()
