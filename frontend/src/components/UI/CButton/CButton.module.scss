@@ -13,8 +13,26 @@
 
 .primary {
   background: $primary-color;
+  &:hover{
+    cursor: pointer;
+    background: $primary-hovered;
+  }
+  &:active{
+    background: #25286e;
+  }
 }
 
 .secondary {
   background: $secondary-color; 
+
+  &:hover{
+    cursor: pointer;
+    background: $secondary-hovered;
+  }
+
+  &:active{
+    background: #25286e;
+  }
 }
+
+

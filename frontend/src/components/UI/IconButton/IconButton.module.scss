@@ -11,10 +11,14 @@
   border-radius: 10px;
   img {
     user-select: none;
-    height: 15px;
+    height: 20px;
   }
   width: 35px;
-}
-.iconButton:hover {
-  background-color: $border-color;
+  &:hover{
+    cursor: pointer;
+    background-color: $border-color;
+  }
+  &:active{
+    background-color: $bright-plain-color;
+  }
 }

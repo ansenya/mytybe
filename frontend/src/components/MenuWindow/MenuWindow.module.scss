@@ -1,0 +1,30 @@
+@import "../../variables";
+
+.overlay {
+  display: none;
+  position: fixed;
+  top: 60px;
+  right: 0;
+  left: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1;
+
+  &.active {
+    display: flex;
+  } 
+}
+
+.menuWindow {
+  position: fixed;
+  height: calc(100vh - 60px);
+  top: 60px;
+  width: 220px;
+  z-index: 2;
+  background: $background-color;
+  left: -220px;
+  transition: left 0.3s ease;
+  &.open{
+    left: 0;
+  }
+}

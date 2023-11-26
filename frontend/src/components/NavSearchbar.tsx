@@ -20,7 +20,7 @@ const NavSearchbar: FC<NavSearchbarProps> = ({setSearchBarVisible}) => {
         <IconButton icon={arrowIcon} onClick={() => setSearchBarVisible(false)}/>
         <div className="search__smartphone">
           <img src={searchIcon} alt="иконочка))" draggable={false} />
-          <input type="text" ref={inputRef} />
+          <input type="text" ref={inputRef} spellCheck={false}/>
         </div>
       </div>
     </>

@@ -12,6 +12,7 @@
 body {
   background: $background-color;
   font-family: "Roboto Thin", sans-serif;
+  height: 100vh;
   overflow: auto;
 }
 
@@ -22,6 +23,7 @@ body {
   border-bottom: $border-color 2px solid;
   height: 60px;
   background: $background-color;
+  z-index: 2;
 
   .navbar {
     width: 97%;
@@ -55,7 +57,7 @@ body {
           box-shadow: 0 0 6px $primary-color;
         }
 
-        margin: 0 6px 0 60px;
+        margin: 0 6px 0 20px;
         min-height: 33px;
         width: 400px;
         background: $secondary-color;
@@ -184,13 +186,13 @@ body {
       align-items: center;
       gap: 10px;
 
-      .avatar {
-        width: 35px;
-        height: 35px;
-        object-fit: cover;
-        border-radius: 50%;
-        user-select: none;
-      }
+      // .avatar {
+      //   width: 35px;
+      //   height: 35px;
+      //   object-fit: cover;
+      //   border-radius: 50%;
+      //   user-select: none;
+      // }
 
       div {
         height: 100%;
@@ -226,4 +228,13 @@ body {
   50% {
     opacity: 0;
   }
+}
+
+.avatar {
+  width: 35px;
+  height: 35px;
+  object-fit: cover;
+  border-radius: 50%;
+  cursor: pointer;
+  user-select: none;
 }

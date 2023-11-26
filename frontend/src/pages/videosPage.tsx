@@ -4,6 +4,7 @@ import {useGetVideosQuery} from "../store/api/serverApi";
 import {IVideo} from "../models";
 import VideoLine from "../components/VideoLine"
 import CButton from '../components/UI/CButton/CButton';
+import Loader from '../components/UI/Loader/Loader';
 
 const VideosPage = () => {
 

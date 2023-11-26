@@ -4,7 +4,7 @@ import styles from "./CButton.module.scss"
 type ButtonType = "primary" | "secondary"
 
 interface addButtonProps {
-  buttonType?: ButtonType; 
+  buttonType: ButtonType; 
 }
 
 type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & addButtonProps;

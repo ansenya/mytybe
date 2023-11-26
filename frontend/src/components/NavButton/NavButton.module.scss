@@ -1,0 +1,31 @@
+@import "../../variables";
+
+.navButton {
+  height: 40px;
+  border: none;
+  border-radius: 10px;
+  background: $background-color;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+  padding-left: 10px;
+  font-size: 15px;
+  font-weight: 600;
+  color: $text-color;
+  width: 95%;
+  margin: 6px auto;
+
+  img {
+    user-select: none;
+    height: 20px;
+  }
+  &:hover {
+    background: $border-color;
+  }
+
+  &.active {
+    background: $bright-plain-color;
+  }
+}

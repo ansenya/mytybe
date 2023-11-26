@@ -1,0 +1,16 @@
+@import "../../../variables";
+
+.loader {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 6px solid $bright-plain-color; 
+  border-right-color: $primary-color;
+  animation: spin 1s ease infinite;
+}
+
+@keyframes spin{
+  100%{
+    transform: rotate(360deg);
+  }
+}

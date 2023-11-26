@@ -2,6 +2,7 @@ import React from 'react';
 import {Outlet, NavLink, useNavigate} from 'react-router-dom'
 import {useActions} from "../hooks/actions";
 import Navbar from "../components/Navbar";
+import MenuWindow from '../components/MenuWindow/MenuWindow';
 
 
 const Layout = () => {

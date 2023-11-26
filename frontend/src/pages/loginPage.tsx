@@ -10,7 +10,7 @@ const LoginPage = () => {
     const navigate = useNavigate();
     const pathFrom = location.state?.from?.pathname
 
-    const {setToken, setUser} = useActions()
+    const {setToken, setUser, setIsError, setIsLoaded} = useActions()
 
     const [username, setUsername] = useState<string>('')
     const [password, setPassword] = useState<string>('')
@@ -29,6 +29,8 @@ const LoginPage = () => {
     useEffect(() => {
         if (!isLoading && data !== undefined ){
             setToken(data[1]);
+            setIsLoaded(true);
+            setIsError(false)
             setUser(data[0]);
             navigate(pathFrom || '/', {replace: true})
         }
