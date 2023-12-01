@@ -57,7 +57,7 @@ body {
           box-shadow: 0 0 6px $primary-color;
         }
 
-        margin: 0 6px 0 20px;
+        margin: 0 6px 0 60px;
         min-height: 33px;
         width: 400px;
         background: $secondary-color;
@@ -137,7 +137,13 @@ body {
 
     .btns {
       display: flex;
+      width: 146px;
       gap: 6px;
+      justify-content: flex-end;
+
+      @media (max-width: 576px) {
+        width: auto;
+      }
     }
 
     &__menu {
@@ -156,6 +162,7 @@ body {
 }
 
 .main {
+  max-width: 1920px;
   width: 97%;
   margin: 30px auto;
 

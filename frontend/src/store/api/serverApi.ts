@@ -68,4 +68,5 @@ export const {
   useGetUserByIdQuery,
   useLazyGetUserByIdQuery,
   useGetVideosQuery,
+  useLazyGetVideosQuery,
 } = serverApi;

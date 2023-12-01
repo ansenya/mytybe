@@ -2,12 +2,12 @@ import React from 'react';
 import {IVideo} from "../models";
 import VideoCard from "./UI/VideoCard";
 
-interface VideoLineProps {
+interface VideosProps {
     categoryName: string,
     videos: IVideo[]
 }
 
-const VideoLine = ({videos, categoryName}: VideoLineProps) => {
+const Videos = ({videos, categoryName}: VideosProps) => {
 
 
     return (
@@ -24,4 +24,4 @@ const VideoLine = ({videos, categoryName}: VideoLineProps) => {
     );
 };
 
-export default VideoLine;
+export default Videos;
