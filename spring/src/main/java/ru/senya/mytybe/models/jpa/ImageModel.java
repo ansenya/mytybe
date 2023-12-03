@@ -22,7 +22,6 @@ import static ru.senya.mytybe.MytybeApplication.PORT;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-
 public class ImageModel {
 
     @Id
@@ -60,7 +59,7 @@ public class ImageModel {
     private boolean deleted = false;
 
     public static ImageModelBuilder builder() {
-        return new ImageModelBuilder().path("def");
+        return new ImageModelBuilder().path("def.jpg");
     }
 
 //    public String getPath() {

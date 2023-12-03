@@ -32,6 +32,10 @@ public class UserModel {
     @EqualsAndHashCode.Include
     private String name, surname;
 
+    private String publicStreamLink;
+
+    private String privateStreamLink;
+
     @EqualsAndHashCode.Include
     private String sex = "none";
 
@@ -95,6 +99,9 @@ public class UserModel {
             inverseJoinColumns = @JoinColumn(name = "video_id"))
     private Set<VideoModel> recommendedVideos;
 
+    @OneToMany(mappedBy = "user")
+    private Set<UserLinkEntity> links;
+
     @CurrentTimestamp
     @EqualsAndHashCode.Include
     private Date created;
@@ -102,6 +109,9 @@ public class UserModel {
     @UpdateTimestamp
     @EqualsAndHashCode.Include
     private Date updated;
+
+    @EqualsAndHashCode.Include
+    private boolean streaming = false;
 
     @EqualsAndHashCode.Include
     private boolean deleted = false;

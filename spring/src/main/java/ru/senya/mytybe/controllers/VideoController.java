@@ -226,7 +226,7 @@ public class VideoController extends BaseController {
         return ResponseEntity.ok(modelMapper.map(video, VideoDto.class));
     }
 
-    @GetMapping("{id}?likes")
+    @GetMapping("{id}/likes")
     public ResponseEntity<?> getLiked(@PathVariable Long id,
                                       @RequestParam("page") int page,
                                       @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize) {

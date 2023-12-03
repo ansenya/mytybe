@@ -32,14 +32,18 @@ public class ThumbnailsController {
         this.imagesRepository = imagesRepository;
     }
 
-    @PostMapping("{id}?th")
+    @PostMapping("{id}/th")
     public ResponseEntity<?> setThumbnail(@RequestParam(value = "th", required = false) MultipartFile th,
                                           @PathVariable Long id,
                                           Authentication authentication) {
         VideoModel videoModel = videoService.findById(id);
 
         if (videoModel == null) {
-            return ResponseEntity.status(404).body("video is null");
+            return ResponseEntity.status(400).body("video is null");
+        }
+
+        if (th == null || th.getContentType() == null) {
+            return ResponseEntity.status(400).body("thumbnail is null");
         }
 
         if (!videoModel.getChannel().getUser().getId().equals(userRepository.findByUsername(authentication.getName()).getId())) {
@@ -50,9 +54,13 @@ public class ThumbnailsController {
             return ResponseEntity.status(404).body("th should be the photo, not the video");
         }
 
-        if (videoModel.getThumbnail().getPath().equals(videoModel.getVid_uuid())) {
-            File old = new File("src/main/resources/images", videoModel.getThumbnail().getPath());
-            old.delete();
+        try {
+            if (videoModel.getThumbnail().getPath().equals(videoModel.getVid_uuid())) {
+                File old = new File("src/main/resources/images", videoModel.getThumbnail().getPath());
+                old.delete();
+            }
+        } catch (NullPointerException ignored){
+
         }
 
         File destFile;

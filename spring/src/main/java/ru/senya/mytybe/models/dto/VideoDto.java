@@ -2,8 +2,12 @@ package ru.senya.mytybe.models.dto;
 
 import lombok.Data;
 import ru.senya.mytybe.models.jpa.CategoryModel;
+import ru.senya.mytybe.models.jpa.ImageModel;
 
 import java.util.Date;
+
+import static ru.senya.mytybe.MytybeApplication.IP;
+import static ru.senya.mytybe.MytybeApplication.PORT;
 
 @Data
 public class VideoDto {
@@ -18,13 +22,14 @@ public class VideoDto {
 
     private Long views = 0L;
 
+    private String path;
+
     private ImageDto thumbnail;
 
     private ChannelDto channel;
 
     private CategoryModel category;
 
-    private String path;
 
 //    private LinkedList<CommentDto> comments;
 
@@ -51,8 +56,21 @@ public class VideoDto {
     private Date updated;
 
     public String getThumbnail() {
-        return thumbnail.getFalsePath();
+        try {
+            return thumbnail.getFalsePath();
+        } catch (Exception e){
+            return "http://" + IP + ":" + PORT + "/api/static/img?fileName=" + "def.jpg";
+        }
     }
+
+    public String getPath() {
+        if (stream) {
+            return "http://" + IP + ":" + PORT + "/hls/" + path + ".m3u8";
+        } else {
+            return "http://" + IP + ":" + PORT + "/api/static/vid?fileName=" + path + ".mp4";
+        }
+    }
+
 
 //    public List<String> getTags() {
 //        List<String> good_tags = new LinkedList<>();

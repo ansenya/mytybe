@@ -17,6 +17,8 @@ import ru.senya.mytybe.models.jpa.UserModel;
 import ru.senya.mytybe.models.jpa.UserRequest;
 import ru.senya.mytybe.repos.jpa.UserRepository;
 
+import java.util.UUID;
+
 
 @RequestMapping("auth")
 @RestController
@@ -93,5 +95,6 @@ public class AuthController {
         user.setCountry("ru");
         user.setSex(userRequest.getSex());
         user.setPfp(pfp);
+        user.setPublicStreamLink(String.valueOf(UUID.randomUUID()));
     }
 }

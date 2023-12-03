@@ -19,12 +19,14 @@ VideoRepository extends JpaRepository<VideoModel, Long> {
 
     @Query(value = "SELECT * FROM videos vm " +
             "WHERE vm.id IN (:specificIds)" +
+            "and not vm.stream" +
             "ORDER BY vm.created DESC",
             nativeQuery = true)
     List<VideoModel> findInSpecificIds(List<Long> specificIds);
 
     @Query(value = "SELECT * FROM videos vm " +
             "WHERE vm.id NOT IN (:specificIds)" +
+            "and not vm.stream" +
             "ORDER BY vm.created ASC",
             nativeQuery = true)
     List<VideoModel> findNotInSpecificIds(List<Long> specificIds);

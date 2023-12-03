@@ -43,17 +43,18 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-//                .addFilterAfter(new LoggingFilter(), BasicAuthenticationFilter .class)
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers("u/auth/register").permitAll()
-                        .requestMatchers("u/auth/login").permitAll()
-                        .requestMatchers("v/tag").permitAll()
-                        .requestMatchers("v/done").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS).permitAll()
+                        .requestMatchers("auth/register").permitAll()
+                        .requestMatchers("auth/login").permitAll()
+                        .requestMatchers("videos/tag").permitAll()
+                        .requestMatchers("videos/done").permitAll()
                         .requestMatchers("/static/**").permitAll()
-                        .anyRequest().authenticated()
+                        .requestMatchers("/stream/validate").permitAll()
+                        .requestMatchers("/stream/**").permitAll()
+                        .anyRequest().permitAll()
                 )
                 .oauth2ResourceServer(configurer -> configurer.jwt(jwt -> jwt.decoder(jwtDecoder())))
                 .userDetailsService(userDetailsService)

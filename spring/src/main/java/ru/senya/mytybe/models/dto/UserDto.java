@@ -1,10 +1,12 @@
 package ru.senya.mytybe.models.dto;
 
 import lombok.Data;
-import ru.senya.mytybe.models.jpa.ImageModel;
 
 import java.util.Date;
 import java.util.Set;
+
+import static ru.senya.mytybe.MytybeApplication.IP;
+import static ru.senya.mytybe.MytybeApplication.PORT;
 
 @Data
 public class UserDto {
@@ -17,10 +19,11 @@ public class UserDto {
     private ImageDto pfp;
     private Integer age;
     private String country;
+//    private String streamLink;
     private Set<ChannelDtoWithoutUser> channels;
 //    private List<VideoModel> lastViewed;
 
-//    private Set<UserModel> subscriptions;
+    //    private Set<UserModel> subscriptions;
 //    private Set<CommentModel> comments;
 //    private Set<VideoModel> likedVideos;
 //    private Set<VideoModel> dislikedVideos;
