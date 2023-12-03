@@ -18,7 +18,7 @@ import java.nio.file.Paths;
 
 
 @RestController
-@RequestMapping("v")
+@RequestMapping("videos")
 public class ThumbnailsController {
 
     final VideoService videoService;
@@ -32,7 +32,7 @@ public class ThumbnailsController {
         this.imagesRepository = imagesRepository;
     }
 
-    @PostMapping("video/{id}/th")
+    @PostMapping("{id}?th")
     public ResponseEntity<?> setThumbnail(@RequestParam(value = "th", required = false) MultipartFile th,
                                           @PathVariable Long id,
                                           Authentication authentication) {

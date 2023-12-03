@@ -21,7 +21,7 @@ import ru.senya.mytybe.repos.jpa.UserRepository;
 import java.util.Objects;
 
 
-@RequestMapping("c")
+@RequestMapping("channels")
 @RestController
 public class ChannelController extends BaseController {
     final
@@ -40,7 +40,7 @@ public class ChannelController extends BaseController {
         this.imagesRepository = imagesRepository;
     }
 
-    @GetMapping("channel/{id}")
+    @GetMapping("{id}")
     public ResponseEntity<?> getOne(@PathVariable Long id) {
 
         if (id == null) {
@@ -58,7 +58,7 @@ public class ChannelController extends BaseController {
         return ResponseEntity.ok(channelDto);
     }
 
-    @GetMapping("all")
+    @GetMapping
     public ResponseEntity<?> getALl(@RequestParam(value = "page", required = false) Integer pageNum,
                                     @RequestParam(value = "size", required = false, defaultValue = "10") int pageSize,
                                     @RequestParam(value = "sort", required = false, defaultValue = "asc") String sort,
@@ -105,7 +105,7 @@ public class ChannelController extends BaseController {
         }
     }
 
-    @PostMapping("channel")
+    @PostMapping("create")
     public ResponseEntity<?> create(@RequestParam(value = "name") String name, Authentication authentication) {
         UserModel userModel = userRepository.findByUsername(authentication.getName());
 

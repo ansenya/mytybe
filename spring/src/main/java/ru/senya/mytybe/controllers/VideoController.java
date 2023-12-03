@@ -31,7 +31,7 @@ import ru.senya.mytybe.services.VideoService;
 import java.io.*;
 import java.util.*;
 
-@RequestMapping("v")
+@RequestMapping("videos")
 @RestController
 public class VideoController extends BaseController {
 
@@ -61,7 +61,7 @@ public class VideoController extends BaseController {
     }
 
 
-    @GetMapping("all")
+    @GetMapping
     public ResponseEntity<?> getAll(@RequestParam(value = "page", required = false) Integer pageNum,
                                     @RequestParam(value = "size", required = false, defaultValue = "10") int pageSize,
                                     @RequestParam(value = "sort", required = false, defaultValue = "asc") String sort,
@@ -100,7 +100,7 @@ public class VideoController extends BaseController {
         return ResponseEntity.ok(videoDtoPage);
     }
 
-    @PostMapping("video")
+    @PostMapping("upload")
     public ResponseEntity<?> upload(@RequestParam(value = "video", required = false) MultipartFile file,
                                     @RequestParam(value = "channelId", required = false) Long channelId,
                                     @RequestParam(value = "videoName", required = false, defaultValue = "") String videoName,
@@ -175,7 +175,7 @@ public class VideoController extends BaseController {
         return ResponseEntity.ok(modelMapper.map(video, VideoDto.class));
     }
 
-    @GetMapping("video/{id}")
+    @GetMapping("{id}")
     public ResponseEntity<?> getOne(@PathVariable Long id, Authentication authentication) {
         UserModel userModel = userRepository.findByUsername(authentication.getName());
 
@@ -195,7 +195,7 @@ public class VideoController extends BaseController {
     }
 
 
-    @PutMapping("video/{id}")
+    @PutMapping("{id}")
     public ResponseEntity<?> like(@PathVariable Long id, @RequestParam("like") Boolean like, Authentication
             authentication) {
         VideoModel video = videoService.findById(id);
@@ -226,8 +226,9 @@ public class VideoController extends BaseController {
         return ResponseEntity.ok(modelMapper.map(video, VideoDto.class));
     }
 
-    @GetMapping("video/{id}/likes")
-    public ResponseEntity<?> getLiked(@PathVariable Long id, @RequestParam("page") int page,
+    @GetMapping("{id}?likes")
+    public ResponseEntity<?> getLiked(@PathVariable Long id,
+                                      @RequestParam("page") int page,
                                       @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize) {
         VideoModel video = videoService.findById(id);
         if (video == null) {
@@ -242,56 +243,56 @@ public class VideoController extends BaseController {
     }
 
 
-    @GetMapping("eta")
-    public ResponseEntity<?> getEta(@RequestParam(value = "id") Long id) {
-        VideoModel videoModel = videoService.findById(id);
+//    @GetMapping("eta")
+//    public ResponseEntity<?> getEta(@RequestParam(value = "id") Long id) {
+//        VideoModel videoModel = videoService.findById(id);
+//
+//        if (videoModel == null) {
+//            return ResponseEntity.notFound().build();
+//        }
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.set("Content-Type", "application/json");
+//
+//        return ResponseEntity.ok().headers(headers).body(requestEta(videoModel.getVid_uuid()));
+//    }
 
-        if (videoModel == null) {
-            return ResponseEntity.notFound().build();
-        }
-        HttpHeaders headers = new HttpHeaders();
-        headers.set("Content-Type", "application/json");
-
-        return ResponseEntity.ok().headers(headers).body(requestEta(videoModel.getVid_uuid()));
-    }
-
-    @PostMapping("tag")
-    public ResponseEntity<?> setTag(@RequestParam(value = "tag", required = false) String tag,
-                                    @RequestParam(value = "id", required = false) Long id) {
-
-        System.out.println(tag);
-        TagModel tagModel = tagRepository.findByEnTag(tag);
-        VideoModel videoModel = videoService.findById(id);
-
-        if (tagModel == null || videoModel == null) {
-            return ResponseEntity.status(404).build();
-        }
-
-//        tagModel.getVideos().add(videoModel);
-//        tagModel = tagRepository.save(tagModel);
-        
-        videoModel.getTags().add(tagModel);
-        videoModel = videoService.save(videoModel);
-
-        return ResponseEntity.ok(videoModel);
-    }
-
-    @PostMapping("done")
-    public ResponseEntity<?> setDone(@RequestParam(value = "id", required = false) Long id) {
-        VideoModel videoModel = videoService.findById(id);
-
-        if (videoModel == null) {
-            return ResponseEntity.status(404).build();
-        }
-
-        EsVideoModel esVideoModel = modelMapper.map(videoModel, EsVideoModel.class);
-
-        esVideoModel = elasticVideoRepository.save(esVideoModel);
-
-        System.out.println(gson.toJson(esVideoModel));
-
-        return ResponseEntity.ok(esVideoModel);
-    }
+//    @PostMapping("tag")
+//    public ResponseEntity<?> setTag(@RequestParam(value = "tag", required = false) String tag,
+//                                    @RequestParam(value = "id", required = false) Long id) {
+//
+//        System.out.println(tag);
+//        TagModel tagModel = tagRepository.findByEnTag(tag);
+//        VideoModel videoModel = videoService.findById(id);
+//
+//        if (tagModel == null || videoModel == null) {
+//            return ResponseEntity.status(404).build();
+//        }
+//
+////        tagModel.getVideos().add(videoModel);
+////        tagModel = tagRepository.save(tagModel);
+//
+//        videoModel.getTags().add(tagModel);
+//        videoModel = videoService.save(videoModel);
+//
+//        return ResponseEntity.ok(videoModel);
+//    }
+//
+//    @PostMapping("done")
+//    public ResponseEntity<?> setDone(@RequestParam(value = "id", required = false) Long id) {
+//        VideoModel videoModel = videoService.findById(id);
+//
+//        if (videoModel == null) {
+//            return ResponseEntity.status(404).build();
+//        }
+//
+//        EsVideoModel esVideoModel = modelMapper.map(videoModel, EsVideoModel.class);
+//
+//        esVideoModel = elasticVideoRepository.save(esVideoModel);
+//
+//        System.out.println(gson.toJson(esVideoModel));
+//
+//        return ResponseEntity.ok(esVideoModel);
+//    }
 
     private String requestEta(String uuid) {
         RestTemplate restTemplate = new RestTemplate();

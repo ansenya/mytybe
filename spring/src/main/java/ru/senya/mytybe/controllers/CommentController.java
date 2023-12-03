@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Objects;
 
 
-@RequestMapping("com")
+@RequestMapping("comments")
 @RestController
 public class CommentController extends BaseController {
 
@@ -44,7 +44,7 @@ public class CommentController extends BaseController {
     }
 
 
-    @GetMapping("/all")
+    @GetMapping
     public ResponseEntity<?> getAll(@RequestParam(value = "page", required = false) Integer pageNum,
                                     @RequestParam(value = "size", required = false, defaultValue = "10") int pageSize,
                                     @RequestParam(value = "sort", required = false, defaultValue = "asc") String sort,
@@ -87,8 +87,8 @@ public class CommentController extends BaseController {
     }
 
 
-    @GetMapping("/comment")
-    public ResponseEntity<?> getComment(@RequestParam(value = "id", required = false) Long id) {
+    @GetMapping("{id}")
+    public ResponseEntity<?> getComment(@PathVariable Long id) {
         if (id == null) {
             return ResponseEntity.badRequest().body("id is null");
         }
@@ -102,7 +102,7 @@ public class CommentController extends BaseController {
         return ResponseEntity.ok(modelMapper.map(comment, CommentDto.class));
     }
 
-    @PostMapping("/comment")
+    @PostMapping("create")
     public ResponseEntity<?> leaveComment(@RequestParam(value = "text", required = false) String text,
                                           @RequestParam(value = "commentId", required = false) Long commentId,
                                           @RequestParam(value = "channelId", required = false) Long channelId,

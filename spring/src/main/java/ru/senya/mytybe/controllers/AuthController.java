@@ -18,7 +18,7 @@ import ru.senya.mytybe.models.jpa.UserRequest;
 import ru.senya.mytybe.repos.jpa.UserRepository;
 
 
-@RequestMapping("/u/auth")
+@RequestMapping("auth")
 @RestController
 public class AuthController {
 
@@ -50,16 +50,10 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody UserRequest userRequest) {
-
-        if (userRequest == null || userRequest.isEmpty())
-            return ResponseEntity.badRequest().body("Empty body");
-        if (userRepository.existsByUsername(userRequest.getUsername())) {
-            return ResponseEntity.status(409).build();
+        var validationResponse = validateUserRequest(userRequest);
+        if (validationResponse != null) {
+            return validationResponse;
         }
-        if (userRequest.getPassword().length() < 7) {
-            return ResponseEntity.status(406).body("Password must contain than 7 or more letters");
-        }
-
 
         UserModel user = new UserModel();
 
@@ -68,6 +62,28 @@ public class AuthController {
                 .user(user)
                 .build();
 
+        createUser(userRequest, user, pfp);
+
+        user = userRepository.save(user);
+
+        imagesRepository.save(pfp);
+
+        return ResponseEntity.ok(modelMapper.map(user, UserDto.class));
+    }
+
+    private ResponseEntity<?> validateUserRequest(UserRequest userRequest) {
+        if (userRequest == null || userRequest.isEmpty())
+            return ResponseEntity.badRequest().body("Empty body");
+        if (userRepository.existsByUsername(userRequest.getUsername())) {
+            return ResponseEntity.status(409).build();
+        }
+        if (userRequest.getPassword().length() < 7) {
+            return ResponseEntity.status(406).body("Password must contain than 7 or more letters");
+        }
+        return null;
+    }
+
+    private void createUser(UserRequest userRequest, UserModel user, ImageModel pfp) {
         user.setUsername(userRequest.getUsername());
         user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
         user.setName(userRequest.getName());
@@ -77,11 +93,5 @@ public class AuthController {
         user.setCountry("ru");
         user.setSex(userRequest.getSex());
         user.setPfp(pfp);
-
-        user = userRepository.save(user);
-
-        imagesRepository.save(pfp);
-
-        return ResponseEntity.ok(modelMapper.map(user, UserDto.class));
     }
 }

@@ -14,8 +14,8 @@ import ru.senya.mytybe.repos.jpa.UserRepository;
 import java.util.Objects;
 
 
-@RequestMapping("/u")
 @RestController
+@RequestMapping("users")
 public class UserController extends BaseController {
 
     UserRepository userRepository;
@@ -28,8 +28,8 @@ public class UserController extends BaseController {
     }
 
 
-    @GetMapping("user")
-    public ResponseEntity<?> getOne(@RequestParam(value = "id", required = false) Long id){
+    @GetMapping("{id}")
+    public ResponseEntity<?> getOne(@PathVariable Long id){
 
         if (id == null){
             return ResponseEntity.badRequest().body("id is null");
@@ -44,7 +44,7 @@ public class UserController extends BaseController {
         return ResponseEntity.ok(modelMapper.map(user, UserDto.class));
     }
 
-    @GetMapping("all")
+    @GetMapping
     public ResponseEntity<?> getALlUsers(@RequestParam(value = "page", required = false) Integer pageNum,
                                          @RequestParam(value = "size", required = false, defaultValue = "10") int pageSize,
                                          @RequestParam(value = "sort", required = false, defaultValue = "asc") String sort) {
