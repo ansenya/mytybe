@@ -21,7 +21,7 @@ public class StaticController extends BaseController{
 
     @GetMapping("vid")
     public ResponseEntity<byte[]> serveVideo(@RequestParam(value = "fileName") String videoFileName) throws IOException {
-        Path videoPath = Path.of("src/main/resources/videos", videoFileName + ".mp4");
+        Path videoPath = Path.of("src/main/resources/videos", videoFileName);
 
         if (!videoPath.toFile().exists()) {
             return ResponseEntity.notFound().build();

@@ -49,9 +49,9 @@ public class VideoModel {
     @JsonIgnore
     private ChannelModel channel;
 
-    @ManyToOne
-    @JoinColumn(name = "category_id")
-    private CategoryModel category;
+//    @ManyToOne
+//    @JoinColumn(name = "category_id")
+//    private CategoryModel category;
 
     private String path;
 
@@ -84,7 +84,13 @@ public class VideoModel {
 
     private boolean deleted = false;
 
-    private boolean stream = false;
+    // private boolean stream = false;
+
+    @Column(columnDefinition = "integer default 0")
+    private Integer streamStatus = 0;
+    // 0 - not a stream
+    // 1 - a stream
+    // 2 - finished stream
 
     @CurrentTimestamp
     private Date created;

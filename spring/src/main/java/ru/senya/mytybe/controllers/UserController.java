@@ -29,15 +29,15 @@ public class UserController extends BaseController {
 
 
     @GetMapping("{id}")
-    public ResponseEntity<?> getOne(@PathVariable Long id){
+    public ResponseEntity<?> getOne(@PathVariable Long id) {
 
-        if (id == null){
+        if (id == null) {
             return ResponseEntity.badRequest().body("id is null");
         }
 
         UserModel user = userRepository.findById(id).orElse(null);
 
-        if (user == null){
+        if (user == null) {
             return ResponseEntity.notFound().build();
         }
 

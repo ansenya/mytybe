@@ -7,9 +7,12 @@ import org.springframework.data.jpa.repository.Query;
 import ru.senya.mytybe.models.jpa.VideoModel;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface VideoRepository extends JpaRepository<VideoModel, Long> {
     Page<VideoModel> findAllByChannelId(Long id, Pageable pageable);
+
+    Optional<VideoModel> findByPath(String path);
 
     @Query(value = "SELECT * FROM videos", nativeQuery = true)
     List<VideoModel> getAll();

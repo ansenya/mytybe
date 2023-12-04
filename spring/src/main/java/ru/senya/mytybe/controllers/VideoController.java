@@ -18,14 +18,12 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import ru.senya.mytybe.models.dto.LikesDto;
 import ru.senya.mytybe.models.dto.VideoDto;
-import ru.senya.mytybe.models.es.EsVideoModel;
 import ru.senya.mytybe.models.jpa.*;
 import ru.senya.mytybe.recs.VideoRecommendationSystem;
 import ru.senya.mytybe.repos.es.ElasticVideoRepository;
 import ru.senya.mytybe.repos.jpa.ChannelRepository;
 import ru.senya.mytybe.repos.jpa.TagRepository;
 import ru.senya.mytybe.repos.jpa.UserRepository;
-import ru.senya.mytybe.repos.jpa.VideoRepository;
 import ru.senya.mytybe.services.VideoService;
 
 import java.io.*;
@@ -64,29 +62,34 @@ public class VideoController extends BaseController {
     @GetMapping
     public ResponseEntity<?> getAll(@RequestParam(value = "page") Integer pageNum,
                                     @RequestParam(value = "size", required = false, defaultValue = "10") int pageSize,
-                                    @RequestParam(value = "sort", required = false, defaultValue = "asc") String sort,
                                     @RequestParam(value = "channelId", required = false, defaultValue = "-1") Long channelId,
                                     Authentication authentication) {
+        if (authentication != null) {
+            UserModel userModel = userRepository.findByUsername(authentication.getName());
 
-        UserModel userModel = userRepository.findByUsername(authentication.getName());
+            VideoRecommendationSystem recommendationSystem = new VideoRecommendationSystem(videoService.getAll());
 
-        VideoRecommendationSystem recommendationSystem = new VideoRecommendationSystem(videoService.getAll());
+            List<VideoDto> recs = recommendationSystem.recommendVideos(userModel).stream().map(videoModel -> modelMapper.map(videoModel, VideoDto.class)).toList();
 
-        List<VideoDto> recs = recommendationSystem.recommendVideos(userModel).stream().map(videoModel -> modelMapper.map(videoModel, VideoDto.class)).toList();
+            PageRequest page = PageRequest.of(pageNum, pageSize, Sort.by(Sort.Direction.ASC, "created"));
 
-        PageRequest page = PageRequest.of(pageNum, pageSize, Sort.by(Sort.Direction.ASC, "created"));
+            Page<VideoModel> videoPage;
+            if (channelId == -1) {
+                videoPage = videoService.getAll(recs.stream().map(VideoDto::getId).toList(), page);
+            } else {
+                videoPage = videoService.findAllByChannelId(channelId, page);
+            }
 
-        Page<VideoModel> videoPage;
-        if (channelId == -1) {
-            videoPage = videoService.getAll(recs.stream().map(VideoDto::getId).toList(), page);
+            Page<VideoDto> videoDtoPage = videoPage.map(videoModel -> modelMapper.map(videoModel, VideoDto.class));
+
+            return ResponseEntity.ok(videoDtoPage);
         } else {
-            videoPage = videoService.findAllByChannelId(channelId, page);
+            var all = videoService.findAll(PageRequest.of(pageNum, pageSize, Sort.by(Sort.Direction.DESC, "id")))
+                    .map(videoModel -> modelMapper.map(videoModel, VideoDto.class));
+            return ResponseEntity.ok(all);
         }
-
-        Page<VideoDto> videoDtoPage = videoPage.map(videoModel -> modelMapper.map(videoModel, VideoDto.class));
-
-        return ResponseEntity.ok(videoDtoPage);
     }
+
 
     @PostMapping("upload")
     public ResponseEntity<?> upload(@RequestParam(value = "video", required = false) MultipartFile file,
@@ -164,11 +167,9 @@ public class VideoController extends BaseController {
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<?> getOne(@PathVariable Long id, Authentication authentication) {
-        UserModel userModel = userRepository.findByUsername(authentication.getName());
-
-        VideoModel video = videoService.findById(id);
-
+    public ResponseEntity<?> getOne(@PathVariable Long id,
+                                    Authentication authentication) {
+        var video = videoService.findById(id);
         if (video == null) {
             return ResponseEntity.notFound().build();
         }
@@ -176,8 +177,11 @@ public class VideoController extends BaseController {
         video.setViews(video.getViews() + 1);
         video = videoService.save(video);
 
-        userModel.getLastViewed().add(video);
-        userRepository.save(userModel);
+        if (authentication != null) {
+            var user = userRepository.findByUsername(authentication.getName());
+            user.getLastViewed().add(video);
+            userRepository.save(user);
+        }
 
         return ResponseEntity.ok().body(modelMapper.map(video, VideoDto.class));
     }

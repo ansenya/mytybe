@@ -1,7 +1,6 @@
 package ru.senya.mytybe.models.dto;
 
 import lombok.Data;
-import ru.senya.mytybe.models.jpa.CategoryModel;
 import ru.senya.mytybe.models.jpa.ImageModel;
 
 import java.util.Date;
@@ -18,24 +17,26 @@ public class VideoDto {
     private Long views = 0L;
     private String path;
     private ImageDto thumbnail;
-    private CategoryModel category;
+//    private CategoryModel category;
     private ChannelDtoWithoutUser channel;
     private boolean explicit;
-    private boolean stream;
+    private Integer streamStatus;
     private Date created;
     private Date updated;
 
     public String getThumbnail() {
         try {
             return thumbnail.getFalsePath();
-        } catch (Exception e){
+        } catch (Exception e) {
             return "http://" + IP + ":" + PORT + "/api/static/img?fileName=" + "def.jpg";
         }
     }
 
     public String getPath() {
-        if (stream) {
+        if (streamStatus == 1) {
             return "http://" + IP + ":" + HLS_PORT + "/hls/" + path + ".m3u8";
+        } else if (streamStatus == 2) {
+            return "http://" + IP + ":" + PORT + "/api/static/vid?fileName=" + path + ".flv";
         } else {
             return "http://" + IP + ":" + PORT + "/api/static/vid?fileName=" + path + ".mp4";
         }

@@ -10,9 +10,9 @@ import ru.senya.mytybe.models.redis.RedisVideoModel;
 import ru.senya.mytybe.repos.jpa.*;
 import ru.senya.mytybe.repos.redis.RedisVideoRepository;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class VideoService {
@@ -50,6 +50,10 @@ public class VideoService {
         return videoRepository.getAll();
     }
 
+    public Page<VideoModel> findAll(Pageable pageable) {
+        return videoRepository.findAll(pageable);
+    }
+
     public Page<VideoModel> findAllByChannelId(Long channelId, Pageable pageable) {
         return videoRepository.findAllByChannelId(channelId, pageable);
     }
@@ -65,6 +69,10 @@ public class VideoService {
             return videoRepository.findById(id).orElse(null);
         }
         return modelMapper.map(videoModel, VideoModel.class);
+    }
+
+    public Optional<VideoModel> findByLink(String path) {
+        return videoRepository.findByPath(path);
     }
 
     public VideoModel save(VideoModel videoModel) {
