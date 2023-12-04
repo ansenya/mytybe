@@ -24,6 +24,7 @@ public class MytybeApplication {
 
     public static String IP;
     public static String PORT = "1984";
+    public static String HLS_PORT = "8088";
 
     static {
         try {

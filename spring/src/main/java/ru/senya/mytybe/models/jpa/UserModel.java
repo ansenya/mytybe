@@ -92,15 +92,15 @@ public class UserModel {
     @OneToMany(mappedBy = "owner")
     private Set<PlaylistModel> playlists;
 
+    @OneToMany(mappedBy = "user")
+    private Set<StreamingTaskModel> tasks;
+
     @ManyToMany
     @JoinTable(
             name = "recommendations",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "video_id"))
     private Set<VideoModel> recommendedVideos;
-
-    @OneToMany(mappedBy = "user")
-    private Set<UserLinkEntity> links;
 
     @CurrentTimestamp
     @EqualsAndHashCode.Include

@@ -56,6 +56,9 @@ public class ChannelModel {
     @JsonIgnore
     private Set<CommentModel> comments;
 
+    @OneToMany(mappedBy = "channel")
+    private Set<StreamingTaskModel> tasks;
+
     private boolean deleted = false;
 
     @CurrentTimestamp

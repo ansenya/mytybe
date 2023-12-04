@@ -6,8 +6,7 @@ import ru.senya.mytybe.models.jpa.ImageModel;
 
 import java.util.Date;
 
-import static ru.senya.mytybe.MytybeApplication.IP;
-import static ru.senya.mytybe.MytybeApplication.PORT;
+import static ru.senya.mytybe.MytybeApplication.*;
 
 @Data
 public class VideoDto {
@@ -30,7 +29,6 @@ public class VideoDto {
 
     private CategoryModel category;
 
-
 //    private LinkedList<CommentDto> comments;
 
 //    private Set<TagModel> tags;
@@ -43,11 +41,11 @@ public class VideoDto {
 
 //    private String vid_uuid;
 
-    private boolean processed;
+//    private boolean processed;
 
     private boolean explicit;
 
-    private boolean deleted;
+//    private boolean deleted;
 
     private boolean stream;
 
@@ -65,7 +63,7 @@ public class VideoDto {
 
     public String getPath() {
         if (stream) {
-            return "http://" + IP + ":" + PORT + "/hls/" + path + ".m3u8";
+            return "http://" + IP + ":" + HLS_PORT + "/hls/" + path + ".m3u8";
         } else {
             return "http://" + IP + ":" + PORT + "/api/static/vid?fileName=" + path + ".mp4";
         }

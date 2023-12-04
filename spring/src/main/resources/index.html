@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RTMP Streaming</title>
+    <link href="https://vjs.zencdn.net/7.11.4/video-js.css" rel="stylesheet">
+    <script src="https://vjs.zencdn.net/7.11.4/video.js"></script>
+</head>
+<body>
+<video id="my-video" class="video-js" controls preload="auto" width="640" height="360"
+       data-setup='{"fluid": true}'>
+    <source src="http://localhost:8088/hls/0aebb3e2-c49a-48d2-8509-082805ec1a76.m3u8" type="application/x-mpegURL">
+</video>
+</body>
+</html>
