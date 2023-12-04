@@ -19,16 +19,6 @@ public class UserDto {
     private ImageDto pfp;
     private Integer age;
     private String country;
-//    private String streamLink;
-    private Set<ChannelDtoWithoutUser> channels;
-//    private List<VideoModel> lastViewed;
-
-    //    private Set<UserModel> subscriptions;
-//    private Set<CommentModel> comments;
-//    private Set<VideoModel> likedVideos;
-//    private Set<VideoModel> dislikedVideos;
-//    private Set<PlaylistModel> playlists;
-    private boolean deleted;
     private boolean locked;
     private Date created;
     private Date updated;
@@ -37,3 +27,16 @@ public class UserDto {
         return pfp.getFalsePath();
     }
 }
+/*
+    private String streamLink;
+    private Set<ChannelDtoWithoutUser> channels;
+    private List<VideoModel> lastViewed;
+
+    private Set<UserModel> subscriptions;
+    private Set<CommentModel> comments;
+    private Set<VideoModel> likedVideos;
+    private Set<VideoModel> dislikedVideos;
+    private Set<PlaylistModel> playlists;
+    private boolean deleted;
+
+ */

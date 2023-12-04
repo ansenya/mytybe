@@ -101,6 +101,8 @@ public class StreamingController {
         task.get().setStatus(2);
         streamingTaskRepository.save(task.get());
 
+//        var stream = videoService.findById();
+
         return ResponseEntity.ok("");
     }
 

@@ -62,16 +62,11 @@ public class VideoController extends BaseController {
 
 
     @GetMapping
-    public ResponseEntity<?> getAll(@RequestParam(value = "page", required = false) Integer pageNum,
+    public ResponseEntity<?> getAll(@RequestParam(value = "page") Integer pageNum,
                                     @RequestParam(value = "size", required = false, defaultValue = "10") int pageSize,
                                     @RequestParam(value = "sort", required = false, defaultValue = "asc") String sort,
                                     @RequestParam(value = "channelId", required = false, defaultValue = "-1") Long channelId,
                                     Authentication authentication) {
-
-
-        if (pageNum == null) {
-            return ResponseEntity.badRequest().body("page is null");
-        }
 
         UserModel userModel = userRepository.findByUsername(authentication.getName());
 
@@ -79,14 +74,7 @@ public class VideoController extends BaseController {
 
         List<VideoDto> recs = recommendationSystem.recommendVideos(userModel).stream().map(videoModel -> modelMapper.map(videoModel, VideoDto.class)).toList();
 
-        Sort.Direction direction;
-
-        if (Objects.equals(sort, "asc")) {
-            direction = Sort.Direction.ASC;
-        } else {
-            direction = Sort.Direction.DESC;
-        }
-        PageRequest page = PageRequest.of(pageNum, pageSize, Sort.by(direction, "created"));
+        PageRequest page = PageRequest.of(pageNum, pageSize, Sort.by(Sort.Direction.ASC, "created"));
 
         Page<VideoModel> videoPage;
         if (channelId == -1) {

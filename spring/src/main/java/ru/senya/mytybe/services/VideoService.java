@@ -1,11 +1,9 @@
 package ru.senya.mytybe.services;
 
-import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import ru.senya.mytybe.models.jpa.VideoModel;
 import ru.senya.mytybe.models.redis.RedisVideoModel;
@@ -17,7 +15,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 @Service
-
 public class VideoService {
 
     private final VideoRepository videoRepository;
