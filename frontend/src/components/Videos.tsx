@@ -14,6 +14,7 @@ const Videos = ({videos, categoryName}: VideosProps) => {
         <div className="content__block">
             {videos.map(video =>
                 <VideoCard
+                    id={video.id}
                     key={video.id}
                     thumbnail={video.thumbnail}
                     name={video.name}

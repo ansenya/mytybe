@@ -32,8 +32,8 @@ const authSlice = createSlice({
       localStorage.setItem("jwtoken", payload.payload.token);
     },
     clearAuth(state) {
-      state = initialState;
-      localStorage.removeItem("jwtoken");
+      localStorage.removeItem("jwtoken")
+      return {user: null, isError: true, isLoaded: true};
     },
   },
 });

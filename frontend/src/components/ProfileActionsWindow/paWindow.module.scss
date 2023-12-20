@@ -1,0 +1,21 @@
+@import "../../variables";
+
+.paWindow {
+  width: 140px;
+  padding: 3px;
+  border-radius: 10px;  
+  border: 1px $border-color solid;
+  background: $background-color;
+  position: fixed;
+  right: -140px;
+  top: 70px;
+  z-index: 2;
+  &.active{
+    right: 1.5vw;
+  }
+  transition: right 0.2s ease;
+  // justify-content: space-between;
+  // flex-direction: column;
+  // gap: 6px; 
+}
+

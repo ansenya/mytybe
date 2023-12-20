@@ -1,0 +1,50 @@
+@import "../../../variables";
+
+.formField {
+  display: flex;
+  width: 100%;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: start;
+
+  label {
+    font-size: 20px;
+    font-weight: bolder;
+    color: $text-color;
+    margin-bottom: 6px;
+  }
+
+  .active {
+    box-shadow: 0 0 6px $primary-color;
+  }
+  .formInput {
+    min-height: 33px;
+    width: 100%;
+    background: $secondary-color;
+    display: flex;
+    padding: 0 0 0 4px;
+    border: $primary-color 3px solid;
+    border-radius: 10px;
+    align-items: center;
+
+    input {
+      background: transparent;
+      color: $primary-color;
+      margin-right: 10px;
+      height: 100%;
+      width: 100%;
+      flex: 1;
+      border: none;
+      outline: none;
+      font-size: 20px;
+      font-weight: normal;
+      &::placeholder {
+        color: $primary-color;
+        opacity: 0.5;
+      }
+    }
+    img{
+      margin-right: 6px;
+    }
+  }
+}

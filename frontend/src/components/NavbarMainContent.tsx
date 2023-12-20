@@ -6,6 +6,8 @@ import CButton from "./UI/CButton/CButton";
 import IconButton from "./UI/IconButton/IconButton";
 import uploadIcon from "../assets/upload-svgrepo-com.svg";
 import Loader from "./UI/Loader/Loader";
+import { useLocation, useNavigate } from "react-router-dom";
+import PaWindow from "./ProfileActionsWindow/paWindow";
 
 interface MainContentProps {
   isSmallScreen: boolean;
@@ -17,26 +19,38 @@ interface MainContentProps {
 const NavbarMainContent: FC<MainContentProps> = ({
   setSearchBarVisible,
   isSmallScreen,
-  isMenuShown, 
-  setIsMenuShown
+  isMenuShown,
+  setIsMenuShown,
 }) => {
   const { user, isLoaded, isError } = useAppSelector((state) => state.auth);
+  const [isFocused, setIsFocused] = useState<boolean>(false);
+  const [isProfile, setIsProfile] = useState<boolean>(false);
+  const location = useLocation();
+  const navigate = useNavigate();
 
-  function handleSearchButton(){
+  function handleSearchButton() {
     setSearchBarVisible(true);
     setIsMenuShown(false);
   }
   return (
     <>
       <div className="navbar__menu">
-        <IconButton icon={menuIcon} onClick={() => setIsMenuShown(!isMenuShown)} />
+        <IconButton
+          icon={menuIcon}
+          onClick={() => setIsMenuShown(!isMenuShown)}
+        />
         <span>Spot</span>
       </div>
       <div className="navbar__center">
         {!isSmallScreen ? (
-          <div className="search__bar">
+          <div className={["search__bar", isFocused ? "active" : ""].join(" ")}>
             <img src={searchIcon} alt="иконочка))" draggable={false} />
-            <input type="text" spellCheck={false} />
+            <input
+              type="text"
+              spellCheck={false}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
+            />
           </div>
         ) : (
           <IconButton
@@ -47,10 +61,20 @@ const NavbarMainContent: FC<MainContentProps> = ({
       </div>
       <div className="btns">
         {!isLoaded && <Loader />}
-        {isError && (
+        {!user && isLoaded && (
           <>
-            <CButton buttonType="primary">Sign in</CButton>
-            <CButton buttonType="secondary">Sign up</CButton>
+            <CButton
+              buttonType="primary"
+              onClick={() => navigate("/login", { state: {from: location} })}
+            >
+              Sign in
+            </CButton>
+            <CButton
+              buttonType="secondary"
+              onClick={() => navigate("/register", { state: {from: location} })}
+            >
+              Sign up
+            </CButton>
           </>
         )}
         {user && (
@@ -61,7 +85,9 @@ const NavbarMainContent: FC<MainContentProps> = ({
               src={user.pfp}
               className="avatar"
               draggable={false}
+              onClick={() => {setIsProfile(!isProfile)}}
             />
+            <PaWindow user={user} isActive={isProfile}/> 
           </>
         )}
       </div>
