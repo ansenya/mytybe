@@ -47,7 +47,8 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers(HttpMethod.OPTIONS).permitAll()
-                        .requestMatchers("auth/**").permitAll()
+                        .requestMatchers("auth/login").permitAll()
+                        .requestMatchers("auth/register").permitAll()
                         .requestMatchers("users").permitAll()
                         .requestMatchers("videos/tag").permitAll()
                         .requestMatchers("videos/done").permitAll()
