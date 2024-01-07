@@ -38,6 +38,6 @@ public class MytybeApplication {
     }
 
     public static void main(String[] args) {
-        SpringApplication.run(MytybeApplication.class, args);
+        SpringApplication.run(MytybeApplreadme.mdcation.class, args);
     }
 }
