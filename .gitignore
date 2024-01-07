@@ -5,9 +5,9 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 spring/src/main/resources/videos/
-ai/videos/
+videos/
 ai/venv/
-ai/res/results.db
+res/results.db
 
 ### STS ###
 .apt_generated
