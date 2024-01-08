@@ -10,9 +10,15 @@ const VideoPage = () => {
   const { id } = useParams();
   const { data, error, isLoading } = useGetVideoByIdQuery(Number(id));
 
+  useEffect(() => {
+    if (data){
+      console.log(data)
+    }
+  }, [data])
+
   return (
     <div className={styles.watchVideo}>
-      {!data ? (
+      {!data || isLoading ? (
         <Loader />
       ) : (
         <>

@@ -1,37 +1,27 @@
-import React, { useEffect, useRef, CSSProperties } from "react";
-import videojs from "video.js";
-import "video.js/dist/video-js.css";
-import styles from "../../pages/videoPage/videoPage.module.scss";
-import video from "../../assets/asdf.mp4";
+import React, { useRef, useState } from 'react';
+import ReactPlayer from 'react-player';
+import { Player } from 'video-react';
+import "node_modules/video-react/dist/video-react.css"; // import css
 
-const VideoPlayer = ({ source }: { source: string }) => {
-  const videoRef = useRef<HTMLVideoElement>(null);
+interface VideoPlayerProps {
+    source: string;
+}
 
-  useEffect(() => {
-    const player = videojs(videoRef.current || "");
-    player.src({
-      src: source,
-      type: "video/mp4",
-    });
-    return () => {
-      player.dispose();
-    };
-  }, [source]);
+const VideoPlayer: React.FC<VideoPlayerProps> = ({ source }) => {
+    const playerRef = useRef<ReactPlayer>(null);
 
-  const containerStyle: CSSProperties = {
-    borderRadius: 10,
-    width: "100%",
-  };
-
-  return (
-    <div data-vjs-player style={containerStyle}>
-      <video
-        ref={videoRef}
-        controls
-        className="video-js"
-      />
-    </div>
-  );
+    return (
+        <div>
+            {/* ReactPlayer component for video playback */}
+            <ReactPlayer
+                ref={playerRef}
+                url={source}
+                controls
+                width="100%"
+                height="auto"
+            />
+        </div>
+    );
 };
 
 export default VideoPlayer;

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useCallback } from "react";
+import React from "react";
 import VideoScroll from "../components/videosScroll";
 
 const VideosPage = () => {

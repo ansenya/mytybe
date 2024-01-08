@@ -69,9 +69,9 @@ export const serverApi = createApi({
     getVideoById: build.query<IVideo, number>({
       query: (id) => ({
         url: `videos/${id}`,
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("jwtoken")}`,
-        },
+        // headers: {
+        //   Authorization: `Bearer ${localStorage.getItem("jwtoken")}`,
+        // },
       }),
     }),
   }),
