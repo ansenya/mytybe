@@ -1,7 +1,6 @@
 import React, { useRef, useState } from 'react';
 import ReactPlayer from 'react-player';
-import { Player } from 'video-react';
-import "node_modules/video-react/dist/video-react.css"; // import css
+import PlayerButton from "./PlayerButton";
 
 interface VideoPlayerProps {
     source: string;
@@ -11,15 +10,20 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ source }) => {
     const playerRef = useRef<ReactPlayer>(null);
 
     return (
-        <div>
-            {/* ReactPlayer component for video playback */}
+        <div className="player">
             <ReactPlayer
+                className="player__video"
                 ref={playerRef}
                 url={source}
-                controls
                 width="100%"
                 height="auto"
             />
+            <div className="timeline"></div>
+            <div className="controls">
+                <PlayerButton icon={""}></PlayerButton>
+                <PlayerButton icon={""}></PlayerButton>
+                <PlayerButton icon={""}></PlayerButton>
+            </div>
         </div>
     );
 };

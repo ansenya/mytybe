@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import VideoPlayer from "../../components/UI/VideoPlayer";
+import VideoPlayer from "../../components/UI/VideoPlayer/VideoPlayer";
 import VideoScroll from "../../components/videosScroll";
 import { useGetVideoByIdQuery } from "../../store/api/serverApi";
 import Loader from "../../components/UI/Loader/Loader";
