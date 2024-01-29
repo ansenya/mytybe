@@ -2,10 +2,11 @@
   width: 100%;
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
   gap: 20px;
 
   .side {
-    width: 400px;
+    flex: 0.3;
     @media (max-width: 1025px) {
       width: 100%;
     }

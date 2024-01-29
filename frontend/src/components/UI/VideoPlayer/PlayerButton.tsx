@@ -7,8 +7,8 @@ interface iconProp {
 type props = ButtonHTMLAttributes<HTMLButtonElement> & iconProp
 const PlayerButton: FC<props> = ({icon, ...props}) => {
     return (
-        <button {...props} className="controls__button">
-            <img src={icon} alt="иконочка))" draggable={false}/>
+        <button {...props} className={["controls__button", props.className].join(" ")}>
+            <img src={icon} alt="" draggable={false}/>
         </button>
     );
 };

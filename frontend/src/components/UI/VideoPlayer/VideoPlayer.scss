@@ -1,7 +1,151 @@
 @import "../../../variables";
 
 .player{
-  &__video {
-    position: relative;
+  margin-top: 10px;
+  position: relative;
+  overflow: hidden;
+  border-radius: 10px;
+  @media (max-width: 1025px) {
+    width: calc(100% - 20px);
+    align-self: center;
   }
+  flex: 1;
+  aspect-ratio: 16/9;
+  color: white;
+  background: black;
+
+  &__video {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+
+  .controls-container {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    opacity: 0;
+    z-index: 1;
+    transition: opacity ease-in-out 150ms;
+
+    &::before{
+      content: '';
+      position: absolute;
+      bottom: 0;
+      background: linear-gradient(to top, rgba(0, 0, 0, .75), transparent);
+      width: 100%;
+      aspect-ratio: 6/1;
+      z-index: -1;
+      pointer-events: none;
+    }
+  }
+
+  &:hover, &.paused, &:focus-within {
+    .controls-container {
+      opacity: 1;
+    }
+  }
+
+  .controls-container .controls {
+    display: flex;
+    gap: .5rem;
+    padding: .25rem;
+    align-items: center;
+  }
+
+  .controls__button {
+    background: transparent;
+    cursor: pointer;
+    border: none;
+    color: inherit;
+    height: 30px;
+    width: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    img {
+      width: 80%;
+      height: 80%;
+    }
+    font-size: 1.1rem;
+
+  }
+
+  .volume-container {
+    display: flex;
+    align-items: center;
+
+    &:hover .volume-slider{
+      width: 100px;
+      transform: scaleX(1);
+    }
+    .volume-slider{
+      width: 0;
+      transform-origin: left;
+      transform: scaleX(0);
+      transition: width ease-in-out 150ms, transform ease-in-out 150ms;
+    }
+
+  }
+  .duration{
+    display: flex;
+    gap: .5rem;
+    flex-grow: 1;
+    padding: 5px;
+  }
+
+  .timeline-container {
+    height: 7px;
+    margin-inline: .3rem;
+    display: flex;
+    align-items: center;
+
+    input[type="range"]{
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 5px;
+      background: white;
+      opacity: .6;
+      outline: none;
+      border-radius: 5px;
+
+      &::-webkit-slider-thumb{
+        -webkit-appearance: none;
+        transition: all ease-in-out 150ms;
+        appearance: none;
+        width: 0;
+        height: 0;
+        border-radius: 50%;
+        background-color: $primary-color;
+        cursor: pointer;
+      }
+
+      &::-webkit-slider-runnable-track {
+        background: black;
+      }
+
+      &:hover::-webkit-slider-thumb{
+        width: 15px;
+        height: 15px;
+      }
+
+
+
+      &:hover{
+        height: 100%;
+      }
+    }
+
+
+
+  }
+
+
+
+
+
+
 }
