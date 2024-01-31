@@ -1,4 +1,4 @@
-package com.ask.home.videostream.service;
+package ru.senya.storage.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,7 +16,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 
-import static com.ask.home.videostream.constants.ApplicationConstants.*;
+import static ru.senya.storage.constants.ApplicationConstants.*;
 
 @Service
 public class VideoStreamService {

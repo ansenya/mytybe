@@ -1,4 +1,4 @@
-package com.ask.home.videostream.constants;
+package ru.senya.storage.constants;
 
 public class ApplicationConstants {
     public static final String VIDEO = "/video";

@@ -1,4 +1,4 @@
-package com.ask.home.videostream;
+package ru.senya.storage;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

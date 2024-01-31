@@ -1,6 +1,6 @@
-package com.ask.home.videostream.controller;
+package ru.senya.storage.controller;
 
-import com.ask.home.videostream.service.VideoStreamService;
+import ru.senya.storage.service.VideoStreamService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.server.ServerHttpResponse;
 import org.springframework.web.bind.annotation.*;
