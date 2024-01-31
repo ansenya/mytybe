@@ -2,12 +2,12 @@ import React, {useState, useEffect, useRef, useMemo} from "react";
 import { useLazyGetVideosQuery } from "../store/api/serverApi";
 import { IVideo } from "../models";
 import Videos from "./Videos";
-import Loader from "./UI/Loader/Loader";
+import InlineLoader from "./UI/Loader/InlineLoader";
 import { useParams } from "react-router-dom";
 
 const VideoScroll = () => {
   const {id} = useParams();
-  const [pageNumber, setPageNumber] = useState<number>(1);
+  const [pageNumber, setPageNumber] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(999);
   const observer = useRef<IntersectionObserver>();
   const divRef = useRef(null);
@@ -52,7 +52,7 @@ const VideoScroll = () => {
         <Videos videos={videos.filter((video: IVideo) => video.id !== Number(id))} categoryName="fuck" />
         <span style={{ color: "transparent" }}>penis</span>
       </div>
-      {isFetching && <Loader />}
+      {isFetching && <InlineLoader />}
       <div
         style={{
           width: "100%",

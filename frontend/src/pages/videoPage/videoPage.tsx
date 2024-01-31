@@ -3,23 +3,17 @@ import { useParams } from "react-router-dom";
 import VideoPlayer from "../../components/UI/VideoPlayer/VideoPlayer";
 import VideoScroll from "../../components/videosScroll";
 import { useGetVideoByIdQuery } from "../../store/api/serverApi";
-import Loader from "../../components/UI/Loader/Loader";
+import InlineLoader from "../../components/UI/Loader/InlineLoader";
 import styles from "./videoPage.module.scss";
 
 const VideoPage = () => {
   const { id } = useParams();
   const { data, error, isLoading } = useGetVideoByIdQuery(Number(id));
 
-  useEffect(() => {
-    if (data){
-      console.log(data)
-    }
-  }, [data])
-
   return (
     <div className={styles.watchVideo}>
       {!data || isLoading ? (
-        <Loader />
+        <InlineLoader />
       ) : (
         <>
           <VideoPlayer source={data?.path ?? ""} />

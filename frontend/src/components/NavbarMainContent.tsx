@@ -5,7 +5,7 @@ import { useAppSelector } from "../hooks/redux";
 import CButton from "./UI/CButton/CButton";
 import IconButton from "./UI/IconButton/IconButton";
 import uploadIcon from "../assets/upload-svgrepo-com.svg";
-import Loader from "./UI/Loader/Loader";
+import InlineLoader from "./UI/Loader/InlineLoader";
 import { useLocation, useNavigate } from "react-router-dom";
 import PaWindow from "./ProfileActionsWindow/paWindow";
 
@@ -60,7 +60,7 @@ const NavbarMainContent: FC<MainContentProps> = ({
         )}
       </div>
       <div className="btns">
-        {!isLoaded && <Loader />}
+        {!isLoaded && <InlineLoader />}
         {!user && isLoaded && (
           <>
             <CButton

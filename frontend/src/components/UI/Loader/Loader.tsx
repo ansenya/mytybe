@@ -1,10 +1,10 @@
 import React from "react";
 import styles from "./Loader.module.scss"
 
+
+
 const Loader = () => {
-  return <div style={{width: "100%", display: "flex", justifyContent: "center"}}>
-    <div className={styles.loader}></div>;
-  </div>;
+    return <div className={[styles.loader].join(" ")}></div>;
 };
 
 export default Loader;
