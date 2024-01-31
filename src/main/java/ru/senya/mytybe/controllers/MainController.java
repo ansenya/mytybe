@@ -6,16 +6,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RestController;
 import ru.senya.mytybe.models.dto.ImageDto;
 import ru.senya.mytybe.models.dto.UserDto;
-import ru.senya.mytybe.models.dto.VideoDto;
-import ru.senya.mytybe.models.jpa.ImageModel;
 import ru.senya.mytybe.models.jpa.UserModel;
 import ru.senya.mytybe.models.jpa.VideoModel;
 import ru.senya.mytybe.models.redis.RedisVideoModel;
 import ru.senya.mytybe.repos.es.ElasticVideoRepository;
-import ru.senya.mytybe.repos.jpa.*;
+import ru.senya.mytybe.repos.jpa.ChannelRepository;
+import ru.senya.mytybe.repos.jpa.ImagesRepository;
+import ru.senya.mytybe.repos.jpa.UserRepository;
+import ru.senya.mytybe.repos.jpa.VideoRepository;
 import ru.senya.mytybe.repos.redis.RedisVideoRepository;
 
 @RestController

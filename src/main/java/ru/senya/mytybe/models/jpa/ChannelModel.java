@@ -8,7 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CurrentTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.data.redis.core.RedisHash;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -71,7 +70,7 @@ public class ChannelModel {
     public Integer getFollowersAmount() {
         try {
             return followers.size();
-        } catch (Exception e){
+        } catch (Exception e) {
             return 0;
         }
     }
@@ -79,7 +78,7 @@ public class ChannelModel {
     public Integer getVideosAmount() {
         try {
             return videos.size();
-        } catch (NullPointerException e){
+        } catch (NullPointerException e) {
             return 0;
         }
     }

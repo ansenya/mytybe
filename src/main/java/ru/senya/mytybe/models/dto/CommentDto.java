@@ -28,7 +28,7 @@ public class CommentDto {
             List<CommentDto> commentDtoList = new ArrayList<>(nextComments.stream().toList());
             commentDtoList.sort(Comparator.comparing(o -> o.id));
             return commentDtoList;
-        } catch (NullPointerException e){
+        } catch (NullPointerException e) {
             return new ArrayList<>();
         }
     }

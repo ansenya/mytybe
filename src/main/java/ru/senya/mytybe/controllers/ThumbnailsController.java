@@ -13,8 +13,6 @@ import ru.senya.mytybe.repos.jpa.UserRepository;
 import ru.senya.mytybe.services.VideoService;
 
 import java.io.*;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 
 @RestController
@@ -59,7 +57,7 @@ public class ThumbnailsController {
                 File old = new File("src/main/resources/images", videoModel.getThumbnail().getPath());
                 old.delete();
             }
-        } catch (NullPointerException ignored){
+        } catch (NullPointerException ignored) {
 
         }
 

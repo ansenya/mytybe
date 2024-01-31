@@ -1,14 +1,11 @@
 package ru.senya.mytybe.controllers;
 
-import com.google.gson.Gson;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import ru.senya.mytybe.models.dto.VideoDto;
-import ru.senya.mytybe.models.jpa.ImageModel;
 import ru.senya.mytybe.models.jpa.StreamingTaskModel;
 import ru.senya.mytybe.models.jpa.VideoModel;
 import ru.senya.mytybe.repos.jpa.ChannelRepository;

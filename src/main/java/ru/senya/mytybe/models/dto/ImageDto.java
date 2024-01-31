@@ -22,6 +22,7 @@ public class ImageDto {
     private Date updated;
 
     private boolean deleted = false;
+
     public String getFalsePath() {
         return "http://" + IP + ":" + PORT + "/api/static/img?fileName=" + path;
     }

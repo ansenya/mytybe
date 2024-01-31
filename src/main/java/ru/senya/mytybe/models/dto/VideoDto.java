@@ -1,7 +1,6 @@
 package ru.senya.mytybe.models.dto;
 
 import lombok.Data;
-import ru.senya.mytybe.models.jpa.ImageModel;
 
 import java.util.Date;
 
@@ -17,7 +16,7 @@ public class VideoDto {
     private Long views = 0L;
     private String path;
     private ImageDto thumbnail;
-//    private CategoryModel category;
+    //    private CategoryModel category;
     private ChannelDtoWithoutUser channel;
     private boolean explicit;
     private Integer streamStatus;
@@ -38,7 +37,7 @@ public class VideoDto {
         } else if (streamStatus == 2) {
             return "http://" + IP + ":" + PORT + "/api/static/vid?fileName=" + path + ".flv";
         } else {
-            return "http://" + IP + ":" + PORT + "/api/static/vid?fileName=" + path + ".mp4";
+            return "http://" + IP + ":" + STORAGE_PORT + "/api/static/vid?filename=" + path + ".mp4";
         }
     }
 

@@ -3,7 +3,6 @@ package ru.senya.mytybe;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
@@ -13,7 +12,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.UUID;
 
 @SpringBootApplication
 @EnableConfigurationProperties(RsaKeyProperties.class)
@@ -24,6 +22,7 @@ public class MytybeApplication {
 
     public static String IP;
     public static String PORT = "1984";
+    public static String STORAGE_PORT = "1986";
     public static String HLS_PORT = "8088";
 
     static {
@@ -38,6 +37,6 @@ public class MytybeApplication {
     }
 
     public static void main(String[] args) {
-        SpringApplication.run(MytybeApplreadme.mdcation.class, args);
+        SpringApplication.run(MytybeApplication.class, args);
     }
 }

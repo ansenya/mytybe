@@ -3,10 +3,6 @@ package ru.senya.mytybe.models.dto;
 import lombok.Data;
 
 import java.util.Date;
-import java.util.Set;
-
-import static ru.senya.mytybe.MytybeApplication.IP;
-import static ru.senya.mytybe.MytybeApplication.PORT;
 
 @Data
 public class UserDto {

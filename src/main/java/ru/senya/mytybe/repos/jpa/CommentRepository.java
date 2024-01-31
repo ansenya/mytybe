@@ -11,5 +11,6 @@ import ru.senya.mytybe.models.jpa.VideoModel;
 public interface CommentRepository extends JpaRepository<CommentModel, Long> {
 
     Page<CommentModel> findAllByVideo(Pageable pageable, VideoModel videoModel);
+
     CommentModel findById(CommentModel commentModel);
 }

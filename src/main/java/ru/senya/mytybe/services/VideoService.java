@@ -7,7 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ru.senya.mytybe.models.jpa.VideoModel;
 import ru.senya.mytybe.models.redis.RedisVideoModel;
-import ru.senya.mytybe.repos.jpa.*;
+import ru.senya.mytybe.repos.jpa.VideoRepository;
 import ru.senya.mytybe.repos.redis.RedisVideoRepository;
 
 import java.util.LinkedList;
@@ -60,15 +60,15 @@ public class VideoService {
 
     public VideoModel findById(Long id) {
 
-        if (System.currentTimeMillis() - lastAddedTime > 15 * 60 * 1000) {
-            addToRedis();
-        }
+//        if (System.currentTimeMillis() - lastAddedTime > 15 * 60 * 1000) {
+//            addToRedis();
+//        }
 
-        RedisVideoModel videoModel = redisVideoRepository.findById(id).orElse(null);
-        if (videoModel == null) {
-            return videoRepository.findById(id).orElse(null);
-        }
-        return modelMapper.map(videoModel, VideoModel.class);
+//        RedisVideoModel videoModel = redisVideoRepository.findById(id).orElse(null);
+//        if (videoModel == null) {
+//            return videoRepository.findById(id).orElse(null);
+//        }
+        return modelMapper.map(videoRepository.findById(id).orElse(null), VideoModel.class);
     }
 
     public Optional<VideoModel> findByLink(String path) {

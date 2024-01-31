@@ -1,7 +1,6 @@
 package ru.senya.mytybe.models.dto;
 
 import lombok.Data;
-import ru.senya.mytybe.models.jpa.ImageModel;
 
 @Data
 public class ChannelDtoWithoutUser {

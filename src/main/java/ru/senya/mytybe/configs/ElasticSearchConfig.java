@@ -9,7 +9,6 @@ import org.springframework.data.elasticsearch.client.ClientConfiguration;
 import org.springframework.data.elasticsearch.client.erhlc.ElasticsearchRestTemplate;
 import org.springframework.data.elasticsearch.client.erhlc.RestClients;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
-import org.springframework.data.elasticsearch.repository.config.EnableElasticsearchRepositories;
 
 @Configuration
 public class ElasticSearchConfig {

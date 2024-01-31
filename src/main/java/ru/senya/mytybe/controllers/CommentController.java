@@ -64,7 +64,7 @@ public class CommentController extends BaseController {
         }
         PageRequest page = PageRequest.of(pageNum, pageSize, Sort.by(direction, "created"));
 
-        if (commentID == null){
+        if (commentID == null) {
             if (!videoRepository.existsById(videoId)) {
                 return ResponseEntity.status(404).build();
             }
@@ -117,7 +117,7 @@ public class CommentController extends BaseController {
         }
 
         ChannelModel channelModel = null;
-        if (channelId != null){
+        if (channelId != null) {
             channelModel = channelRepository.findById(channelId).orElse(null);
         }
 
@@ -137,7 +137,7 @@ public class CommentController extends BaseController {
                     .text(text)
                     .build();
 
-            if (channelModel != null){
+            if (channelModel != null) {
                 commentModel.setChannel(channelModel);
             }
 
@@ -149,7 +149,7 @@ public class CommentController extends BaseController {
 
             return ResponseEntity.ok(modelMapper.map(commentModel, CommentDto.class));
         } else {
-            if (channelModel == null){
+            if (channelModel == null) {
                 return ResponseEntity.badRequest().body("channel is null");
             }
 

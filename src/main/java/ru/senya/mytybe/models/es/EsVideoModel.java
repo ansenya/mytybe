@@ -7,7 +7,6 @@ import org.springframework.data.elasticsearch.annotations.Field;
 import org.springframework.data.elasticsearch.annotations.FieldType;
 import ru.senya.mytybe.models.jpa.TagModel;
 
-import java.util.Arrays;
 import java.util.Set;
 
 

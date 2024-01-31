@@ -1,24 +1,26 @@
 package ru.senya.mytybe.controllers;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 import org.modelmapper.ModelMapper;
 import org.springframework.core.io.FileSystemResource;
-import org.springframework.data.domain.*;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
+import org.springframework.http.*;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import ru.senya.mytybe.models.dto.LikesDto;
 import ru.senya.mytybe.models.dto.VideoDto;
-import ru.senya.mytybe.models.jpa.*;
+import ru.senya.mytybe.models.jpa.ChannelModel;
+import ru.senya.mytybe.models.jpa.ImageModel;
+import ru.senya.mytybe.models.jpa.UserModel;
+import ru.senya.mytybe.models.jpa.VideoModel;
 import ru.senya.mytybe.recs.VideoRecommendationSystem;
 import ru.senya.mytybe.repos.es.ElasticVideoRepository;
 import ru.senya.mytybe.repos.jpa.ChannelRepository;
@@ -27,7 +29,10 @@ import ru.senya.mytybe.repos.jpa.UserRepository;
 import ru.senya.mytybe.services.VideoService;
 
 import java.io.*;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 
 @RequestMapping("videos")
 @RestController
@@ -101,13 +106,9 @@ public class VideoController extends BaseController {
         if (channelId == null) {
             return ResponseEntity.badRequest().body("channel id is null");
         }
-//        if (videoName == null) {
-//            return ResponseEntity.badRequest().body("video name is null");
-//        }
 
-        ChannelModel channel = channelRepository.findById(channelId).orElse(null);
         UserModel user = userRepository.findByUsername(authentication.getName());
-
+        ChannelModel channel = channelRepository.findById(channelId).orElse(null);
 
         if (channel == null) {
             return ResponseEntity.badRequest().body("channel does not exist");
@@ -123,28 +124,28 @@ public class VideoController extends BaseController {
             return ResponseEntity.badRequest().body("not a video");
         }
 
+
         String uuid = String.valueOf(UUID.randomUUID());
-        File destFile;
-        try {
-            destFile = convertMultipartFileToFile(file, uuid);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+
+        if (!sendToStorage(uuid, Objects.requireNonNull(file.getContentType()).split("/")[1], file)) {
+            return ResponseEntity.status(418).body("upload is not available (cannot save)");
         }
+//
+//
+//        HashMap<String, String> result;
+//        try {
+//            result = gson.fromJson(processVideo(destFile.getPath(), uuid),
+//                    new TypeToken<HashMap<String, String>>() {
+//                    }.getType());
+//        } catch (Exception exception) {
+//            File delete = new File("src/main/resources/videos/" + uuid + ".mp4");
+//            delete.delete();
+//            return ResponseEntity.status(418).body("upload is not available");
+//        }
 
-        HashMap<String, String> result;
-        try {
-            result = gson.fromJson(processVideo(destFile.getPath(), uuid),
-                    new TypeToken<HashMap<String, String>>() {
-                    }.getType());
-        } catch (Exception exception) {
-            File delete = new File("src/main/resources/videos/" + uuid + ".mp4");
-            delete.delete();
-            return ResponseEntity.status(418).body("upload is not available");
+        if (videoName.isEmpty()) {
+            videoName = file.getOriginalFilename();
         }
-
-        if (videoName.isEmpty())
-            videoName = file.getOriginalFilename().replace(".mp4", "");
-
 
         ImageModel thumbnail = ImageModel.builder()
                 .type("th")
@@ -154,16 +155,31 @@ public class VideoController extends BaseController {
                 .name(videoName)
                 .channel(channel)
                 .description(description)
-                .vid_uuid(uuid)
+                .path(uuid)
                 .thumbnail(thumbnail)
                 .tags(new HashSet<>())
-                .path(result.get("id"))
+                .streamStatus(0)
                 .build();
 
         video = videoService.save(video);
-        user = userRepository.save(user);
 
         return ResponseEntity.ok(modelMapper.map(video, VideoDto.class));
+    }
+
+    private boolean sendToStorage(String uuid, String type, MultipartFile file) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        body.add("file", file.getResource());
+
+        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+
+        RestOperations restTemplate = new RestTemplate();
+        ResponseEntity<String> response = restTemplate.exchange("http://localhost:1986/api/upload?uuid=" + uuid + "&type=" + type, HttpMethod.POST, requestEntity, String.class);
+
+        HttpStatusCode statusCode = response.getStatusCode();
+        return statusCode == HttpStatus.OK;
     }
 
     @GetMapping("{id}")

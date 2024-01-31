@@ -1,11 +1,5 @@
 package ru.senya.mytybe.models.jpa;
 
-import jakarta.persistence.*;
-import lombok.Data;
-import org.springframework.data.redis.core.RedisHash;
-
-import java.util.Set;
-
 //@Data
 //@Entity
 //@Table(name = "category")

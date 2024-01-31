@@ -16,7 +16,7 @@ public class VideoRecommendationSystem {
     }
 
     public List<VideoModel> recommendVideos(UserModel user) {
-        
+
         List<VideoModel> userHistory = getLastNElements(user.getLastViewed().stream().toList(), 100); // последние 100 видео из истории просмотров. на их основе формируются рекомендации.
         List<VideoModel> likedVideos = getLastNElements(user.getLikedVideos().stream().toList(), 100);
         List<VideoModel> dislikedVideos = getLastNElements(user.getDislikedVideos().stream().toList(), 100);

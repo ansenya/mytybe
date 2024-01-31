@@ -7,7 +7,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CurrentTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-import org.springframework.data.redis.core.RedisHash;
 
 import java.util.Date;
 import java.util.Objects;

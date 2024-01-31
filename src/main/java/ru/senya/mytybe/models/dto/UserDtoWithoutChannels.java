@@ -1,7 +1,6 @@
 package ru.senya.mytybe.models.dto;
 
 import lombok.Data;
-import ru.senya.mytybe.models.jpa.ImageModel;
 
 import java.util.Date;
 
@@ -16,7 +15,7 @@ public class UserDtoWithoutChannels {
     private ImageDto pfp;
     private Integer age;
     private String country;
-//    private Set<ChannelDto> channels;
+    //    private Set<ChannelDto> channels;
     //    private Set<UserModel> subscriptions;
 //    private Set<CommentModel> comments;
 //    private Set<VideoModel> likedVideos;
