@@ -10,8 +10,10 @@ import reactor.core.publisher.Mono;
 import ru.senya.storage.confs.Log;
 import ru.senya.storage.service.VideoStreamService;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -44,8 +46,6 @@ public class VideoStreamController {
 
     @PostMapping("vid/upload")
     public ResponseEntity<?> uploadVideo(@RequestParam("file") MultipartFile video, @RequestParam("uuid") String uuid, @RequestParam("type") String type) {
-        System.out.println(new File("vids").isDirectory());
-
         try {
             saveVideo(video, uuid, type);
         } catch (IOException exception) {
@@ -70,8 +70,19 @@ public class VideoStreamController {
         try {
             ProcessBuilder pb = new ProcessBuilder("src/main/resources/scripts/encode.sh", filename);
             pb.redirectErrorStream(true);
-            pb.start();
-        } catch (IOException e) {
+            pb.redirectErrorStream(true);
+            Process process = pb.start();
+
+//            // Получаем вывод от процесса
+            BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
+            String line;
+
+            while ((line = reader.readLine()) != null) {
+                System.out.println(line);
+            }
+
+            process.waitFor();
+        } catch (IOException | InterruptedException e) {
             log.error("encode error", e);
         }
     }
