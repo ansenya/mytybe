@@ -16,9 +16,10 @@ import ru.senya.mytybe.repos.jpa.VideoRepository;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
-public class SearchController extends BaseController {
+public class SearchController {
 
     final ElasticVideoRepository elasticVideoRepository;
     final VideoRepository videoRepository;
@@ -32,20 +33,22 @@ public class SearchController extends BaseController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<?> search(@RequestParam(value = "text") String text) {
-
+    public ResponseEntity<?> search(@RequestParam(value = "q") String query,
+                                    @RequestParam(value = "type", required = false, defaultValue = "v") String type) {
         PageRequest page = PageRequest.of(0, 10);
 
-        Page<EsVideoModel> got = elasticVideoRepository.find(text, page);
+        Page<EsVideoModel> got = elasticVideoRepository.find(query, page);
 
-        elasticVideoRepository.findAll(page);
+        List<Long> videoIds = got.getContent().stream()
+                .map(esVideoModel -> Long.valueOf(esVideoModel.getId()))
+                .collect(Collectors.toList());
 
-        List<VideoModel> found = new LinkedList<>();
+        List<VideoModel> found = videoRepository.findAllById(videoIds);
 
-        for (EsVideoModel esVideoModel : got) {
-            found.add(videoRepository.findById(Long.valueOf(esVideoModel.getId())).get());
-        }
+        PageImpl<VideoDto> resultPage = new PageImpl<>(found.stream()
+                .map(videoModel -> modelMapper.map(videoModel, VideoDto.class))
+                .toList(), page, found.size());
 
-        return ResponseEntity.ok(new PageImpl<>(found.stream().map(videoModel -> modelMapper.map(videoModel, VideoDto.class)).toList(), page, found.size()));
+        return ResponseEntity.ok(resultPage);
     }
 }

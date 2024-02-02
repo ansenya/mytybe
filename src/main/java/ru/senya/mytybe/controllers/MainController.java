@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.senya.mytybe.models.dto.ImageDto;
 import ru.senya.mytybe.models.dto.UserDto;
+import ru.senya.mytybe.models.es.EsVideoModel;
 import ru.senya.mytybe.models.jpa.UserModel;
 import ru.senya.mytybe.models.jpa.VideoModel;
 import ru.senya.mytybe.models.redis.RedisVideoModel;
@@ -57,9 +58,13 @@ public class MainController {
     }
 
 
-    @GetMapping("test")
+    @GetMapping("cock")
     public ResponseEntity<?> getTest() {
-        return ResponseEntity.ok(redisVideoRepository.findAll());
+        var vids = videoRepository.findAll();
+        for (var vid : vids) {
+            elasticsearchRepository.save(modelMapper.map(vid, EsVideoModel.class));
+        }
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("test")

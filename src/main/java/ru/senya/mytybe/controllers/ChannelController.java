@@ -23,7 +23,7 @@ import java.util.Objects;
 
 @RequestMapping("channels")
 @RestController
-public class ChannelController extends BaseController {
+public class ChannelController {
     final
     ChannelRepository channelRepository;
     final

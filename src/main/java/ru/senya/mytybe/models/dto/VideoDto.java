@@ -27,17 +27,17 @@ public class VideoDto {
         try {
             return thumbnail.getFalsePath();
         } catch (Exception e) {
-            return "http://" + IP + ":" + PORT + "/api/static/img?fileName=" + "def.jpg";
+            return "http://" + IP + ":" + STORAGE_PORT + "/api/img?filename=" + "def_th.png";
         }
     }
 
     public String getPath() {
         if (streamStatus == 1) {
-            return "http://" + IP + ":" + HLS_PORT + "/hls/" + path + ".m3u8";
+            return "http://" + STORAGE_IP + ":" + HLS_PORT + "/hls/" + path + ".m3u8";
         } else if (streamStatus == 2) {
-            return "http://" + IP + ":" + PORT + "/api/static/vid?fileName=" + path + ".flv";
+            return "http://" + STORAGE_IP + ":" + PORT + "/api/static/vid?fileName=" + path + ".flv";
         } else {
-            return "http://" + IP + ":" + STORAGE_PORT + "/api/static/vid?filename=" + path + ".mp4";
+            return "http://" + STORAGE_IP + ":" + STORAGE_PORT + "/api/vid?filename=" + path + ".mp4";
         }
     }
 

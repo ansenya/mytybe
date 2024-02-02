@@ -5,8 +5,7 @@ import lombok.Data;
 
 import java.util.Date;
 
-import static ru.senya.mytybe.MytybeApplication.IP;
-import static ru.senya.mytybe.MytybeApplication.PORT;
+import static ru.senya.mytybe.MytybeApplication.*;
 
 @Data
 public class ImageDto {
@@ -24,6 +23,6 @@ public class ImageDto {
     private boolean deleted = false;
 
     public String getFalsePath() {
-        return "http://" + IP + ":" + PORT + "/api/static/img?fileName=" + path;
+        return "http://" + STORAGE_IP + ":" + STORAGE_PORT + "/api/img?filename=" + path;
     }
 }

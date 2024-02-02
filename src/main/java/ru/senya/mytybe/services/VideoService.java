@@ -1,12 +1,15 @@
 package ru.senya.mytybe.services;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import ru.senya.mytybe.models.es.EsVideoModel;
 import ru.senya.mytybe.models.jpa.VideoModel;
 import ru.senya.mytybe.models.redis.RedisVideoModel;
+import ru.senya.mytybe.repos.es.ElasticVideoRepository;
 import ru.senya.mytybe.repos.jpa.VideoRepository;
 import ru.senya.mytybe.repos.redis.RedisVideoRepository;
 
@@ -19,12 +22,15 @@ public class VideoService {
 
     private final VideoRepository videoRepository;
     private final RedisVideoRepository redisVideoRepository;
+    private final ElasticVideoRepository elasticVideoRepository;
     private final ModelMapper modelMapper = new ModelMapper();
     private Long lastAddedTime = System.currentTimeMillis();
 
-    public VideoService(VideoRepository videoRepository, RedisVideoRepository redisVideoRepository) {
+    @Autowired
+    public VideoService(VideoRepository videoRepository, RedisVideoRepository redisVideoRepository, ElasticVideoRepository elasticVideoRepository) {
         this.videoRepository = videoRepository;
         this.redisVideoRepository = redisVideoRepository;
+        this.elasticVideoRepository = elasticVideoRepository;
     }
 
     public Page<VideoModel> getAll(List<Long> specificIds, Pageable pageable) {
@@ -76,7 +82,9 @@ public class VideoService {
     }
 
     public VideoModel save(VideoModel videoModel) {
-        return videoRepository.save(videoModel);
+        VideoModel saved = videoRepository.save(videoModel);
+        elasticVideoRepository.save(modelMapper.map(saved, EsVideoModel.class));
+        return saved;
     }
 
     public Page<VideoModel> getPopular(Pageable pageable) {

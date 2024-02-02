@@ -36,7 +36,7 @@ import java.util.UUID;
 
 @RequestMapping("videos")
 @RestController
-public class VideoController extends BaseController {
+public class VideoController {
 
     final
     UserRepository userRepository;
@@ -97,7 +97,8 @@ public class VideoController extends BaseController {
 
 
     @PostMapping("upload")
-    public ResponseEntity<?> upload(@RequestParam(value = "video", required = false) MultipartFile file,
+    public ResponseEntity<?> upload(@RequestParam(value = "videoFile", required = false) MultipartFile videoFile,
+                                    @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
                                     @RequestParam(value = "channelId", required = false) Long channelId,
                                     @RequestParam(value = "videoName", required = false, defaultValue = "") String videoName,
                                     @RequestParam(value = "videoDescription", required = false) String description,
@@ -117,20 +118,24 @@ public class VideoController extends BaseController {
             return ResponseEntity.badRequest().body("user is not the owner of the channel " + channel.getName());
         }
 
-        if (file == null || file.isEmpty()) {
+        if (videoFile == null || videoFile.isEmpty()) {
             return ResponseEntity.badRequest().body("video is empty");
         }
-        if (!checkType(Objects.requireNonNull(file.getOriginalFilename()))) {
+        if (!checkType(Objects.requireNonNull(videoFile.getOriginalFilename()))) {
             return ResponseEntity.badRequest().body("not a video");
         }
 
 
         String uuid = String.valueOf(UUID.randomUUID());
 
-        if (!sendToStorage(uuid, Objects.requireNonNull(file.getContentType()).split("/")[1], file)) {
+        if (!sendToStorage(uuid, Objects.requireNonNull(videoFile.getContentType()).split("/")[1], "vid", videoFile)) {
             return ResponseEntity.status(418).body("upload is not available (cannot save)");
         }
-//
+
+        if (imageFile != null && !imageFile.isEmpty()) {
+            sendToStorage(uuid, Objects.requireNonNull(videoFile.getContentType()).split("/")[1], "img", imageFile);
+        }
+
 //
 //        HashMap<String, String> result;
 //        try {
@@ -144,11 +149,12 @@ public class VideoController extends BaseController {
 //        }
 
         if (videoName.isEmpty()) {
-            videoName = file.getOriginalFilename();
+            videoName = videoFile.getOriginalFilename();
         }
 
         ImageModel thumbnail = ImageModel.builder()
                 .type("th")
+                .path(uuid + "." + Objects.requireNonNull(videoFile.getContentType()).split("/")[1])
                 .build();
 
         VideoModel video = VideoModel.builder()
@@ -163,10 +169,13 @@ public class VideoController extends BaseController {
 
         video = videoService.save(video);
 
+        System.gc();
         return ResponseEntity.ok(modelMapper.map(video, VideoDto.class));
     }
 
-    private boolean sendToStorage(String uuid, String type, MultipartFile file) {
+    private boolean sendToStorage(String uuid, String type, String endpoint, MultipartFile file) {
+        String url = "http://5.180.174.71:1986/api/" + endpoint + "/upload";
+
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
 
@@ -176,7 +185,7 @@ public class VideoController extends BaseController {
         HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
         RestOperations restTemplate = new RestTemplate();
-        ResponseEntity<String> response = restTemplate.exchange("http://localhost:1986/api/upload?uuid=" + uuid + "&type=" + type, HttpMethod.POST, requestEntity, String.class);
+        ResponseEntity<String> response = restTemplate.exchange(url + "?uuid=" + uuid + "&type=" + type, HttpMethod.POST, requestEntity, String.class);
 
         HttpStatusCode statusCode = response.getStatusCode();
         return statusCode == HttpStatus.OK;

@@ -25,7 +25,7 @@ import java.util.Objects;
 
 @RequestMapping("comments")
 @RestController
-public class CommentController extends BaseController {
+public class CommentController {
 
     final UserRepository userRepository;
     final VideoRepository videoRepository;

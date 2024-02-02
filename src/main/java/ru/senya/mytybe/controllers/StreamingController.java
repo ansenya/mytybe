@@ -1,6 +1,5 @@
 package ru.senya.mytybe.controllers;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -25,7 +24,6 @@ public class StreamingController {
     final ChannelRepository channelRepository;
     final StreamingTaskRepository streamingTaskRepository;
     final VideoService videoService;
-    final ModelMapper modelMapper = new ModelMapper();
 
 
     @Autowired

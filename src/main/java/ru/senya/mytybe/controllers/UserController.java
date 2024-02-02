@@ -16,7 +16,7 @@ import java.util.Objects;
 
 @RestController
 @RequestMapping("users")
-public class UserController extends BaseController {
+public class UserController {
 
     UserRepository userRepository;
     ModelMapper modelMapper = new ModelMapper();

@@ -55,7 +55,7 @@ public class ImageModel {
     private boolean deleted = false;
 
     public static ImageModelBuilder builder() {
-        return new ImageModelBuilder().path("def.jpg");
+        return new ImageModelBuilder().path("def.png");
     }
 
 //    public String getPath() {
