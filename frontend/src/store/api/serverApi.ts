@@ -54,17 +54,19 @@ export const serverApi = createApi({
       }),
     }),
     getVideos: build.query<VideosResponse, VideosRequest>({
-      query: ({ sort, page, size }) => ({
-        url: `videos`,
-        params: {
-          page,
-          sort,
-          size,
-        },
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("jwtoken")}`,
-        },
-      }),
+      query: ({ sort, page, size }) => {
+        const token = localStorage.getItem("jwtoken");
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+        return {
+          url: `videos`,
+          params: {
+            page,
+            sort,
+            size,
+          },
+          headers,
+        };
+      },
     }),
     getVideoById: build.query<IVideo, number>({
       query: (id) => ({
