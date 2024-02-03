@@ -51,16 +51,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({source}) => {
     useKeyPress("l", seekBackward);
     useKeyPress("ArrowRight", seekForward);
     useKeyPress("ArrowLeft", seekForward);
-    //
-    // useEffect(() => {
-    //     if (isSpacePressed || isKPressed) handlePause();
-    //     if (isMPressed) handleMute();
-    //     if (isLPressed || isArrowRightPressed) seekForward();
-    //     if (isJPressed || isArrowLeftPressed) seekBackward();
-    //
-    // }, [isSpacePressed, isKPressed, isMPressed, isJPressed, isLPressed])
-
-
 
     const formatTime = (time: number) => {
         let seconds = Math.floor(time)%60;
@@ -89,7 +79,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({source}) => {
     }
 
     const handleProgress = (state: {played: number, playedSeconds: number}) => {
-        console.log(progress*(playerRef.current?.getDuration()||0), state.playedSeconds);
+        console.log(progress*(playerRef.current?.getDuration()||0) - state.playedSeconds);
         if (progress > state.played){
             playerRef.current?.seekTo(Number(progress*playerRef.current?.getDuration()));
         }
@@ -136,19 +126,19 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({source}) => {
         setProgress(Number(e.target.value))
         setTotal(formatTime(playerRef.current?.getDuration() || 0));
         setCurrent(formatTime(Number(e.target.value)*(playerRef.current?.getDuration()||0)));
-        if (!isLoading){
-            playerRef.current?.seekTo(Number(e.target.value)*playerRef.current?.getDuration())
-        }
+        playerRef.current?.seekTo(Number(e.target.value)*playerRef.current?.getDuration())
     }
 
 
 
     const handleMouseDown = () => {
         lineRef.current?.addEventListener('mousemove', () => handleSeek);
+        setIsPlaying(false);
     };
 
     const handleMouseUp = () => {
         lineRef.current?.removeEventListener('mousemove', () => handleSeek);
+        if (!isLoading) setIsPlaying(true);
     };
 
     function handleMute() {
@@ -182,6 +172,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({source}) => {
             <ReactPlayer
                 playing={isPlaying}
                 volume={volume}
+                progressInterval={100}
                 className="player__video"
                 ref={playerRef}
                 url={source}
