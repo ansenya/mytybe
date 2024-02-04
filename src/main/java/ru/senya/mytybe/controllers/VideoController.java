@@ -36,6 +36,7 @@ import java.util.UUID;
 
 @RequestMapping("videos")
 @RestController
+@CrossOrigin(origins = "*")
 public class VideoController {
 
     final

@@ -21,7 +21,7 @@ import java.net.URL;
 public class MytybeApplication {
 
     public static String IP;
-    public static String STORAGE_IP = "5.180.174.71";
+        public static String STORAGE_IP = "5.180.174.216";
     public static String PORT = "1984";
     public static String STORAGE_PORT = "1986";
     public static String HLS_PORT = "8088";
