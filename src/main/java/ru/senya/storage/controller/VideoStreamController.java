@@ -1,7 +1,9 @@
 package ru.senya.storage.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -9,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Mono;
 import ru.senya.storage.confs.Log;
 import ru.senya.storage.service.VideoStreamService;
+import ru.senya.storage.utils.UserRequestTracker;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -26,22 +29,39 @@ import static ru.senya.storage.controller.Utils.save;
 public class VideoStreamController {
 
     private final VideoStreamService videoStreamService;
+    private final UserRequestTracker userRequestTracker;
+
     private final Logger log = LoggerFactory.getLogger(Log.class);
 
-    public VideoStreamController(VideoStreamService videoStreamService) {
+    @Autowired
+    public VideoStreamController(VideoStreamService videoStreamService, UserRequestTracker userRequestTracker) {
         this.videoStreamService = videoStreamService;
+        this.userRequestTracker = userRequestTracker;
     }
 
     @GetMapping("vid")
-    public Mono<ResponseEntity<byte[]>> streamVideo(@RequestHeader(value = "Range", required = false) String httpRangeList,
+    public Mono<ResponseEntity<byte[]>> streamVideo(HttpServletRequest request,
+                                                    @RequestHeader(value = "Range", required = false) String httpRangeList,
                                                     @RequestParam(value = "filename") String fileName,
                                                     @RequestParam(value = "q", required = false, defaultValue = "") String quality) {
-        String path = findVideoPath(fileName, quality);
-        String type = determineFileType(fileName);
-        if (!new File("vids/" + path + "." + type).exists()) {
-            return Mono.just(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+        if (userRequestTracker.isRequestInProgress(request.getRemoteAddr())) {
+            log.error("429 from {}", request.getRemoteAddr());
+            return Mono.just(ResponseEntity.status(429).build());
+        } else {
+            try {
+                userRequestTracker.setRequestInProgress(request.getRemoteAddr(), true);
+                log.error("set progress from {}", request.getRemoteAddr());
+                String path = findVideoPath(fileName, quality);
+                String type = determineFileType(fileName);
+                if (!new File("vids/" + path + "." + type).exists()) {
+                    return Mono.just(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+                }
+                return Mono.just(videoStreamService.prepareContent(path, type, httpRangeList));
+            } finally {
+                log.error("unset progress from {}", request.getRemoteAddr());
+                userRequestTracker.setRequestInProgress(request.getRemoteAddr(), false);
+            }
         }
-        return Mono.just(videoStreamService.prepareContent(path, type, httpRangeList));
     }
 
     @PostMapping("vid/upload")

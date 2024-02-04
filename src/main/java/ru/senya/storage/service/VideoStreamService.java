@@ -6,10 +6,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.RandomAccessFile;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -23,14 +22,6 @@ public class VideoStreamService {
 
     private final Logger logger = LoggerFactory.getLogger(VideoStreamService.class);
 
-    /**
-     * Prepare the content.
-     *
-     * @param fileName String.
-     * @param fileType String.
-     * @param range    String.
-     * @return ResponseEntity.
-     */
     public ResponseEntity<byte[]> prepareContent(final String fileName, final String fileType, final String range) {
         System.gc();
 
@@ -73,19 +64,8 @@ public class VideoStreamService {
             logger.error("Exception while reading the file {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-
-
     }
 
-    /**
-     * ready file byte by byte.
-     *
-     * @param filename String.
-     * @param start    long.
-     * @param end      long.
-     * @return byte array.
-     * @throws IOException exception.
-     */
     public byte[] readByteRangeNew(String filename, long start, long end) throws IOException {
         Path path = Paths.get(getFilePath(), filename);
         byte[] data = Files.readAllBytes(path);
@@ -94,38 +74,26 @@ public class VideoStreamService {
         return result;
     }
 
+//    public byte[] readByteRangeNew(String filename, long start, long end) throws IOException {
+//        Path path = Paths.get(getFilePath(), filename);
+//        try (RandomAccessFile file = new RandomAccessFile(path.toFile(), "r")) {
+//            long size = end - start + 1;
+//            byte[] result = new byte[(int) size];
+//
+//            file.seek(start);
+//            file.readFully(result);
+//
+//            return result;
+//        } catch (IOException e) {
+//            logger.error("error while reading file", e);
+//            throw e;
+//        }
+//    }
 
-    public byte[] readByteRange(String filename, long start, long end) throws IOException {
-        Path path = Paths.get(getFilePath(), filename);
-        try (InputStream inputStream = (Files.newInputStream(path));
-             ByteArrayOutputStream bufferedOutputStream = new ByteArrayOutputStream()) {
-            byte[] data = new byte[BYTE_RANGE];
-            int nRead;
-            while ((nRead = inputStream.read(data, 0, data.length)) != -1) {
-                bufferedOutputStream.write(data, 0, nRead);
-            }
-            bufferedOutputStream.flush();
-            byte[] result = new byte[(int) (end - start) + 1];
-            System.arraycopy(bufferedOutputStream.toByteArray(), (int) start, result, 0, result.length);
-            return result;
-        }
-    }
-
-    /**
-     * Get the filePath.
-     *
-     * @return String.
-     */
     private String getFilePath() {
         return new File("vids/").getAbsolutePath();
     }
 
-    /**
-     * Content length.
-     *
-     * @param fileName String.
-     * @return Long.
-     */
     public Long getFileSize(String fileName) {
         return Optional.ofNullable(fileName)
                 .map(file -> Paths.get(getFilePath(), file))
@@ -133,12 +101,6 @@ public class VideoStreamService {
                 .orElse(0L);
     }
 
-    /**
-     * Getting the size from the path.
-     *
-     * @param path Path.
-     * @return Long.
-     */
     private Long sizeFromFile(Path path) {
         try {
             return Files.size(path);
