@@ -66,29 +66,29 @@ public class VideoStreamService {
         }
     }
 
-    public byte[] readByteRangeNew(String filename, long start, long end) throws IOException {
-        Path path = Paths.get(getFilePath(), filename);
-        byte[] data = Files.readAllBytes(path);
-        byte[] result = new byte[(int) (end - start) + 1];
-        System.arraycopy(data, (int) start, result, 0, (int) (end - start) + 1);
-        return result;
-    }
-
 //    public byte[] readByteRangeNew(String filename, long start, long end) throws IOException {
 //        Path path = Paths.get(getFilePath(), filename);
-//        try (RandomAccessFile file = new RandomAccessFile(path.toFile(), "r")) {
-//            long size = end - start + 1;
-//            byte[] result = new byte[(int) size];
-//
-//            file.seek(start);
-//            file.readFully(result);
-//
-//            return result;
-//        } catch (IOException e) {
-//            logger.error("error while reading file", e);
-//            throw e;
-//        }
+//        byte[] data = Files.readAllBytes(path);
+//        byte[] result = new byte[(int) (end - start) + 1];
+//        System.arraycopy(data, (int) start, result, 0, (int) (end - start) + 1);
+//        return result;
 //    }
+
+    public byte[] readByteRangeNew(String filename, long start, long end) throws IOException {
+        Path path = Paths.get(getFilePath(), filename);
+        try (RandomAccessFile file = new RandomAccessFile(path.toFile(), "r")) {
+            long size = end - start + 1;
+            byte[] result = new byte[(int) size];
+
+            file.seek(start);
+            file.readFully(result);
+
+            return result;
+        } catch (IOException e) {
+            logger.error("error while reading file", e);
+            throw e;
+        }
+    }
 
     private String getFilePath() {
         return new File("vids/").getAbsolutePath();

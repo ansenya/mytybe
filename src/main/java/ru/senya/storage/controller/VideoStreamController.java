@@ -49,7 +49,7 @@ public class VideoStreamController {
             return Mono.just(ResponseEntity.status(429).build());
         } else {
             try {
-                userRequestTracker.setRequestInProgress(request.getRemoteAddr(), true);
+                userRequestTracker.setRequestInProgress(request.getRemoteAddr(), 1);
                 log.error("set progress from {}", request.getRemoteAddr());
                 String path = findVideoPath(fileName, quality);
                 String type = determineFileType(fileName);
@@ -59,7 +59,7 @@ public class VideoStreamController {
                 return Mono.just(videoStreamService.prepareContent(path, type, httpRangeList));
             } finally {
                 log.error("unset progress from {}", request.getRemoteAddr());
-                userRequestTracker.setRequestInProgress(request.getRemoteAddr(), false);
+                userRequestTracker.setRequestInProgress(request.getRemoteAddr(), 1);
             }
         }
     }
