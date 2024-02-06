@@ -19,7 +19,7 @@ const VideoScroll = () => {
     fetchData({
       page: pageNumber,
       sort: "desc",
-      size: 3,
+      size: 60,
     });
   }, [pageNumber]);
 

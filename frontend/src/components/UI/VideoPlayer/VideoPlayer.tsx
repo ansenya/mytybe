@@ -1,7 +1,12 @@
-import React, {useEffect, useRef, useState} from 'react';
+import React, {useCallback, useEffect, useRef, useState} from 'react';
+import Loader from "../Loader/Loader";
+import Hls from "hls.js";
+import useKeyPress from "../../../hooks/useKeyPress";
 import ReactPlayer from 'react-player';
 import PlayerButton from "./PlayerButton";
 import './VideoPlayer.scss'
+
+
 import PipIcon from "../../../assets/pip-svgrepo-com.svg"
 import PlayIcon from "../../../assets/play-svgrepo-com (1).svg"
 import PauseIcon from "../../../assets/pause-svgrepo-com.svg"
@@ -10,15 +15,18 @@ import ExitIcon from "../../../assets/fullscreen-exit-svgrepo-com.svg"
 import LowVolume from "../../../assets/volume-low-filled-svgrepo-com.svg"
 import HighVolume from "../../../assets/volume-filled-svgrepo-com.svg"
 import MutedVolume from "../../../assets/volume-mute-filled-svgrepo-com.svg"
-import Loader from "../Loader/Loader";
-import Hls from "hls.js";
-import useKeyPress from "../../../hooks/useKeyPress";
+import RepeatIcon from '../../../assets/redo-icon-svgrepo-com.svg'
+import SettingsIcon from "../../../assets/settings-svgrepo-com.svg"
+import ChipiChapa from "../../../assets/asdf.mp4"
+
 
 
 
 interface VideoPlayerProps {
     source: string;
 }
+
+
 
 
 const VideoPlayer: React.FC<VideoPlayerProps> = ({source}) => {
@@ -35,6 +43,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({source}) => {
     const [isLoading, setIsLoading] = useState(true)
     const [playbackSpeed, setPlaybackSpeed] = useState(1)
     const [isPip, setIsPip] = useState(false);
+    const [isEnded, setIsEnded] = useState(false);
 
     const seekForward = () => {
         console.log("f");
@@ -44,13 +53,13 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({source}) => {
         console.log("b");
     }
 
-    useKeyPress(" ", handlePause);
-    useKeyPress("k", handlePause);
-    useKeyPress("m", handleMute);
-    useKeyPress("j", seekForward);
-    useKeyPress("l", seekBackward);
-    useKeyPress("ArrowRight", seekForward);
-    useKeyPress("ArrowLeft", seekForward);
+    useKeyPress([" "], handlePause);
+    useKeyPress(["k", "л"], handlePause);
+    useKeyPress(["m", "ь"], handleMute);
+    useKeyPress(["j", "о"], seekForward);
+    useKeyPress(["l", "д"], seekBackward);
+    useKeyPress(["ArrowRight"], seekForward);
+    useKeyPress(["ArrowLeft"], seekBackward);
 
     const formatTime = (time: number) => {
         let seconds = Math.floor(time)%60;
@@ -72,23 +81,25 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({source}) => {
         setVolume(newVolume)
     }
 
-
-
     function handlePause(){
+        setIsEnded(false);
         setIsPlaying(prevState => !prevState);
     }
 
+
+
     const handleProgress = (state: {played: number, playedSeconds: number}) => {
-        console.log(progress*(playerRef.current?.getDuration()||0) - state.playedSeconds);
-        if (progress > state.played){
-            playerRef.current?.seekTo(Number(progress*playerRef.current?.getDuration()));
-        }
+        if (isLoading)return;
         setProgress(state.played)
         setTotal(formatTime(playerRef.current?.getDuration() || 0));
         setCurrent(formatTime(state.playedSeconds));
     };
 
+    function setPlayIcon(){
+        if (isEnded) return RepeatIcon;
 
+        return !isPlaying ? PlayIcon : PauseIcon
+    }
 
     const handleFullScreen = () => {
         if (!isFullScreen) {
@@ -120,26 +131,26 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({source}) => {
         }
     }, [progress])
 
-
+    function debounceSeek(delay: number) {
+        let timer: NodeJS.Timer;
+        return function (rangeValue: number){
+            clearTimeout(timer);
+            timer = setTimeout(() => {
+                playerRef.current?.seekTo(rangeValue*playerRef.current?.getDuration())
+            }, delay)
+        }
+    }
 
     const handleSeek = (e: React.MouseEvent<HTMLInputElement> & React.ChangeEvent<HTMLInputElement>) => {
         setProgress(Number(e.target.value))
         setTotal(formatTime(playerRef.current?.getDuration() || 0));
         setCurrent(formatTime(Number(e.target.value)*(playerRef.current?.getDuration()||0)));
-        playerRef.current?.seekTo(Number(e.target.value)*playerRef.current?.getDuration())
+        debounceSeek(100)(Number(e.target.value))
     }
 
-
-
-    const handleMouseDown = () => {
-        lineRef.current?.addEventListener('mousemove', () => handleSeek);
-        setIsPlaying(false);
-    };
-
-    const handleMouseUp = () => {
-        lineRef.current?.removeEventListener('mousemove', () => handleSeek);
-        if (!isLoading) setIsPlaying(true);
-    };
+    const onMouseDown = () => {
+        setIsLoading(true);
+    }
 
     function handleMute() {
         if (volume){
@@ -155,12 +166,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({source}) => {
     }
 
     const handleBufferStart = () => {
-        setIsLoading(true)
+        setIsLoading(true);
     }
 
     const handleBufferEnd = () => {
-        setIsLoading(false)
-        setIsPlaying(true);
+        setIsLoading(false);
     }
 
     const handleControlsClick = (e: React.MouseEvent) => {
@@ -170,7 +180,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({source}) => {
     return (
         <div id="player-container" className={["player", !isPlaying ? "paused" : ""].join(" ")} onClick={handlePause}>
             <ReactPlayer
-                playing={isPlaying}
+                playing={isPlaying && !isLoading}
+                onError={(error) => console.log(error)}
                 volume={volume}
                 progressInterval={100}
                 className="player__video"
@@ -185,16 +196,20 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({source}) => {
                 onBufferEnd={handleBufferEnd}
                 pip={isPip}
                 onDisablePIP={() => setIsPip(false)}
+                onEnded={() => {
+                    setIsEnded(true);
+                    setIsPlaying(false);
+                }}
             />
             {isLoading && (<div className="loader"><Loader/></div>)}
             <div className="controls-container" onClick={handleControlsClick}>
                 <div className="timeline-container">
                     <input type="range" min={0} max={1} step="any"  className="timeline" value={progress} ref={lineRef}
-                        onChange={handleSeek} onMouseDown={handleMouseDown} onMouseUp={handleMouseUp}
+                           onMouseUp={handleSeek} onMouseDown={onMouseDown} onChange={handleSeek}
                     />
                 </div>
                 <div className="controls">
-                    <PlayerButton icon={!isPlaying ? PlayIcon : PauseIcon} onClick={handlePause}></PlayerButton>
+                    <PlayerButton icon={setPlayIcon()} onClick={handlePause}></PlayerButton>
                     <div className="volume-container">
                         <PlayerButton icon={setVolumeIcon()} onClick={handleMute}></PlayerButton>
                         <input

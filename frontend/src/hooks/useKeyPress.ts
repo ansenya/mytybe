@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 
-const useKeyPress = (targetKey: string, callback: () => void): void => {
+const useKeyPress = (targetKeys: string[], callback: () => void): void => {
 
     const downHandler = (event: KeyboardEvent) => {
         if (event.key === " ") event.preventDefault();
-        if (event.key === targetKey) {
+        if (targetKeys.includes(event.key.toLowerCase())){
             callback()
         }
     };
@@ -17,7 +17,7 @@ const useKeyPress = (targetKey: string, callback: () => void): void => {
         return () => {
             window.removeEventListener('keydown', handleKeyDown);
         };
-    }, [targetKey]);
+    }, []);
 
 };
 

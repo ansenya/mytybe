@@ -7,7 +7,7 @@ import { RegisterArgs } from "../../pages/registrationPage";
 export const serverApi = createApi({
   reducerPath: "server",
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://5.180.174.71:1984/api",
+    baseUrl: "http://5.180.174.216:1984/api",
   }),
   endpoints: (build) => ({
     getUsers: build.query({
