@@ -45,12 +45,10 @@ public class VideoStreamController {
                                                     @RequestParam(value = "filename") String fileName,
                                                     @RequestParam(value = "q", required = false, defaultValue = "") String quality) {
         if (userRequestTracker.isRequestInProgress(request.getRemoteAddr())) {
-            log.error("429 from {}", request.getRemoteAddr());
             return Mono.just(ResponseEntity.status(429).build());
         } else {
             try {
                 userRequestTracker.setRequestInProgress(request.getRemoteAddr(), 1);
-                log.error("set progress from {}", request.getRemoteAddr());
                 String path = findVideoPath(fileName, quality);
                 String type = determineFileType(fileName);
                 if (!new File("vids/" + path + "." + type).exists()) {
@@ -58,7 +56,6 @@ public class VideoStreamController {
                 }
                 return Mono.just(videoStreamService.prepareContent(path, type, httpRangeList));
             } finally {
-                log.error("unset progress from {}", request.getRemoteAddr());
                 userRequestTracker.setRequestInProgress(request.getRemoteAddr(), 1);
             }
         }
@@ -88,12 +85,11 @@ public class VideoStreamController {
 
     private void encode(String filename) {
         try {
-            ProcessBuilder pb = new ProcessBuilder("src/main/resources/scripts/encode.sh", filename);
+            ProcessBuilder pb = new ProcessBuilder("scripts/encode.sh", filename);
             pb.redirectErrorStream(true);
             pb.redirectErrorStream(true);
             Process process = pb.start();
 
-//            // Получаем вывод от процесса
             BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
             String line;
 

@@ -7,12 +7,10 @@ import java.util.concurrent.ConcurrentHashMap;
 @Component
 public class UserRequestTracker {
     private final ConcurrentHashMap<String, Integer> requestStatusMap = new ConcurrentHashMap<>();
+    private static final int maxConnections = 10;
 
     public boolean isRequestInProgress(String userId) {
-        if (requestStatusMap.getOrDefault(userId, 0) == 5) {
-            return true;
-        }
-        return false;
+        return requestStatusMap.getOrDefault(userId, 0) == maxConnections;
     }
 
     public void setRequestInProgress(String userId, int inProgress) {
