@@ -39,7 +39,7 @@ const NavbarMainContent: FC<MainContentProps> = ({
           icon={menuIcon}
           onClick={() => setIsMenuShown(!isMenuShown)}
         />
-        <span>Spot</span>
+        <a href="/"><span>Spot</span></a>
       </div>
       <div className="navbar__center">
         {!isSmallScreen ? (
