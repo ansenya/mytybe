@@ -2,6 +2,7 @@ package ru.senya.mytybe.controllers;
 
 import com.google.gson.Gson;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeToken;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -17,10 +18,8 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import ru.senya.mytybe.models.dto.LikesDto;
 import ru.senya.mytybe.models.dto.VideoDto;
-import ru.senya.mytybe.models.jpa.ChannelModel;
-import ru.senya.mytybe.models.jpa.ImageModel;
-import ru.senya.mytybe.models.jpa.UserModel;
-import ru.senya.mytybe.models.jpa.VideoModel;
+import ru.senya.mytybe.models.es.EsVideoModel;
+import ru.senya.mytybe.models.jpa.*;
 import ru.senya.mytybe.recs.VideoRecommendationSystem;
 import ru.senya.mytybe.repos.es.ElasticVideoRepository;
 import ru.senya.mytybe.repos.jpa.ChannelRepository;
@@ -29,10 +28,7 @@ import ru.senya.mytybe.repos.jpa.UserRepository;
 import ru.senya.mytybe.services.VideoService;
 
 import java.io.*;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
 @RequestMapping("videos")
 @RestController
@@ -129,25 +125,26 @@ public class VideoController {
 
         String uuid = String.valueOf(UUID.randomUUID());
 
-        if (!sendToStorage(uuid, Objects.requireNonNull(videoFile.getContentType()).split("/")[1], "vid", videoFile)) {
-            return ResponseEntity.status(418).body("upload is not available (cannot save)");
-        }
-
-        if (imageFile != null && !imageFile.isEmpty()) {
-            sendToStorage(uuid, Objects.requireNonNull(videoFile.getContentType()).split("/")[1], "img", imageFile);
-        }
+//        if (!sendToStorage(uuid, Objects.requireNonNull(videoFile.getContentType()).split("/")[1], "vid", videoFile)) {
+//            return ResponseEntity.status(418).body("upload is not available (cannot save)");
+//        }
+//
+//        if (imageFile != null && !imageFile.isEmpty()) {
+//            sendToStorage(uuid, Objects.requireNonNull(videoFile.getContentType()).split("/")[1], "img", imageFile);
+//        }
 
 //
-//        HashMap<String, String> result;
-//        try {
-//            result = gson.fromJson(processVideo(destFile.getPath(), uuid),
-//                    new TypeToken<HashMap<String, String>>() {
-//                    }.getType());
-//        } catch (Exception exception) {
-//            File delete = new File("src/main/resources/videos/" + uuid + ".mp4");
-//            delete.delete();
-//            return ResponseEntity.status(418).body("upload is not available");
-//        }
+        HashMap<String, String> result;
+        try {
+            result = gson.fromJson(processVideo(videoFile, uuid),
+                    new TypeToken<HashMap<String, String>>() {
+                    }.getType());
+        } catch (Exception exception) {
+            System.out.println(exception);
+            return ResponseEntity.status(418).body("upload is not available");
+        }
+        System.out.println(result);
+
 
         if (videoName.isEmpty()) {
             videoName = videoFile.getOriginalFilename();
@@ -274,43 +271,43 @@ public class VideoController {
 //        return ResponseEntity.ok().headers(headers).body(requestEta(videoModel.getVid_uuid()));
 //    }
 
-//    @PostMapping("tag")
-//    public ResponseEntity<?> setTag(@RequestParam(value = "tag", required = false) String tag,
-//                                    @RequestParam(value = "id", required = false) Long id) {
+    @PostMapping("tag")
+    public ResponseEntity<?> setTag(@RequestParam(value = "tag", required = false) String tag,
+                                    @RequestParam(value = "id", required = false) Long id) {
+
+        System.out.println(tag);
+        TagModel tagModel = tagRepository.findByEnTag(tag);
+        VideoModel videoModel = videoService.findById(id);
+
+        if (tagModel == null || videoModel == null) {
+            return ResponseEntity.status(404).build();
+        }
+
+//        tagModel.getVideos().add(videoModel);
+//        tagModel = tagRepository.save(tagModel);
+
+        videoModel.getTags().add(tagModel);
+        videoModel = videoService.save(videoModel);
+
+        return ResponseEntity.ok(videoModel);
+    }
 //
-//        System.out.println(tag);
-//        TagModel tagModel = tagRepository.findByEnTag(tag);
-//        VideoModel videoModel = videoService.findById(id);
-//
-//        if (tagModel == null || videoModel == null) {
-//            return ResponseEntity.status(404).build();
-//        }
-//
-////        tagModel.getVideos().add(videoModel);
-////        tagModel = tagRepository.save(tagModel);
-//
-//        videoModel.getTags().add(tagModel);
-//        videoModel = videoService.save(videoModel);
-//
-//        return ResponseEntity.ok(videoModel);
-//    }
-//
-//    @PostMapping("done")
-//    public ResponseEntity<?> setDone(@RequestParam(value = "id", required = false) Long id) {
-//        VideoModel videoModel = videoService.findById(id);
-//
-//        if (videoModel == null) {
-//            return ResponseEntity.status(404).build();
-//        }
-//
-//        EsVideoModel esVideoModel = modelMapper.map(videoModel, EsVideoModel.class);
-//
-//        esVideoModel = elasticVideoRepository.save(esVideoModel);
-//
-//        System.out.println(gson.toJson(esVideoModel));
-//
-//        return ResponseEntity.ok(esVideoModel);
-//    }
+    @PostMapping("done")
+    public ResponseEntity<?> setDone(@RequestParam(value = "id", required = false) Long id) {
+        VideoModel videoModel = videoService.findById(id);
+
+        if (videoModel == null) {
+            return ResponseEntity.status(404).build();
+        }
+
+        EsVideoModel esVideoModel = modelMapper.map(videoModel, EsVideoModel.class);
+
+        esVideoModel = elasticVideoRepository.save(esVideoModel);
+
+        System.out.println(gson.toJson(esVideoModel));
+
+        return ResponseEntity.ok(esVideoModel);
+    }
 
     private String requestEta(String uuid) {
         RestTemplate restTemplate = new RestTemplate();
@@ -319,8 +316,8 @@ public class VideoController {
         return response.getBody();
     }
 
-    private String processVideo(String path, String uuid) {
-        int timeout = 10000;
+    private String processVideo(MultipartFile videoFile, String uuid) {
+        int timeout = 10_000;
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
         factory.setReadTimeout(timeout);
         factory.setConnectTimeout(timeout);
@@ -329,7 +326,7 @@ public class VideoController {
 
         String serverUrl = "http://localhost:8642/process?uuid=" + uuid;
 
-        FileSystemResource fileResource = new FileSystemResource(path);
+        FileSystemResource fileResource = new FileSystemResource(convert(videoFile));
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
@@ -341,7 +338,18 @@ public class VideoController {
         ResponseEntity<String> response = restTemplate.postForEntity(serverUrl, requestEntity, String.class);
         return response.getBody();
     }
-
+    private File convert(MultipartFile file) {
+        File convFile = new File(file.getOriginalFilename());
+        try {
+            convFile.createNewFile();
+            FileOutputStream fos = new FileOutputStream(convFile);
+            fos.write(file.getBytes());
+            fos.close();
+        } catch (IOException e) {
+            System.err.println(e);
+        }
+        return convFile;
+    }
 
     private boolean checkType(String name) {
         return name.endsWith(".mp4") || name.endsWith(".avi");

@@ -54,7 +54,6 @@ public class SecurityConfig {
                         .requestMatchers("videos/done").permitAll()
                         .requestMatchers(HttpMethod.GET, "videos/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "channels/**").permitAll()
-                        .requestMatchers("/static/**").permitAll()
                         .requestMatchers("/stream/**").permitAll()
                         .anyRequest().authenticated()
                 )
