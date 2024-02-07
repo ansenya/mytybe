@@ -18,7 +18,7 @@ def upload_video():
 
     req_id = request.args['uuid']
 
-    video_path = f"../videos/{req_id}.mp4"
+    video_path = f"videos/{req_id}.mp4"
     uploaded_file.save(video_path)
 
     create_result(req_id, uploaded_file.filename.split(".")[1])
@@ -61,7 +61,7 @@ def result():
 @app.route('/video', methods=['GET'])
 def video():
     req_id = str(request.args.get('id'))
-    return send_file("../videos/" + f'{req_id}.{get_type(req_id)}', as_attachment=False)
+    return send_file("videos/" + f'{req_id}.{get_type(req_id)}', as_attachment=False)
 
 
 if __name__ == '__main__':
@@ -72,7 +72,7 @@ if __name__ == '__main__':
     def do_process(not_done_item):
         with semaphore:
             print(not_done_item)
-            process_video("../videos/{}.mp4".format(not_done_item[0]), not_done_item[0])
+            process_video("videos/{}.mp4".format(not_done_item[0]), not_done_item[0])
 
 
     processing_threads = []

@@ -16,16 +16,16 @@ print(torch.cuda.is_available())
 
 def process_video(video_path, req_id):
     video_capture = cv2.VideoCapture(video_path)
-    total_frames = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
-    # total_frames = 2 * int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
+    # total_frames = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
+    total_frames = 2 * int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
     start = time.time()
     video_capture.release()
 
     finish = []
     for i in process_ef(start, total_frames, video_path, req_id):
         finish.append(i)
-    # for i in list(process_yolo(start, total_frames, video_path, req_id)):
-    #     finish.append(i)
+    for i in list(process_yolo(start, total_frames, video_path, req_id)):
+        finish.append(i)
 
     print(finish)
 
@@ -55,7 +55,7 @@ def process_ef(start, total_frames, video_path, req_id):
     tfms = transforms.Compose([transforms.Resize(224), transforms.ToTensor(),
                                transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]), ])
 
-    labels_map = json.load(open('../efficientnet_pytorch/labels_map.txt'))
+    labels_map = json.load(open('main/efficientnet_pytorch/labels_map.txt'))
     labels_map = [labels_map[str(i)] for i in range(1000)]
 
     while 1:
@@ -105,9 +105,9 @@ def process_yolo(start, total_frames, video_path, req_id):
     Conf_threshold = 0.4
     NMS_threshold = 0.4
 
-    with open('fclasses.txt', 'r') as f:
+    with open('main/res/tags/fclasses.txt', 'r') as f:
         class_name = [cname.strip() for cname in f.readlines()]
-    net = cv2.dnn.readNet('yolov4-tiny.weights', 'yolov4-tiny.cfg')
+    net = cv2.dnn.readNet('main/res/weights/yolov4-tiny.weights', 'main/res/weights/yolov4-tiny.cfg')
     net.setPreferableBackend(cv2.dnn.DNN_BACKEND_CUDA)
     net.setPreferableTarget(cv2.dnn.DNN_TARGET_CUDA_FP16)
 
@@ -141,10 +141,10 @@ def process_yolo(start, total_frames, video_path, req_id):
 
 
 def set_processed(req_id, tags):
-    host = "5.180.174.71"
+    host = "5.180.174.216"
     user = "user"
     password = ""
-    database = "tube"
+    database = "spot"
 
     connection = mysql.connector.connect(
         host=host,
@@ -159,16 +159,17 @@ def set_processed(req_id, tags):
                    (True, req_id))
     connection.commit()
 
-    cursor.execute("SELECT id FROM videos WHERE vid_uuid = %s", (req_id,))
+    cursor.execute("SELECT id FROM videos WHERE path = %s", (req_id,))
 
     vid_id = int(cursor.fetchone()[0])
 
     for p in tags:
-        url = f"http://localhost:1984/api/v/tag?tag={p}&id={vid_id}"
+        url = f"http://localhost:1984/api/videos/tag?tag={p}&id={vid_id}"
         response = requests.post(url)
         print(response.status_code)
+        print(response.text)
 
-    url = f"http://localhost:1984/api/v/done?id={vid_id}"
+    url = f"http://localhost:1984/api/videos/done?id={vid_id}"
     requests.post(url)
 
     cursor.close()
@@ -176,13 +177,13 @@ def set_processed(req_id, tags):
 
 
 def set_time(req_id):
-    video = VideoFileClip(f"../videos/{req_id}.mp4")
+    video = VideoFileClip(f"videos/{req_id}.mp4")
     duration = video.duration
 
-    host = "5.180.174.71"
+    host = "5.180.174.216"
     user = "user"
     password = ""
-    database = "tube"
+    database = "spot"
 
     connection = mysql.connector.connect(
         host=host,

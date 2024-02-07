@@ -1,10 +1,10 @@
 import json
 import mysql.connector
 
-host = "5.180.174.71"
+host = "5.180.174.216"
 user = "user"
 password = ""
-database = "tube"
+database = "spot"
 
 connection = mysql.connector.connect(
     host=host,
@@ -15,7 +15,7 @@ connection = mysql.connector.connect(
 
 cursor = connection.cursor()
 
-data = json.load(open('labels_map.txt'))
+data = json.load(open('main/res/tags/labels_map.txt'))
 
 i = 1
 for key, value in data.items():
@@ -25,8 +25,7 @@ for key, value in data.items():
     connection.commit()
     i += 1
 
-
-data = open('classes.txt').readlines()
+data = open('main/res/tags/classes.txt').readlines()
 
 i = 1001
 for value in data:
@@ -36,9 +35,9 @@ for value in data:
     connection.commit()
     i += 1
 
-data = open('ru_tags.txt').readlines()
+data = open('main/res/tags/ru_tags.txt').readlines()
 
-for i in range(999, len(data)):
+for i in range(0, len(data)):
     query = "UPDATE tags SET ru_tag = %s where id = %s"
     values = (data[i].strip(), i + 1)
     cursor.execute(query, values)

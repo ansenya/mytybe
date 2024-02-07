@@ -7,7 +7,7 @@ build/
 spring/src/main/resources/videos/
 videos/
 ai/venv/
-res/results.db
+main/res/results.db
 
 ### STS ###
 .apt_generated

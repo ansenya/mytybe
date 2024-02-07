@@ -1,7 +1,7 @@
 import sqlite3
 import time
 
-base_url = "../res/results.db"
+base_url = "main/res/results.db"
 
 
 def init_db():
