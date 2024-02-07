@@ -1,8 +1,0 @@
-pillow
-torch
-torchvision
-opencv-python
-Flask
-gunicorn
-Flask-Celery
-mysql-connector-python
