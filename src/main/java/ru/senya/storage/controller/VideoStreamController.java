@@ -56,7 +56,7 @@ public class VideoStreamController {
                 }
                 return Mono.just(videoStreamService.prepareContent(path, type, httpRangeList));
             } finally {
-                userRequestTracker.setRequestInProgress(request.getRemoteAddr(), 1);
+                userRequestTracker.setRequestInProgress(request.getRemoteAddr(), -1);
             }
         }
     }
@@ -109,7 +109,11 @@ public class VideoStreamController {
         String path;
         if (quality.isBlank()) {
             int maxQuality = findMaxQuality(name);
-            path = name + "_" + maxQuality;
+            if (maxQuality == -1) {
+                path = name;
+            } else {
+                path = name + "_" + maxQuality;
+            }
         } else {
             path = name + "_" + quality;
         }
@@ -117,20 +121,25 @@ public class VideoStreamController {
     }
 
     private int findMaxQuality(String name) {
-        int maxQuality = 0;
-        try (Stream<Path> paths = Files.walk(Paths.get("vids"))) {
-            maxQuality = paths
-                    .filter(Files::isRegularFile)
-                    .map(Path::getFileName)
-                    .map(Path::toString)
-                    .filter(video -> video.startsWith(name))
-                    .map(video -> Integer.parseInt(video.split("\\.")[0].split("_")[1]))
-                    .max(Integer::compare)
-                    .orElse(0);
-        } catch (IOException e) {
-            e.printStackTrace();
+        try {
+
+            int maxQuality = 0;
+            try (Stream<Path> paths = Files.walk(Paths.get("vids"))) {
+                maxQuality = paths
+                        .filter(Files::isRegularFile)
+                        .map(Path::getFileName)
+                        .map(Path::toString)
+                        .filter(video -> video.startsWith(name))
+                        .map(video -> Integer.parseInt(video.split("\\.")[0].split("_")[1]))
+                        .max(Integer::compare)
+                        .orElse(0);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return maxQuality;
+        } catch (ArrayIndexOutOfBoundsException e) {
+            return -1;
         }
-        return maxQuality;
     }
 
     private String determineFileType(String fileName) {
