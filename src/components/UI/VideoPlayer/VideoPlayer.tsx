@@ -16,7 +16,6 @@ import LowVolume from "../../../assets/volume-low-filled-svgrepo-com.svg"
 import HighVolume from "../../../assets/volume-filled-svgrepo-com.svg"
 import MutedVolume from "../../../assets/volume-mute-filled-svgrepo-com.svg"
 import RepeatIcon from '../../../assets/redo-icon-svgrepo-com.svg'
-import SettingsIcon from "../../../assets/settings-svgrepo-com.svg"
 import ChipiChapa from "../../../assets/asdf.mp4"
 import PlayerSelect from "../PlayerSelect/PlayerSelect";
 
@@ -52,20 +51,29 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({source}) => {
     const pValues = ["2", "1.5", "1", "0.5"]
 
     const seekForward = () => {
-        console.log("f");
+        if (playerRef.current)
+            playerRef.current?.seekTo(playerRef.current?.getCurrentTime()+10)
     }
 
     const seekBackward = () => {
-        console.log("b");
+        if (playerRef.current)
+            playerRef.current?.seekTo(playerRef.current?.getCurrentTime()-10)
+    }
+
+    const handleMute = (volume: number) => {
+        if (volume !== 0) {
+            setSavedVolume(volume);
+            setVolume(0);
+        } else {
+            setVolume(savedVolume);
+        }
     }
 
     useKeyPress([" "], handlePause);
     useKeyPress(["k", "л"], handlePause);
-    useKeyPress(["m", "ь"], handleMute);
-    useKeyPress(["j", "о"], seekForward);
-    useKeyPress(["l", "д"], seekBackward);
-    useKeyPress(["ArrowRight"], seekForward);
-    useKeyPress(["ArrowLeft"], seekBackward);
+    useKeyPress(["m", "ь"], handleMute, volume);
+    useKeyPress(["j", "о", "arrowleft"], seekBackward);
+    useKeyPress(["l", "д", "arrowright"], seekForward);
 
     const formatTime = (time: number) => {
         let seconds = Math.floor(time)%60;
@@ -95,8 +103,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({source}) => {
 
 
     const handleProgress = (state: {played: number, playedSeconds: number}) => {
+        
         if (isLoading)return;
         setProgress(state.played)
+        setIsError(false);
         setTotal(formatTime(playerRef.current?.getDuration() || 0));
         setCurrent(formatTime(state.playedSeconds));
     };
@@ -158,14 +168,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({source}) => {
         setIsLoading(true);
     }
 
-    function handleMute() {
-        if (volume){
-            setSavedVolume(volume)
-            setVolume(0)
-            return
-        }
-        setVolume(savedVolume)
-    }
+    
 
     const handlePip = () => {
         setIsPip(true);
@@ -218,7 +221,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({source}) => {
                 <div className="controls">
                     <PlayerButton icon={setPlayIcon()} onClick={handlePause}></PlayerButton>
                     <div className="volume-container">
-                        <PlayerButton icon={setVolumeIcon()} onClick={handleMute}></PlayerButton>
+                        <PlayerButton icon={setVolumeIcon()} onClick={() => handleMute(volume)}></PlayerButton>
                         <input
                             type="range"
                             min="0"
