@@ -17,6 +17,11 @@
     top: calc(50% - 20px);
     left: calc(50% - 20px);
   }
+  .error{
+    position: absolute;
+    top: 30%;
+    left: calc(50% - 150px);
+  }
 
   flex: 1;
   aspect-ratio: 16/9;

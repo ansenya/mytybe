@@ -1,0 +1,44 @@
+@import "../../../variables";
+
+.selectContainer{
+  position: relative;
+}
+
+.options {
+  position: absolute;
+  top: -160px;
+  right: calc(50% - 50px);
+  display: none;
+  flex-direction: column;
+  justify-content: space-between;
+  background: $border-color;
+  border-radius: 10px;
+  width: 100px;
+  height: 150px;
+  &.active{
+    display: flex;
+    opacity: .5;
+  }
+
+
+
+  .option {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    cursor: pointer;
+    &:first-child{
+      border-radius: 10px 10px 0 0;
+    }
+    &:last-child{
+      border-radius: 0 0 10px 10px;
+    }
+    &:hover{
+      background-color: $bright-plain-color;
+    }
+  }
+
+}
+

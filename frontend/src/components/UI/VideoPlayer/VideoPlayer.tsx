@@ -18,6 +18,7 @@ import MutedVolume from "../../../assets/volume-mute-filled-svgrepo-com.svg"
 import RepeatIcon from '../../../assets/redo-icon-svgrepo-com.svg'
 import SettingsIcon from "../../../assets/settings-svgrepo-com.svg"
 import ChipiChapa from "../../../assets/asdf.mp4"
+import PlayerSelect from "../PlayerSelect/PlayerSelect";
 
 
 
@@ -26,6 +27,7 @@ interface VideoPlayerProps {
     source: string;
 }
 
+type ext = "360" | "720" | "480" | "144"
 
 
 
@@ -41,9 +43,13 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({source}) => {
     const [current, setCurrent] = useState("0:00")
     const [progress, setProgress] = useState(0)
     const [isLoading, setIsLoading] = useState(true)
-    const [playbackSpeed, setPlaybackSpeed] = useState(1)
+    const [playbackSpeed, setPlaybackSpeed] = useState<string>("1")
     const [isPip, setIsPip] = useState(false);
     const [isEnded, setIsEnded] = useState(false);
+    const [quality, setQuality] = useState<ext>("720")
+    const [isError, setIsError] = useState<boolean>(false);
+    const qValues: ext[] = ["720", "480", "360", "144"]
+    const pValues = ["2", "1.5", "1", "0.5"]
 
     const seekForward = () => {
         console.log("f");
@@ -136,7 +142,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({source}) => {
         return function (rangeValue: number){
             clearTimeout(timer);
             timer = setTimeout(() => {
-                playerRef.current?.seekTo(rangeValue*playerRef.current?.getDuration())
+                playerRef.current?.seekTo(rangeValue*playerRef.current?.getDuration());
             }, delay)
         }
     }
@@ -145,7 +151,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({source}) => {
         setProgress(Number(e.target.value))
         setTotal(formatTime(playerRef.current?.getDuration() || 0));
         setCurrent(formatTime(Number(e.target.value)*(playerRef.current?.getDuration()||0)));
-        debounceSeek(100)(Number(e.target.value))
+        debounceSeek(1000)(Number(e.target.value));
     }
 
     const onMouseDown = () => {
@@ -181,17 +187,17 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({source}) => {
         <div id="player-container" className={["player", !isPlaying ? "paused" : ""].join(" ")} onClick={handlePause}>
             <ReactPlayer
                 playing={isPlaying && !isLoading}
-                onError={(error) => console.log(error)}
+                onError={(error) => setIsError(true)}
                 volume={volume}
                 progressInterval={100}
                 className="player__video"
                 ref={playerRef}
-                url={source}
+                url={`${source}&q=${quality}`}
                 width="100%"
                 height="auto"
                 onProgress={handleProgress}
                 onReady={() => setIsLoading(false)}
-                playbackRate={playbackSpeed}
+                playbackRate={Number(playbackSpeed)}
                 onBuffer={handleBufferStart}
                 onBufferEnd={handleBufferEnd}
                 pip={isPip}
@@ -202,6 +208,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({source}) => {
                 }}
             />
             {isLoading && (<div className="loader"><Loader/></div>)}
+            {isError && (<div className="error"><h1>Couldn't load media</h1></div>)}
             <div className="controls-container" onClick={handleControlsClick}>
                 <div className="timeline-container">
                     <input type="range" min={0} max={1} step="any"  className="timeline" value={progress} ref={lineRef}
@@ -227,13 +234,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({source}) => {
                         /
                         <div className="total">{total}</div>
                     </div>
-                    <PlayerButton
-                        onClick={(e) => {
-                            setPlaybackSpeed(prevState => prevState%2+0.25)
-                        }}
-                        text={`${playbackSpeed}x`}
-                        >
-                    </PlayerButton>
+                    <PlayerSelect choice={playbackSpeed} setChoice={setPlaybackSpeed} options={pValues} letter={"x"}/>
+                    <PlayerSelect choice={quality} setChoice={setQuality} options={qValues} letter={"p"}/>
                     <PlayerButton icon={PipIcon} onClick={handlePip}></PlayerButton>
                     <PlayerButton icon={isFullScreen ? ExitIcon : FullIcon} onClick={handleFullScreen}></PlayerButton>
 
