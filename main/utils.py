@@ -155,21 +155,25 @@ def set_processed(req_id, tags):
 
     cursor = connection.cursor()
 
-    cursor.execute("UPDATE videos SET processed = %s WHERE vid_uuid = %s",
+    cursor.execute("UPDATE videos SET processed = %s WHERE path = %s",
                    (True, req_id))
     connection.commit()
 
-    cursor.execute("SELECT id FROM videos WHERE path = %s", (req_id,))
+    print(req_id)
 
-    vid_id = int(cursor.fetchone()[0])
+    cursor.execute("SELECT id FROM videos WHERE path = %s", (req_id,))
+    result = cursor.fetchone()
+    print(result)
+
+    vid_id = int(result[0])
 
     for p in tags:
-        url = f"http://localhost:1984/api/videos/tag?tag={p}&id={vid_id}"
+        url = f"http://5.180.174.216:1984/api/videos/tag?tag={p}&id={vid_id}"
         response = requests.post(url)
         print(response.status_code)
         print(response.text)
 
-    url = f"http://localhost:1984/api/videos/done?id={vid_id}"
+    url = f"http://5.180.174.216:1984/api/videos/done?id={vid_id}"
     requests.post(url)
 
     cursor.close()
@@ -194,7 +198,7 @@ def set_time(req_id):
 
     cursor = connection.cursor()
 
-    cursor.execute("UPDATE videos SET duration = %s WHERE vid_uuid = %s",
+    cursor.execute("UPDATE videos SET duration = %s WHERE path = %s",
                    (int(duration), req_id))
     connection.commit()
 

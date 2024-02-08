@@ -1,3 +1,4 @@
+import os
 import threading
 from collections import OrderedDict
 
@@ -66,13 +67,20 @@ def video():
 
 if __name__ == '__main__':
     init_db()
-    not_done_list = get_not_done()
+    # not_done_list = get_not_done()
+    not_done_list = [i.split(".")[0] for i in os.listdir('videos/')]
 
+    #
+    # print(not_done_list)
+    #
+    # for i in not_done_list:
+    #     create_result(i, 'mp4')
 
     def do_process(not_done_item):
         with semaphore:
             print(not_done_item)
-            process_video("videos/{}.mp4".format(not_done_item[0]), not_done_item[0])
+            # process_video("videos/{}.mp4".format(not_done_item[0]), not_done_item[0])
+            process_video("videos/{}.mp4".format(not_done_item), not_done_item)
 
 
     processing_threads = []
