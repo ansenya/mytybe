@@ -27,7 +27,7 @@ public class VideoDto {
         try {
             return thumbnail.getFalsePath();
         } catch (Exception e) {
-            return "http://" + IP + ":" + STORAGE_PORT + "/api/img?filename=" + "def_th.png";
+            return "http://" + MAIN_IP + ":" + STORAGE_PORT + "/api/img?filename=" + "def_th.png";
         }
     }
 
@@ -35,7 +35,7 @@ public class VideoDto {
         if (streamStatus == 1) {
             return "http://" + STORAGE_IP + ":" + HLS_PORT + "/hls/" + path + ".m3u8";
         } else if (streamStatus == 2) {
-            return "http://" + STORAGE_IP + ":" + PORT + "/api/static/vid?fileName=" + path + ".flv";
+            return "http://" + STORAGE_IP + ":" + MAIN_PORT + "/api/static/vid?fileName=" + path + ".flv";
         } else {
             return "http://" + STORAGE_IP + ":" + STORAGE_PORT + "/api/vid?filename=" + path + ".mp4";
         }

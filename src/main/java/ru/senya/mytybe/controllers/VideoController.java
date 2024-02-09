@@ -125,13 +125,13 @@ public class VideoController {
 
         String uuid = String.valueOf(UUID.randomUUID());
 
-//        if (!sendToStorage(uuid, Objects.requireNonNull(videoFile.getContentType()).split("/")[1], "vid", videoFile)) {
-//            return ResponseEntity.status(418).body("upload is not available (cannot save)");
-//        }
-//
-//        if (imageFile != null && !imageFile.isEmpty()) {
-//            sendToStorage(uuid, Objects.requireNonNull(videoFile.getContentType()).split("/")[1], "img", imageFile);
-//        }
+        if (!sendToStorage(uuid, Objects.requireNonNull(videoFile.getContentType()).split("/")[1], "vid", videoFile)) {
+            return ResponseEntity.status(418).body("upload is not available (cannot save)");
+        }
+
+        if (imageFile != null && !imageFile.isEmpty()) {
+            sendToStorage(uuid, Objects.requireNonNull(videoFile.getContentType()).split("/")[1], "img", imageFile);
+        }
 
 //
         HashMap<String, String> result;
@@ -143,17 +143,24 @@ public class VideoController {
             System.out.println(exception);
             return ResponseEntity.status(418).body("upload is not available");
         }
-        System.out.println(result);
 
 
         if (videoName.isEmpty()) {
             videoName = videoFile.getOriginalFilename();
         }
+        ImageModel thumbnail;
+        if (imageFile == null) {
+            thumbnail = ImageModel.builder()
+                    .type("th")
+                    .path("def_th.png")
+                    .build();
+        } else {
+            thumbnail = ImageModel.builder()
+                    .type("th")
+                    .path(uuid + "." + Objects.requireNonNull(imageFile.getContentType()).split("/")[1])
+                    .build();
+        }
 
-        ImageModel thumbnail = ImageModel.builder()
-                .type("th")
-                .path(uuid + "." + Objects.requireNonNull(videoFile.getContentType()).split("/")[1])
-                .build();
 
         VideoModel video = VideoModel.builder()
                 .name(videoName)
@@ -171,8 +178,9 @@ public class VideoController {
         return ResponseEntity.ok(modelMapper.map(video, VideoDto.class));
     }
 
-    private boolean sendToStorage(String uuid, String type, String endpoint, MultipartFile file) {
-        String url = "http://5.180.174.71:1986/api/" + endpoint + "/upload";
+
+    public static boolean sendToStorage(String uuid, String type, String endpoint, MultipartFile file) {
+        String url = "http://5.180.174.216:1986/api/" + endpoint + "/upload";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);
@@ -291,7 +299,8 @@ public class VideoController {
 
         return ResponseEntity.ok(videoModel);
     }
-//
+
+    //
     @PostMapping("done")
     public ResponseEntity<?> setDone(@RequestParam(value = "id", required = false) Long id) {
         VideoModel videoModel = videoService.findById(id);
@@ -316,6 +325,38 @@ public class VideoController {
         return response.getBody();
     }
 
+//    @PostMapping("process")
+//    public ResponseEntity<?> process() {
+//        var videos = videoService.getAll();
+//
+//        for (var video : videos) {
+//            processVideo()
+//        }
+//    }
+
+//    private String processVideo(File videoFile, String uuid) {
+//        int timeout = 10_000;
+//        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+//        factory.setReadTimeout(timeout);
+//        factory.setConnectTimeout(timeout);
+//
+//        RestTemplate restTemplate = new RestTemplate(factory);
+//
+//        String serverUrl = "http://192.168.1.2:8642/process?uuid=" + uuid;
+//
+//        FileSystemResource fileResource = new FileSystemResource(videoFile);
+//
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.MULTIPART_FORM_DATA);
+//
+//        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+//        body.add("video", fileResource);
+//
+//        HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
+//        ResponseEntity<String> response = restTemplate.postForEntity(serverUrl, requestEntity, String.class);
+//        return response.getBody();
+//    }
+
     private String processVideo(MultipartFile videoFile, String uuid) {
         int timeout = 10_000;
         SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
@@ -338,8 +379,9 @@ public class VideoController {
         ResponseEntity<String> response = restTemplate.postForEntity(serverUrl, requestEntity, String.class);
         return response.getBody();
     }
+
     private File convert(MultipartFile file) {
-        File convFile = new File(file.getOriginalFilename());
+        File convFile = new File(Objects.requireNonNull(file.getOriginalFilename()));
         try {
             convFile.createNewFile();
             FileOutputStream fos = new FileOutputStream(convFile);
@@ -353,19 +395,5 @@ public class VideoController {
 
     private boolean checkType(String name) {
         return name.endsWith(".mp4") || name.endsWith(".avi");
-    }
-
-    private File convertMultipartFileToFile(MultipartFile multipartFile, String uuid) throws IOException {
-        File file = new File("src/main/resources/videos/" + uuid + ".mp4");
-
-        try (OutputStream os = new FileOutputStream(file); InputStream is = multipartFile.getInputStream()) {
-            byte[] buffer = new byte[1024];
-            int bytesRead;
-            while ((bytesRead = is.read(buffer)) != -1) {
-                os.write(buffer, 0, bytesRead);
-            }
-        }
-
-        return file;
     }
 }

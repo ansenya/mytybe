@@ -20,9 +20,9 @@ import java.net.URL;
 @EnableElasticsearchRepositories(basePackages = "ru.senya.mytybe.repos.es")
 public class MytybeApplication {
 
-    public static String IP;
-        public static String STORAGE_IP = "5.180.174.216";
-    public static String PORT = "1984";
+    public static String MAIN_IP;
+    public static String MAIN_PORT = "1984";
+    public static String STORAGE_IP = "5.180.174.216";
     public static String STORAGE_PORT = "1986";
     public static String HLS_PORT = "8088";
 
@@ -30,7 +30,7 @@ public class MytybeApplication {
         try {
             URL url = new URL("https://api64.ipify.org?format=text");
             BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
-            IP = in.readLine();
+            MAIN_IP = in.readLine();
         } catch (IOException e) {
             e.printStackTrace();
             System.exit(1);

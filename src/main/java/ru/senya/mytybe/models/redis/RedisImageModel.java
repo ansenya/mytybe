@@ -6,8 +6,8 @@ import org.springframework.data.redis.core.RedisHash;
 
 import java.util.Date;
 
-import static ru.senya.mytybe.MytybeApplication.IP;
-import static ru.senya.mytybe.MytybeApplication.PORT;
+import static ru.senya.mytybe.MytybeApplication.MAIN_IP;
+import static ru.senya.mytybe.MytybeApplication.MAIN_PORT;
 
 @RedisHash("image")
 @Data
@@ -27,6 +27,6 @@ public class RedisImageModel {
     private boolean deleted = false;
 
     public String getFalsePath() {
-        return "http://" + IP + ":" + PORT + "/api/static/img?fileName=" + path;
+        return "http://" + MAIN_IP + ":" + MAIN_PORT + "/api/static/img?fileName=" + path;
     }
 }

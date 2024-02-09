@@ -1,4 +1,4 @@
-package ru.senya.mytybe.configs.security.cfg;
+package ru.senya.mytybe.configs.security;
 
 import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.JWKSet;
