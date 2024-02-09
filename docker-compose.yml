@@ -1,0 +1,12 @@
+version: '3.1'
+
+services:
+  my-service:
+    image: "gwuhaolin/livego"
+    ports:
+      - "1935:1935"
+      - "7001:7001"
+      - "7002:7002"
+      - "8090:8090"
+    container_name: "livego_container"
+    restart: "unless-stopped"
