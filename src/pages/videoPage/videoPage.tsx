@@ -14,6 +14,7 @@ const VideoPage = () => {
     if (data){
       document.title = data.name
     }
+    console.log(data)
     console.log()
   }, [data]);
 
@@ -23,7 +24,7 @@ const VideoPage = () => {
         <InlineLoader />
       ) : (
         <>
-          <VideoPlayer source={data?.path ?? ""} />
+          <VideoPlayer source={data?.path ?? ""} qValues={data?.qualities ?? []}  />
           <div className={styles.side}>
             <VideoScroll />
           </div>

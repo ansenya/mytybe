@@ -31,6 +31,7 @@ export interface IVideo {
     description: string;
     duration?: any;
     views: number;
+    qualities: string[];
     thumbnail: string;
     channel: IChannel;
     category?: string;

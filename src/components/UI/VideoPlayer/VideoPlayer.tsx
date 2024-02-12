@@ -24,13 +24,12 @@ import PlayerSelect from "../PlayerSelect/PlayerSelect";
 
 interface VideoPlayerProps {
     source: string;
+    qValues: string[];
 }
 
-type ext = "360" | "720" | "480" | "144"
 
 
-
-const VideoPlayer: React.FC<VideoPlayerProps> = ({source}) => {
+const VideoPlayer: React.FC<VideoPlayerProps> = ({source, qValues}) => {
     const playerRef = useRef<ReactPlayer>(null);
     const lineRef = useRef<HTMLInputElement>(null);
 
@@ -45,9 +44,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({source}) => {
     const [playbackSpeed, setPlaybackSpeed] = useState<string>("1")
     const [isPip, setIsPip] = useState(false);
     const [isEnded, setIsEnded] = useState(false);
-    const [quality, setQuality] = useState<ext>("720")
+    const [quality, setQuality] = useState<string>(Math.max(...qValues.map((value: string) => parseInt(value))).toString())
     const [isError, setIsError] = useState<boolean>(false);
-    const qValues: ext[] = ["720", "480", "360", "144"]
     const pValues = ["2", "1.5", "1", "0.5"]
 
     const seekForward = () => {
