@@ -11,6 +11,9 @@ const VideoPage = () => {
   const { data, error, isLoading } = useGetVideoByIdQuery(Number(id));
 
   useEffect(() => {
+    if (data){
+      document.title = data.name
+    }
     console.log()
   }, [data]);
 
