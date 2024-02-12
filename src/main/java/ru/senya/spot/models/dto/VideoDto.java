@@ -28,7 +28,7 @@ public class VideoDto {
     private Date created;
     private Date updated;
 
-    private Set<TagModel> tags;
+//    private Set<TagModel> tags;
 
 
     public String getThumbnail() {
@@ -53,14 +53,14 @@ public class VideoDto {
         this.qualities = qualities.split(" ");
     }
 
-    public List<String> getTags() {
-        List<String> good_tags = new LinkedList<>();
-        for (TagModel tagModel : tags) {
-            good_tags.add(tagModel.getEnTag());
-            good_tags.add(tagModel.getRuTag());
-        }
-        return good_tags;
-    }
+//    public List<String> getTags() {
+//        List<String> good_tags = new LinkedList<>();
+//        for (TagModel tagModel : tags) {
+//            good_tags.add(tagModel.getEnTag());
+//            good_tags.add(tagModel.getRuTag());
+//        }
+//        return good_tags;
+//    }
 }
 
 /*
