@@ -34,6 +34,8 @@ public class VideoModel {
 
     private Long views;
 
+    private String qualities;
+
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "image_id")
     private ImageModel thumbnail;
@@ -100,5 +102,9 @@ public class VideoModel {
             return 0L;
         }
         return views;
+    }
+
+    public static VideoModel.VideoModelBuilder builder() {
+        return new VideoModelBuilder().qualities("");
     }
 }

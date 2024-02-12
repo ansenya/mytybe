@@ -19,6 +19,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("videos")
+@CrossOrigin(origins = "*")
 public class GetController {
 
     private final UserRepository userRepository;

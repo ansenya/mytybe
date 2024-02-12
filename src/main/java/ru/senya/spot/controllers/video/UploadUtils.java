@@ -3,10 +3,7 @@ package ru.senya.spot.controllers.video;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import ru.senya.spot.models.dto.VideoDto;
 import ru.senya.spot.models.jpa.ChannelModel;
@@ -22,6 +19,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("videos")
+@CrossOrigin(origins = "*")
 public class UploadUtils {
 
     private final UserRepository userRepository;

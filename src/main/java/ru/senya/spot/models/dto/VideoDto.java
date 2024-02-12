@@ -1,8 +1,12 @@
 package ru.senya.spot.models.dto;
 
 import lombok.Data;
+import ru.senya.spot.models.jpa.TagModel;
 
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 
 import static ru.senya.spot.MytybeApplication.*;
 
@@ -14,6 +18,7 @@ public class VideoDto {
     private String description;
     private Long duration;
     private Long views = 0L;
+    private String[] qualities;
     private String path;
     private ImageDto thumbnail;
     //    private CategoryModel category;
@@ -22,6 +27,9 @@ public class VideoDto {
     private Integer streamStatus;
     private Date created;
     private Date updated;
+
+    private Set<TagModel> tags;
+
 
     public String getThumbnail() {
         try {
@@ -41,13 +49,23 @@ public class VideoDto {
         }
     }
 
+    public void setQualities(String qualities) {
+        this.qualities = qualities.split(" ");
+    }
 
+    public List<String> getTags() {
+        List<String> good_tags = new LinkedList<>();
+        for (TagModel tagModel : tags) {
+            good_tags.add(tagModel.getEnTag());
+            good_tags.add(tagModel.getRuTag());
+        }
+        return good_tags;
+    }
 }
 
 /*
     private LinkedList<CommentDto> comments;
 
-    private Set<TagModel> tags;
 
     private Set<PlaylistModel> playlists;
 
@@ -60,12 +78,5 @@ public class VideoDto {
     private boolean processed;
 
 
-    public List<String> getTags() {
-        List<String> good_tags = new LinkedList<>();
-        for (TagModel tagModel : tags) {
-            good_tags.add(tagModel.getEnTag());
-            good_tags.add(tagModel.getRuTag());
-        }
-        return good_tags;
-    }
+
  */

@@ -15,6 +15,7 @@ import ru.senya.spot.services.VideoService;
 
 @RestController
 @RequestMapping("video")
+@CrossOrigin(origins = "*")
 public class ApiController {
 
     private final VideoService videoService;

@@ -11,10 +11,6 @@ import ru.senya.spot.repos.jpa.ImagesRepository;
 import ru.senya.spot.repos.jpa.UserRepository;
 import ru.senya.spot.services.VideoService;
 
-import java.util.Objects;
-
-import static ru.senya.spot.controllers.VideoController.sendToStorage;
-
 
 @RestController
 @RequestMapping("videos")
@@ -31,27 +27,27 @@ public class ThumbnailsController {
         this.imagesRepository = imagesRepository;
     }
 
-    @PutMapping("{id}/th")
-    public ResponseEntity<?> th(@PathVariable Long id,
-                                @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
-                                Authentication authentication) {
-        var user = userRepository.findByUsername(authentication.getName());
-        var video = videoService.findById(id);
-
-        if (imageFile.isEmpty()) {
-            return ResponseEntity.badRequest().body("imageFile is null");
-        }
-
-        if (video != null && video.getChannel().getUser().equals(user)) {
-            sendToStorage(video.getPath(), Objects.requireNonNull(imageFile.getContentType()).split("/")[1], "img", imageFile);
-        }
-
-        video.setThumbnail(ImageModel.builder()
-                .type("th")
-                .path(video.getPath() + "." + Objects.requireNonNull(imageFile.getContentType()).split("/")[1])
-                .build());
-
-        video = videoService.save(video);
-        return ResponseEntity.ok(modelMapper.map(video, VideoDto.class));
-    }
+//    @PutMapping("{id}/th")
+//    public ResponseEntity<?> th(@PathVariable Long id,
+//                                @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
+//                                Authentication authentication) {
+//        var user = userRepository.findByUsername(authentication.getName());
+//        var video = videoService.findById(id);
+//
+//        if (imageFile.isEmpty()) {
+//            return ResponseEntity.badRequest().body("imageFile is null");
+//        }
+//
+//        if (video != null && video.getChannel().getUser().equals(user)) {
+//            sendToStorage(video.getPath(), Objects.requireNonNull(imageFile.getContentType()).split("/")[1], "img", imageFile);
+//        }
+//
+//        video.setThumbnail(ImageModel.builder()
+//                .type("th")
+//                .path(video.getPath() + "." + Objects.requireNonNull(imageFile.getContentType()).split("/")[1])
+//                .build());
+//
+//        video = videoService.save(video);
+//        return ResponseEntity.ok(modelMapper.map(video, VideoDto.class));
+//    }
 }

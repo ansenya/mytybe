@@ -27,7 +27,7 @@ public class ProcessingUtils {
 
         RestTemplate restTemplate = new RestTemplate(factory);
 
-        String serverUrl = "http://localhost:8642/process?uuid=" + uuid;
+        String serverUrl = "http://176.99.146.176:8642/process?uuid=" + uuid;
 
         FileSystemResource fileResource = new FileSystemResource(convert(videoFile));
 
