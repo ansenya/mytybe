@@ -21,9 +21,10 @@ import usePlayerKeys from "../../../hooks/usePlayerKeys";
 
 interface VideoPlayerProps {
   source: string;
+  qValues: string[];
 }
 
-const VideoPlayer: React.FC<VideoPlayerProps> = ({ source }) => {
+const VideoPlayer: React.FC<VideoPlayerProps> = ({ source, qValues }) => {
   const playerRef = useRef<ReactPlayer>(null);
   const lineRef = useRef<HTMLInputElement>(null);
 
@@ -38,8 +39,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ source }) => {
   const [playbackSpeed, setPlaybackSpeed] = useState<string>("1");
   const [isPip, setIsPip] = useState(false);
   const [isEnded, setIsEnded] = useState(false);
-  const [quality, setQuality] = useState<string>("720");
+  const [quality, setQuality] = useState<string>(
+    Math.max(...qValues.map((value: string) => parseInt(value))).toString(),
+  );
   const [isError, setIsError] = useState<boolean>(false);
+  const pValues = ["2", "1.5", "1", "0.5"];
 
   const {
     isPlayPressed,
@@ -68,7 +72,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ source }) => {
     if (playerRef.current)
       playerRef.current?.seekTo(playerRef.current?.getCurrentTime() + 10);
   };
-
   const seekBackward = () => {
     if (playerRef.current)
       playerRef.current?.seekTo(playerRef.current?.getCurrentTime() - 10);

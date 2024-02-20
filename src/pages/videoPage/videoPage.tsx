@@ -11,7 +11,9 @@ const VideoPage = () => {
   const { data, error, isLoading } = useGetVideoByIdQuery(Number(id));
 
   useEffect(() => {
-    console.log();
+    if (data){
+      document.title = data.name
+    }
   }, [data]);
 
   return (
@@ -21,7 +23,7 @@ const VideoPage = () => {
       ) : (
         <>
           <div className="video__content">
-            <VideoPlayer source={data?.path ?? ""} />
+          <VideoPlayer source={data?.path ?? ""} qValues={data?.qualities ?? []}  />
             <div className="playing__title">
               <h1>{data.name}</h1>
             </div>
