@@ -4,24 +4,33 @@ import VideoPlayer from "../../components/UI/VideoPlayer/VideoPlayer";
 import VideoScroll from "../../components/videosScroll";
 import { useGetVideoByIdQuery } from "../../store/api/serverApi";
 import InlineLoader from "../../components/UI/Loader/InlineLoader";
-import styles from "./videoPage.module.scss";
+import "./videoPage.scss";
 
 const VideoPage = () => {
   const { id } = useParams();
   const { data, error, isLoading } = useGetVideoByIdQuery(Number(id));
 
   useEffect(() => {
-    console.log()
+    console.log();
   }, [data]);
 
   return (
-    <div className={styles.watchVideo}>
+    <div className="watchVideo">
       {!data || isLoading ? (
         <InlineLoader />
       ) : (
         <>
-          <VideoPlayer source={data?.path ?? ""} />
-          <div className={styles.side}>
+          <div className="video__content">
+            <VideoPlayer source={data?.path ?? ""} />
+            <div className="playing__title">
+              <h1>{data.name}</h1>
+            </div>
+            <div className="playing__channel">
+              <img src={data.channel.chp} className="avatar" />
+              <span>{data.channel.name}</span>
+            </div>
+          </div>
+          <div className="side__content">
             <VideoScroll />
           </div>
         </>

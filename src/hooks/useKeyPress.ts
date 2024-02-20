@@ -1,25 +1,36 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
-const useKeyPress = (targetKeys: string[], callback: Function, ...args: any[]): void => {
+const useKeyPress = (targetKeys: string[] ): boolean => {
+  const [isPressed, setIsPressed] = useState<boolean>(false);
 
-    const downHandler = (event: KeyboardEvent) => {
-        if (event.key === " ") event.preventDefault();
-        if (targetKeys.includes(event.key.toLowerCase())){
-            console.log(args)
-            callback(args)
-        }
+  const downHandler = (event: KeyboardEvent) => {
+    if (event.key === " ") event.preventDefault();
+    if (targetKeys.includes(event.key.toLowerCase())) {
+      setIsPressed(true);
+    }
+  };
+
+  const upHandler = (event: KeyboardEvent) => {
+    if ( ["ArrowRigth", "ArrowLeft", " "].includes(event.key)) event.preventDefault();
+    if (targetKeys.includes(event.key.toLowerCase())) {
+      setIsPressed(false);
+    }
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => downHandler(event);
+
+    document.addEventListener("keydown", downHandler);
+    document.addEventListener("keyup", upHandler);
+
+    return () => {
+      document.removeEventListener("keydown", downHandler);
+      document.removeEventListener("keyup", upHandler);
     };
+  }, []);
 
-    useEffect(() => {
-        const handleKeyDown = (event: KeyboardEvent) => downHandler(event);
-
-        window.addEventListener('keydown', handleKeyDown);
-
-        return () => {
-            document.removeEventListener('keydown', handleKeyDown);
-        };
-    }, []);
-
+  return isPressed;
 };
+
 
 export default useKeyPress;
