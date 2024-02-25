@@ -6,7 +6,7 @@ import CButton from "./UI/CButton/CButton";
 import IconButton from "./UI/IconButton/IconButton";
 import uploadIcon from "../assets/upload-svgrepo-com.svg";
 import InlineLoader from "./UI/Loader/InlineLoader";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, Link } from "react-router-dom";
 import PaWindow from "./ProfileActionsWindow/paWindow";
 
 interface MainContentProps {
@@ -39,7 +39,7 @@ const NavbarMainContent: FC<MainContentProps> = ({
           icon={menuIcon}
           onClick={() => setIsMenuShown(!isMenuShown)}
         />
-        <a href="/"><span>Spot</span></a>
+        <Link to="/"><span>Spot</span></Link>
       </div>
       <div className="navbar__center">
         {!isSmallScreen ? (
