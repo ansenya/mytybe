@@ -1,0 +1,45 @@
+@import "../../variables";
+.watchVideo {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+
+  .side__content {
+    flex: 0.4;
+    @media (max-width: 1025px) {
+      width: 100%;
+    }
+  }
+
+  @media (max-width: 1025px) {
+    flex-direction: column;
+  }
+  .video__content {
+    width: 100%;
+    .playing__title {
+      width: 100%;
+      color: white;
+      height: auto;
+      margin: 10px 0;
+      
+
+      h1 {
+        color: inherit;
+        font-size: 1.5rem;
+      }
+    }
+    .playing__channel {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      span{
+        font-size: 1.2rem;
+        color: $text-color;
+        letter-spacing: 0.1px;
+        font-weight: bolder;
+      }
+    }
+  }
+}

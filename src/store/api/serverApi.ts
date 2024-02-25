@@ -63,6 +63,7 @@ export const serverApi = createApi({
             page,
             sort,
             size,
+            channelId: 1,
           },
           headers,
         };
