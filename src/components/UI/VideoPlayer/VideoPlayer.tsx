@@ -283,6 +283,13 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ source, qValues }) => {
             <div className="current">{current}</div>/
             <div className="total">{total}</div>
           </div>
+          <PlayerSelect
+            quality={quality}
+            qualities={qValues}
+            playbackSpeed={playbackSpeed}
+            setPlaybackSpeed={setPlaybackSpeed}
+            setQuality={setQuality}
+          />
           <PlayerButton icon={PipIcon} onClick={handlePip}></PlayerButton>
           <PlayerButton
             icon={isFullScreen ? ExitIcon : FullIcon}

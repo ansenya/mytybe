@@ -8,6 +8,7 @@ import tickIcon from "../../../assets/checkmark-svgrepo-com.svg";
 
 interface PlayerSelectProps {
   quality: string;
+  qualities: string[];
   playbackSpeed: string;
   setQuality: Function;
   setPlaybackSpeed: Function;
@@ -20,6 +21,7 @@ interface IMenu {
 
 const PlayerSelect: FC<PlayerSelectProps> = ({
   quality,
+  qualities,
   playbackSpeed,
   setQuality,
   setPlaybackSpeed,
@@ -81,7 +83,7 @@ const PlayerSelect: FC<PlayerSelectProps> = ({
             </div>
           ))}
         {isQualityOpened && 
-          qValues.map((option: string, index: number) => (
+          qualities.map((option: string, index: number) => (
             <div
               className={[
                 styles.option,
