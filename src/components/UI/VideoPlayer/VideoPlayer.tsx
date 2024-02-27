@@ -43,7 +43,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ source, qValues }) => {
     Math.max(...qValues.map((value: string) => parseInt(value))).toString(),
   );
   const [isError, setIsError] = useState<boolean>(false);
-  const pValues = ["2", "1.5", "1", "0.5"];
 
   const {
     isPlayPressed,
@@ -222,6 +221,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ source, qValues }) => {
         width="100%"
         height="auto"
         onProgress={handleProgress}
+        onSeek={() => setIsLoading(true)}
         onReady={() => setIsLoading(false)}
         playbackRate={Number(playbackSpeed)}
         onBuffer={handleBufferStart}
@@ -255,6 +255,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ source, qValues }) => {
             ref={lineRef}
             onMouseUp={handleSeek}
             onMouseDown={onMouseDown}
+            onTouchStart={onMouseDown}
             onChange={handleSeek}
           />
         </div>
@@ -284,6 +285,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ source, qValues }) => {
           </div>
           <PlayerSelect
             quality={quality}
+            qualities={qValues}
             playbackSpeed={playbackSpeed}
             setPlaybackSpeed={setPlaybackSpeed}
             setQuality={setQuality}

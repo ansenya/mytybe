@@ -1,0 +1,29 @@
+version: '3'
+
+services:
+  nginx:
+    image: arsanoshin/spot-front-nginx
+    container_name: nginx
+    networks:
+      - front
+    volumes:
+    - ./templates:/etc/nginx/templates
+    ports:
+      - "80:80"
+    environment:
+      - NGINX_HOST=video-spot.ru
+      - NGINX_PORT=80
+
+  front:
+    image: arsanoshin/spot-front
+    container_name: front
+    networks:
+      - front
+      
+   
+volumes:
+  nginx_data:
+
+networks:
+  front:
+    driver: bridge

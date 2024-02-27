@@ -8,9 +8,10 @@ import tickIcon from "../../../assets/checkmark-svgrepo-com.svg";
 
 interface PlayerSelectProps {
   quality: string;
+  qualities: string[];
   playbackSpeed: string;
   setQuality: Function;
-  setPlaybackSpeed: Function;
+  setPlaybackSpeed: Function
 }
 
 interface IMenu {
@@ -19,9 +20,10 @@ interface IMenu {
 
 const PlayerSelect: FC<PlayerSelectProps> = ({
   quality,
+  qualities,
   playbackSpeed,
   setQuality,
-  setPlaybackSpeed,
+  setPlaybackSpeed
 }) => {
   const [isMenuOpened, setIsMenuOpened] = useState<boolean>(false);
   const [isQualityOpened, setIsQualityOpened] = useState<boolean>(false);
@@ -44,13 +46,12 @@ const PlayerSelect: FC<PlayerSelectProps> = ({
     setIsQualityOpened(false);
     setIsSpeedOpened(false);
     setIsMenuOpened(prevState => !prevState)
-  } 
+  }
 
   const menu: IMenu = {
-    Разрешение: setIsQualityOpened,
-    Скорость: setIsSpeedOpened,
+    "Разрешение" : setIsQualityOpened,
+    "Скорость": setIsSpeedOpened,
   };
-  const qValues = ["720", "480", "360", "144"];
   const pValues = ["2", "1.5", "1", "0.5"];
 
   return (
@@ -80,7 +81,7 @@ const PlayerSelect: FC<PlayerSelectProps> = ({
             </div>
           ))}
         {isQualityOpened && 
-          qValues.map((option: string, index: number) => (
+          qualities.map((option: string, index: number) => (
             <div
               className={[
                 styles.option,
