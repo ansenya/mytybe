@@ -11,8 +11,7 @@ interface PlayerSelectProps {
   qualities: string[];
   playbackSpeed: string;
   setQuality: Function;
-  setPlaybackSpeed: Function;
-  qValues: string[]
+  setPlaybackSpeed: Function
 }
 
 interface IMenu {
@@ -24,8 +23,7 @@ const PlayerSelect: FC<PlayerSelectProps> = ({
   qualities,
   playbackSpeed,
   setQuality,
-  setPlaybackSpeed,
-    qValues
+  setPlaybackSpeed
 }) => {
   const [isMenuOpened, setIsMenuOpened] = useState<boolean>(false);
   const [isQualityOpened, setIsQualityOpened] = useState<boolean>(false);
