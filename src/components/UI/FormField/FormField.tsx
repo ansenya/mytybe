@@ -6,7 +6,6 @@ import React, {
   forwardRef,
   Ref
 } from "react";
-import IconButton from "../IconButton/IconButton";
 import styles from "./FormField.module.scss";
 import eyeIcon from "../../../assets/eye-svgrepo-com.svg";
 import eyeSlashIcon from "../../../assets/eye-slash-svgrepo-com.svg";
