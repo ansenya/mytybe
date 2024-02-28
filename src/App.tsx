@@ -1,4 +1,3 @@
-import React from "react";
 import { Routes, Route } from "react-router-dom";
 import Layout from "./pages/layout";
 import VideosPage from "./pages/videosPage";
@@ -10,14 +9,19 @@ import ChannelPage from "./pages/channelPage";
 import ErrorPage from "./pages/errorPage";
 import LoginPage from "./pages/loginPage";
 import RegistrationPage from "./pages/registrationPage";
-import RequireAuth from "./hoc/RequireAuth";
 import Logout from "./pages/logout";
+import customTheme from "./models/customAuthTheme";
+
 
 import "./App.scss";
+import { ThemeProvider } from "@emotion/react";
+
+const theme = customTheme();
 
 const App = () => {
   return (
-    <>
+    <ThemeProvider theme={theme}>
+
       <Routes>
         <Route path="/" element={<Layout></Layout>}>
           <Route index element={<VideosPage />}></Route>
@@ -33,7 +37,7 @@ const App = () => {
           <Route path="*" element={<ErrorPage />}></Route>
         </Route>
       </Routes>
-    </>
+    </ThemeProvider>
   );
 };
 

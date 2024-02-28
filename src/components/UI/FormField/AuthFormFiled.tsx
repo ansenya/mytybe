@@ -16,8 +16,6 @@ const AuthFormField = (props: AuthFormFieldProps) => {
         event.preventDefault();
     };
 
-    console.log(showPassword)
-
     return (
         <TextField
             variant="outlined"
@@ -46,7 +44,7 @@ const AuthFormField = (props: AuthFormFieldProps) => {
                 ) : null
             }}
             onChange={props.onChange}
-        />
+            />
     );
 }
 

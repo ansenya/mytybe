@@ -1,11 +1,10 @@
-import { Theme } from "@emotion/react";
 import { createTheme, outlinedInputClasses } from "@mui/material";
 
-const customTheme = (outerTheme: Theme) =>
+const customTheme = () =>
 createTheme({
   palette: {
     background: {
-      default: 'primary', 
+        default: 'primary', // Use primary color as default background
     },
   },
   components: {
