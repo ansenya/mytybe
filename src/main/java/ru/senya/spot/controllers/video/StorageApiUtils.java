@@ -14,7 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 public class StorageApiUtils {
 
     public boolean sendToStorage(String uuid, String type, String endpoint, MultipartFile file) {
-        String url = "http://5.180.174.216:1986/api/" + endpoint + "/upload";
+        String url = "http://st:1986/storage/" + endpoint + "/upload";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.MULTIPART_FORM_DATA);

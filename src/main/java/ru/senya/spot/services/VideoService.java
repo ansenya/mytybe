@@ -36,7 +36,7 @@ public class VideoService {
     public Page<VideoModel> getAll(List<Long> specificIds, Pageable pageable) {
         List<VideoModel> resultList;
         if (specificIds.isEmpty()) {
-            return videoRepository.findAll(pageable);
+            return videoRepository.findAllByDeletedIsFalse(pageable);
         } else {
             List<VideoModel> inSpecificIds = videoRepository.findInSpecificIds(specificIds);
             List<VideoModel> notInSpecificIds = videoRepository.findNotInSpecificIds(specificIds);
@@ -61,7 +61,7 @@ public class VideoService {
     }
 
     public Page<VideoModel> findAllByChannelId(Long channelId, Pageable pageable) {
-        return videoRepository.findAllByChannelId(channelId, pageable);
+        return videoRepository.findAllByChannelIdAndDeletedIsFalse(channelId, pageable);
     }
 
     public VideoModel findById(Long id) {

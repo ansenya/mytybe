@@ -1,12 +1,59 @@
-version: '3.1'
-
+version: '3'
 services:
-  my-service:
-    image: "gwuhaolin/livego"
+  main:
+    container_name: main
+    image: arsanoshin/spot-main
     ports:
-      - "1935:1935"
-      - "7001:7001"
-      - "7002:7002"
-      - "8090:8090"
-    container_name: "livego_container"
-    restart: "unless-stopped"
+      - "1984:1984"
+    depends_on:
+      - es
+      - st
+      - db
+    networks:
+      - spot
+    restart: always
+
+  es:
+    container_name: es
+    image: arsanoshin/elastic:8.12.2
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    networks:
+      - spot
+    mem_limit: 2GB
+
+  st:
+    container_name: st
+    image: arsanoshin/spot-storage
+    ports:
+      - "1986:1986"
+    networks:
+      - spot
+    volumes:
+      - vids_data:/vids
+      - imgs_data:/imgs
+    mem_limit: 2GB
+
+  db:
+    image: mysql:latest
+    container_name: db
+    restart: always
+    networks:
+      - spot
+    environment:
+      MYSQL_USER: "spot-spring"
+      MYSQL_PASSWORD: "Fsi01?$4"
+      MYSQL_DATABASE: "spot"
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:
+  vids_data:
+  imgs_data:
+
+networks:
+  spot:
+    driver: bridge

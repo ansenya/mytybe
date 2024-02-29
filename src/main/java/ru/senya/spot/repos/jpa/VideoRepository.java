@@ -15,7 +15,7 @@ import java.util.Optional;
 public interface VideoRepository extends JpaRepository<VideoModel, Long> {
 
     Page<VideoModel> findAllByDeletedIsFalse(@Nonnull    Pageable pageable);
-    Page<VideoModel> findAllByChannelId(Long id, Pageable pageable);
+    Page<VideoModel> findAllByChannelIdAndDeletedIsFalse(Long id, Pageable pageable);
 
     Optional<VideoModel> findByPath(String path);
 
@@ -25,6 +25,7 @@ public interface VideoRepository extends JpaRepository<VideoModel, Long> {
     @Query(value = "SELECT * FROM videos vm " +
             "WHERE vm.id IN (:specificIds)" +
             "and vm.stream_status=0 " +
+            "and vm.deleted=false " +
             "ORDER BY vm.created DESC",
             nativeQuery = true)
     List<VideoModel> findInSpecificIds(List<Long> specificIds);
@@ -32,6 +33,7 @@ public interface VideoRepository extends JpaRepository<VideoModel, Long> {
     @Query(value = "SELECT * FROM videos vm " +
             "WHERE vm.id NOT IN (:specificIds)" +
             "and vm.stream_status=0 " +
+            "and vm.deleted=false " +
             "ORDER BY vm.created DESC",
             nativeQuery = true)
     List<VideoModel> findNotInSpecificIds(List<Long> specificIds);

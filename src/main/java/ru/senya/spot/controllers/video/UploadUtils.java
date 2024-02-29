@@ -53,19 +53,20 @@ public class UploadUtils {
         try {
             String uuid = UUID.randomUUID().toString();
             String videoContentType = Objects.requireNonNull(videoFile.getContentType()).split("/")[1];
+            String imageContentType = Objects.requireNonNull(imageFile.getContentType()).split("/")[1];
 
             if (!storageApiUtils.sendToStorage(uuid, videoContentType, "vid", videoFile)) {
                 return ResponseEntity.status(418).body("Upload is not available (cannot save)");
             }
 
-            if (imageFile != null && !imageFile.isEmpty()) {
-                storageApiUtils.sendToStorage(uuid, videoContentType, "img", imageFile);
+            if (!imageFile.isEmpty()) {
+                storageApiUtils.sendToStorage(uuid, imageContentType, "img", imageFile);
             }
 
-            processingUtils.processVideo(videoFile, uuid);
+//            processingUtils.processVideo(videoFile, uuid);
 
             if (videoName.isEmpty()) {
-                videoName = videoFile.getOriginalFilename();
+                videoName = videoFile.getOriginalFilename().replace(".mp4", "");
             }
 
             ImageModel thumbnail = createThumbnail(imageFile, uuid);
@@ -104,6 +105,7 @@ public class UploadUtils {
                 .channel(channel)
                 .description(description)
                 .path(uuid)
+                .qualities("720")
                 .thumbnail(thumbnail)
                 .tags(new HashSet<>())
                 .streamStatus(0)

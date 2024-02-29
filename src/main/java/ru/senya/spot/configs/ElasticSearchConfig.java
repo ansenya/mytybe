@@ -18,6 +18,8 @@ import org.springframework.data.elasticsearch.client.erhlc.ElasticsearchRestTemp
 import org.springframework.data.elasticsearch.client.erhlc.RestClients;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 
+import java.time.Duration;
+
 @Configuration
 public class ElasticSearchConfig {
 
@@ -30,6 +32,8 @@ public class ElasticSearchConfig {
                 ClientConfiguration
                         .builder()
                         .connectedTo(elasticsearchUrl)
+                        .withConnectTimeout(300000 )
+                        .withSocketTimeout(300000)
                         .build();
         return RestClients.create(clientConfiguration).rest();
     }
