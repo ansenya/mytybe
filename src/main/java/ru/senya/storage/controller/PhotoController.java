@@ -16,7 +16,6 @@ import java.nio.file.Paths;
 import static ru.senya.storage.controller.Utils.save;
 
 @RestController
-@RequestMapping("/api")
 public class PhotoController {
 
     @GetMapping("img")

@@ -37,7 +37,7 @@ public class VideoStreamService {
                         .header(CONTENT_LENGTH, String.valueOf(rangeEnd))
                         .header(CONTENT_RANGE, BYTES + " " + rangeStart + "-" + rangeEnd + "/" + fileSize)
                         .header(CONTENT_LENGTH, String.valueOf(fileSize))
-                        .body(readByteRangeNew(fileKey, rangeStart, rangeEnd)); // Read the object and convert it as bytes
+                        .body(readByteRangeNew(fileKey, rangeStart, rangeEnd));
             }
             String[] ranges = range.split("-");
             rangeStart = Long.parseLong(ranges[0].substring(6));

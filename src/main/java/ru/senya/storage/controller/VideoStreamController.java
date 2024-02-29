@@ -20,12 +20,12 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.stream.Stream;
 
 import static ru.senya.storage.controller.Utils.save;
 
 @RestController
-@RequestMapping("/api")
 public class VideoStreamController {
 
     private final VideoStreamService videoStreamService;
@@ -50,7 +50,7 @@ public class VideoStreamController {
             try {
                 userRequestTracker.setRequestInProgress(request.getRemoteAddr(), 1);
                 String path = findVideoPath(fileName, quality);
-                String type = determineFileType(fileName);
+                String type = fileName.substring(fileName.lastIndexOf(".") + 1);
                 if (!new File("vids/" + path + "." + type).exists()) {
                     return Mono.just(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
                 }
@@ -63,6 +63,9 @@ public class VideoStreamController {
 
     @PostMapping("vid/upload")
     public ResponseEntity<?> uploadVideo(@RequestParam("file") MultipartFile video, @RequestParam("uuid") String uuid, @RequestParam("type") String type) {
+        if (video.isEmpty()){
+            return ResponseEntity.status(124).body("пусто");
+        }
         try {
             saveVideo(video, uuid, type);
         } catch (IOException exception) {
@@ -85,7 +88,7 @@ public class VideoStreamController {
 
     private void encode(String filename) {
         try {
-            ProcessBuilder pb = new ProcessBuilder("scripts/encode.sh", filename);
+            ProcessBuilder pb = new ProcessBuilder("sh",  "scripts/encode.sh", filename);
             pb.redirectErrorStream(true);
             pb.redirectErrorStream(true);
             Process process = pb.start();
@@ -105,8 +108,8 @@ public class VideoStreamController {
 
     private String findVideoPath(String fileName, String quality) {
         String name = fileName.split("\\.")[0];
-        String type = fileName.split("\\.")[1];
         String path;
+        System.out.println(quality);
         if (quality.isBlank()) {
             int maxQuality = findMaxQuality(name);
             if (maxQuality == -1) {
@@ -122,7 +125,6 @@ public class VideoStreamController {
 
     private int findMaxQuality(String name) {
         try {
-
             int maxQuality = 0;
             try (Stream<Path> paths = Files.walk(Paths.get("vids"))) {
                 maxQuality = paths
@@ -140,10 +142,6 @@ public class VideoStreamController {
         } catch (ArrayIndexOutOfBoundsException e) {
             return -1;
         }
-    }
-
-    private String determineFileType(String fileName) {
-        return fileName.substring(fileName.lastIndexOf(".") + 1);
     }
 
 }
