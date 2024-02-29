@@ -67,14 +67,14 @@ def video():
 
 if __name__ == '__main__':
     init_db()
-    # not_done_list = get_not_done()
-    not_done_list = [i.split(".")[0] for i in os.listdir('videos/')]
+    not_done_list = get_not_done()
+    # not_done_list = [i.split(".")[0] for i in os.listdir('videos/')]
 
     #
-    # print(not_done_list)
+    print(not_done_list)
     #
-    # for i in not_done_list:
-    #     create_result(i, 'mp4')
+    for i in not_done_list:
+        create_result(i, 'mp4')
 
     def do_process(not_done_item):
         with semaphore:

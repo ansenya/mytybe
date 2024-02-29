@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ai-container-deployment
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ai-container
+  template:
+    metadata:
+      labels:
+        app: ai-container
+    spec:
+      containers:
+        - name: ai-container
+          image: arsanoshin/ai:latest
+          ports:
+            - containerPort: 8642
