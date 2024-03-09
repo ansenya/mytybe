@@ -12,6 +12,7 @@ import RegistrationPage from "./pages/registrationPage";
 import LoginPage from "./pages/loginPage";
 import RequireAuth from "./hoc/RequireAuth";
 import Logout from "./pages/logout";
+import UploadPage from "./pages/uploadPage/uploadPage"
 
 import "./App.scss";
 
@@ -21,10 +22,10 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Layout></Layout>}>
           <Route index element={<VideosPage />}></Route>
-          <Route path=":id" element={<VideoPage />}></Route>
           <Route path="login" element={<LoginPage />}></Route>
           <Route path="logout" element={<Logout/>}></Route>
           <Route path="register" element={<RegistrationPage />}></Route>
+          <Route path="videos/upload" element={<UploadPage />}></Route>
           <Route path="channels" element={<ChannelsPage />}></Route>
           <Route path="channels/:id" element={<ChannelPage />}></Route>
           <Route path="videos/:id" element={<VideoPage />}></Route>

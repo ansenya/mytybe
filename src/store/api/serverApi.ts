@@ -1,13 +1,13 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { IUser, IVideo } from "../../models";
 import { AuthCredentials, IToken } from "../../models/AuthModels";
-import { VideosRequest, VideosResponse } from "../../models/VideoModels";
+import { UploadResponse, VideosRequest, VideosResponse, UploadRequest} from "../../models/VideoModels";
 import { RegisterArgs } from "../../pages/registrationPage";
 
 export const serverApi = createApi({
   reducerPath: "server",
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://5.180.174.216:1984/api",
+    baseUrl: "http://video-spot.ru/api",
   }),
   endpoints: (build) => ({
     getUsers: build.query({
@@ -43,6 +43,13 @@ export const serverApi = createApi({
         url: "auth/register",
         method: "POST",
         body: { ...registerData },
+      }),
+    }),
+    uploadVideo: build.mutation<UploadResponse, UploadRequest>({
+      query: (videoData) => ({
+        url: "videos/upload",
+        method: "POST",
+        body: { ...videoData}
       }),
     }),
     getAuth: build.query<[IUser, IToken], void>({
@@ -89,5 +96,6 @@ export const {
   useGetVideosQuery,
   useLazyGetVideosQuery,
   useRegisterMutation,
+  useUploadVideoMutation,
   useGetVideoByIdQuery, 
 } = serverApi;

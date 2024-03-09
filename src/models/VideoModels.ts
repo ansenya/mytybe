@@ -1,37 +1,48 @@
-import {IVideo} from "./index";
-
+import { IVideo } from "./index";
 
 export interface VideosResponse {
-    content: IVideo[];
-    pageable: Pageable;
-    last: boolean;
-    totalPages: number;
-    totalElements: number;
-    size: number;
-    number: number;
-    sort: Sort;
-    numberOfElements: number;
-    first: boolean;
-    empty: boolean;
+  content: IVideo[];
+  pageable: Pageable;
+  last: boolean;
+  totalPages: number;
+  totalElements: number;
+  size: number;
+  number: number;
+  sort: Sort;
+  numberOfElements: number;
+  first: boolean;
+  empty: boolean;
+}
+
+export interface UploadRequest {
+  channelId: number;
+  imageFile?: File;
+  videoFile: File;
+  videoName?: string;
+  videoDescription?: string;
+}
+
+export interface UploadResponse {
+  
 }
 
 export interface Pageable {
-    pageNumber: number;
-    pageSize: number;
-    sort: Sort;
-    offset: number;
-    paged: boolean;
-    unpaged: boolean;
+  pageNumber: number;
+  pageSize: number;
+  sort: Sort;
+  offset: number;
+  paged: boolean;
+  unpaged: boolean;
 }
 
 export interface Sort {
-    empty: boolean;
-    sorted: boolean;
-    unsorted: boolean;
+  empty: boolean;
+  sorted: boolean;
+  unsorted: boolean;
 }
 
 export interface VideosRequest {
-    sort: "desc" | "asc",
-    page: number,
-    size: number
+  sort: "desc" | "asc";
+  page: number;
+  size: number;
 }

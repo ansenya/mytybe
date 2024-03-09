@@ -14,6 +14,9 @@ const VideoPage = () => {
     if (data){
       document.title = data.name
     }
+    return () => {
+      document.title = "Spot"
+    }
   }, [data]);
 
   return (

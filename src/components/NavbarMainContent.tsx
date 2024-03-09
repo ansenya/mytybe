@@ -79,7 +79,7 @@ const NavbarMainContent: FC<MainContentProps> = ({
         )}
         {user && (
           <>
-            <IconButton icon={uploadIcon} />
+            <IconButton icon={uploadIcon} onClick={() => navigate("/videos/upload", {state: {from: location}})}/>
             <img
               alt="иконочка))"
               src={user.pfp}
