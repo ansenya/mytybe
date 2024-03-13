@@ -1,7 +1,12 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { IUser, IVideo } from "../../models";
+import { IChannel, IUser, IVideo } from "../../models";
 import { AuthCredentials, IToken } from "../../models/AuthModels";
-import { UploadResponse, VideosRequest, VideosResponse, UploadRequest} from "../../models/VideoModels";
+import {
+  UploadResponse,
+  VideosRequest,
+  UploadRequest,
+  PaginationResponse,
+} from "../../models/VideoModels";
 import { RegisterArgs } from "../../pages/registrationPage";
 
 export const serverApi = createApi({
@@ -22,9 +27,6 @@ export const serverApi = createApi({
     getUserById: build.query<IUser, number>({
       query: (id: number) => ({
         url: `users/${id}`,
-        params: {
-          id: id,
-        },
         headers: {
           Authorization: `Bearer ${localStorage.getItem("jwtoken")}`,
         },
@@ -49,7 +51,7 @@ export const serverApi = createApi({
       query: (videoData) => ({
         url: "videos/upload",
         method: "POST",
-        body: { ...videoData}
+        body: { ...videoData },
       }),
     }),
     getAuth: build.query<[IUser, IToken], void>({
@@ -60,7 +62,20 @@ export const serverApi = createApi({
         },
       }),
     }),
-    getVideos: build.query<VideosResponse, VideosRequest>({
+    getUserChannels: build.query<PaginationResponse<IChannel[]>, number>({
+      query: (uid: number) => ({
+        url: `channels`,
+        params: {
+          page: 0,
+          size: 10,
+          uid: uid,
+        },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("jwtoken")}`,
+        },
+      }),
+    }), 
+    getVideos: build.query<PaginationResponse<IVideo>, VideosRequest>({
       query: ({ sort, page, size }) => {
         const token = localStorage.getItem("jwtoken");
         const headers = token ? { Authorization: `Bearer ${token}` } : {};
@@ -97,5 +112,6 @@ export const {
   useLazyGetVideosQuery,
   useRegisterMutation,
   useUploadVideoMutation,
-  useGetVideoByIdQuery, 
+  useGetVideoByIdQuery,
+  useGetUserChannelsQuery,
 } = serverApi;

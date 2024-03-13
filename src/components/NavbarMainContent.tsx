@@ -28,6 +28,7 @@ const NavbarMainContent: FC<MainContentProps> = ({
   const location = useLocation();
   const navigate = useNavigate();
 
+
   function handleSearchButton() {
     setSearchBarVisible(true);
     setIsMenuShown(false);
@@ -39,7 +40,9 @@ const NavbarMainContent: FC<MainContentProps> = ({
           icon={menuIcon}
           onClick={() => setIsMenuShown(!isMenuShown)}
         />
-        <a href="/"><span>Spot</span></a>
+        <a href="/">
+          <span>Spot</span>
+        </a>
       </div>
       <div className="navbar__center">
         {!isSmallScreen ? (
@@ -65,13 +68,15 @@ const NavbarMainContent: FC<MainContentProps> = ({
           <>
             <CButton
               buttonType="primary"
-              onClick={() => navigate("/login", { state: {from: location} })}
+              onClick={() => navigate("/login", { state: { from: location } })}
             >
               Sign in
             </CButton>
             <CButton
               buttonType="secondary"
-              onClick={() => navigate("/register", { state: {from: location} })}
+              onClick={() =>
+                navigate("/register", { state: { from: location } })
+              }
             >
               Sign up
             </CButton>
@@ -79,15 +84,22 @@ const NavbarMainContent: FC<MainContentProps> = ({
         )}
         {user && (
           <>
-            <IconButton icon={uploadIcon} onClick={() => navigate("/videos/upload", {state: {from: location}})}/>
+            <IconButton
+              icon={uploadIcon}
+              onClick={() =>
+                navigate("/videos/upload", { state: { from: location } })
+              }
+            />
             <img
               alt="иконочка))"
               src={user.pfp}
               className="avatar"
               draggable={false}
-              onClick={() => {setIsProfile(!isProfile)}}
+              onClick={() => {
+                setIsProfile(!isProfile);
+              }}
             />
-            <PaWindow user={user} isActive={isProfile}/> 
+            <PaWindow user={user} isActive={isProfile} />
           </>
         )}
       </div>

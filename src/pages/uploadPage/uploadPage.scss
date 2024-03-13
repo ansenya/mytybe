@@ -1,16 +1,64 @@
 @import "../../variables";
 
 .frame {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 10px;
+  border: 2px solid $primary-color;
+  align-items: center;
+  color: white;
+  border-radius: 20px;
   position: absolute;
   width: 600px;
-  height: 600px;
+  height: 800px;
   top: 80px;
   left: calc(50% - 300px);
-  overflow: hidden;
   background: $background-color;
-  @media(max-width: 576px) {
-    width: 400px;
-    left: calc(50% - 200px);
+  @media (max-width: 576px) {
+    width: 350px;
+    left: calc(50% - 175px);
+  }
+  &.popped {
+    opacity: 0;
+  }
+
+  transition: opacity 150ms ease-in-out();
+
+  &__foot {
+    width: 95%;
+    margin-bottom: 20px;
+  }
+
+  &__content {
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    width: 95%;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    scrollbar-width: none;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  &__head {
+    width: 95%;
+    height: 40px;
+    display: flex;
+    justify-content: space-between;
+    padding: 30px 0;
+    align-items: center;
+    h1 {
+      text-align: center;
+      font-size: 20px;
+      line-height: 40px;
+      margin-left: 5px;
+    }
+    border-bottom: 3px solid $primary-color;
   }
 }
 
@@ -18,7 +66,7 @@
   box-sizing: border-box;
   z-index: 20;
   position: fixed;
-  background: rgba(0, 0, 0, .4);
+  background: rgba(0, 0, 0, 0.4);
   top: 0;
   left: 0;
   width: 100vw;

@@ -1,18 +1,5 @@
 import { IVideo } from "./index";
 
-export interface VideosResponse {
-  content: IVideo[];
-  pageable: Pageable;
-  last: boolean;
-  totalPages: number;
-  totalElements: number;
-  size: number;
-  number: number;
-  sort: Sort;
-  numberOfElements: number;
-  first: boolean;
-  empty: boolean;
-}
 
 export interface UploadRequest {
   channelId: number;
@@ -22,9 +9,7 @@ export interface UploadRequest {
   videoDescription?: string;
 }
 
-export interface UploadResponse {
-  
-}
+export interface UploadResponse {}
 
 export interface Pageable {
   pageNumber: number;
@@ -45,4 +30,18 @@ export interface VideosRequest {
   sort: "desc" | "asc";
   page: number;
   size: number;
+}
+
+export interface PaginationResponse<T> {
+  content: T[];
+  pageable: Pageable;
+  last: boolean;
+  totalPages: number;
+  totalElements: number;
+  size: number;
+  number: number;
+  sort: Sort;
+  numberOfElements: number;
+  first: boolean;
+  empty: boolean;
 }

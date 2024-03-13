@@ -1,0 +1,36 @@
+@import "../../../variables";
+
+.container {
+  &.tooLong {
+    border: 2px solid $error-color;
+  }
+  &.inputType {
+    flex-direction: row;
+    gap: 6px;
+  }
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  border: 2px solid white;
+  border-radius: 10px;
+  padding: 5px;
+}
+
+.area {
+  resize: none;
+  outline: none;
+  border: none;
+  background: $background-color;
+  color: white;
+  font-size: 1.2rem;
+  width: 100%;
+}
+
+.letterCount {
+  &.tooLong {
+    color: $error-color;
+  }
+  font-weight: bolder;
+  color: gray;
+  align-self: self-end;
+}

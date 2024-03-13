@@ -3,7 +3,7 @@ import { isTemplateHead } from "typescript";
 import menuIcon from "../assets/menu-svgrepo-com (1) 1.svg";
 import searchIcon from "../assets/search-alt-svgrepo-com (3) 1.svg";
 import { useActions } from "../hooks/actions";
-import { useGetAuthQuery } from "../store/api/serverApi";
+import { useGetAuthQuery, useGetUserChannelsQuery } from "../store/api/serverApi";
 import NavbarMainContent from "./NavbarMainContent";
 import NavSearchbar from "./NavSearchbar";
 import CButton from "./UI/CButton/CButton";
