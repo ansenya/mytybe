@@ -1,0 +1,31 @@
+@import '../../../variables';
+.container{
+  width: 95%;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.clickable {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  user-select: none;
+  -webkit-user-select: none;
+  img {
+    height: 50px;
+    width: 50px;
+  }
+
+  p {
+    font-weight: bolder;
+    color: $text-color;
+  }
+}
+
+.frame {
+  border: 2px white solid;
+  flex: 1;
+  aspect-ratio: 16/9;
+}

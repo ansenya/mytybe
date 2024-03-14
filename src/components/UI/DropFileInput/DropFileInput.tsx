@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import styles from "./DropFileInput.module.scss";
 import uploadImage from "../../../assets/upload-svgrepo-com.svg";
-import tickImage from "../../../assets/tick-checkbox-svgrepo-com.svg"
+import tickImage from "../../../assets/tick-checkbox-svgrepo-com.svg";
 
 interface FileInputAddProps {
   fileSet: Function;
@@ -58,47 +58,50 @@ const DropFileInput: FC<FormFieldProps> = ({ fileSet, ...props }) => {
   };
 
   return (
-    <div
-      className={[
-        styles.dropField,
-        uploaded ? styles.active : "",
-        drag ? styles.draggedOver : "",
-      ].join(" ")}
-      onDragStart={onStartDragHandler}
-      onDragOver={onStartDragHandler}
-      onDragLeave={onDragLeaveHandler}
-      onDrop={onDropHandler}
-    >
-      <div className={styles.content}>
-        <input
-          type="file"
-          style={{ display: "none" }}
-          ref={inputRef}
-          onChange={onChangeHandler}
-        />
-        {!uploaded ? (
-          <>
-            <img src={uploadImage} alt="upload" draggable={false} />
-            <p className={styles.contentText}>
-              Перетащите файл или
-              <span className={styles.uploadLink} onClick={clickHandler}>
-                {" "}
-                выберите
-              </span>
-            </p>
-          </>
-        ) : (
-          <>
-            <img src={tickImage} alt="upload" draggable={false} />
-            <p className={styles.contentText}>
-              Загружено.
-              <span className={styles.uploadLink} onClick={cancelHandler}>
-                {" "}
-                отменить
-              </span>
-            </p>
-          </>
-        )}
+    <div>
+      <h1 className={styles.label}>{"Видеофайл"}</h1>
+      <div
+        className={[
+          styles.dropField,
+          uploaded ? styles.active : "",
+          drag ? styles.draggedOver : "",
+        ].join(" ")}
+        onDragStart={onStartDragHandler}
+        onDragOver={onStartDragHandler}
+        onDragLeave={onDragLeaveHandler}
+        onDrop={onDropHandler}
+      >
+        <div className={styles.content}>
+          <input
+            type="file"
+            style={{ display: "none" }}
+            ref={inputRef}
+            onChange={onChangeHandler}
+          />
+          {!uploaded ? (
+            <>
+              <img src={uploadImage} alt="upload" draggable={false} />
+              <p className={styles.contentText}>
+                Перетащите файл или
+                <span className={styles.uploadLink} onClick={clickHandler}>
+                  {" "}
+                  выберите
+                </span>
+              </p>
+            </>
+          ) : (
+            <>
+              <img src={tickImage} alt="upload" draggable={false} />
+              <p className={styles.contentText}>
+                Загружено.
+                <span className={styles.uploadLink} onClick={cancelHandler}>
+                  {" "}
+                  отменить
+                </span>
+              </p>
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

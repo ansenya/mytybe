@@ -14,6 +14,7 @@ import { PaginationResponse, UploadRequest } from "../../models/VideoModels";
 import { IChannel } from "../../models";
 import DropFileInput from "../../components/UI/DropFileInput/DropFileInput";
 import TextArea from "../../components/UI/TextArea/TextArea";
+import ImageUploader from "../../components/UI/ImageUploader/ImageUploader";
 
 type UploadForm = Omit<UploadRequest, "channelId">;
 
@@ -84,7 +85,7 @@ const UploadPage = () => {
                 value={videoDescription}
               />
               <DropFileInput fileSet={setVideoFile} />
-              <input type="file" {...register("imageFile")} />
+              <ImageUploader fileSet={setThumbFile}/>
             </form>
             <div className="frame__select"></div>
           </div>
