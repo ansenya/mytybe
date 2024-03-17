@@ -20,7 +20,7 @@ const VideoPage = () => {
   }, [data]);
 
   return (
-    <div className="watchVideo">
+    <div className="watchVideo" key={id}>
       {!data || isLoading ? (
         <InlineLoader />
       ) : (

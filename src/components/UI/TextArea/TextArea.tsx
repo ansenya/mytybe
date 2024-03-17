@@ -50,14 +50,7 @@ const TextArea: FC<TextAreaProps> = ({
 
   return (
     <div>
-      <h1
-        className={[
-          styles.label,
-          inputLength > maxLength ? styles.tooLong : "",
-        ].join("")}
-      >
-        {labelName}
-      </h1>
+      <h1 className={styles.label}>{labelName}</h1>
 
       <div
         className={[
@@ -67,11 +60,21 @@ const TextArea: FC<TextAreaProps> = ({
         ].join(" ")}
       >
         {isResizble ? (
-          <textarea {...props} className={styles.area} ref={areaRef} />
+          <textarea
+            {...props}
+            className={[
+              styles.area,
+              inputLength > maxLength ? styles.tooLong : "",
+            ].join(" ")}
+            ref={areaRef}
+          />
         ) : (
           <input
             {...(props as React.InputHTMLAttributes<HTMLInputElement>)}
-            className={styles.area}
+            className={[
+              styles.area,
+              inputLength > maxLength ? styles.tooLong : "",
+            ].join(" ")}
             ref={inputRef}
             onInput={(e) => resizableInputHandler()}
           />

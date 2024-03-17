@@ -47,11 +47,14 @@ export const serverApi = createApi({
         body: { ...registerData },
       }),
     }),
-    uploadVideo: build.mutation<UploadResponse, UploadRequest>({
+    uploadVideo: build.mutation({
       query: (videoData) => ({
         url: "videos/upload",
         method: "POST",
-        body: { ...videoData },
+        body: videoData,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("jwtoken")}`,
+        },
       }),
     }),
     getAuth: build.query<[IUser, IToken], void>({
@@ -62,7 +65,7 @@ export const serverApi = createApi({
         },
       }),
     }),
-    getUserChannels: build.query<PaginationResponse<IChannel[]>, number>({
+    getUserChannels: build.query<PaginationResponse<IChannel>, number>({
       query: (uid: number) => ({
         url: `channels`,
         params: {
@@ -74,7 +77,26 @@ export const serverApi = createApi({
           Authorization: `Bearer ${localStorage.getItem("jwtoken")}`,
         },
       }),
-    }), 
+    }),
+    getSearchedVideos: build.query<
+      PaginationResponse<IVideo>,
+      VideosRequest & { searchQuery: string }
+    >({
+      query: ({sort, page, size, searchQuery}) => {
+        const token = localStorage.getItem("jwtoken");
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+        return {
+          url: `search`,
+          params: {
+            page,
+            size,
+            sort, 
+            q: searchQuery,
+          },
+          headers,
+        };
+      },
+    }),
     getVideos: build.query<PaginationResponse<IVideo>, VideosRequest>({
       query: ({ sort, page, size }) => {
         const token = localStorage.getItem("jwtoken");
@@ -85,7 +107,6 @@ export const serverApi = createApi({
             page,
             sort,
             size,
-            channelId: 1,
           },
           headers,
         };
@@ -114,4 +135,5 @@ export const {
   useUploadVideoMutation,
   useGetVideoByIdQuery,
   useGetUserChannelsQuery,
+  useLazyGetSearchedVideosQuery,
 } = serverApi;

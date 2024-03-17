@@ -12,7 +12,7 @@
   flex-direction: column;
   width: 100%;
   border: 2px solid white;
-  border-radius: 10px;
+  border-radius: 6px;
   padding: 5px;
 }
 
@@ -21,7 +21,11 @@
   outline: none;
   border: none;
   background: $background-color;
+  font-weight: bolder;
   color: white;
+  &.tooLong {
+    color: $error-color;
+  }
   font-size: 1.2rem;
   width: 100%;
 }

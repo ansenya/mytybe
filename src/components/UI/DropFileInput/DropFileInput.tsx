@@ -59,7 +59,7 @@ const DropFileInput: FC<FormFieldProps> = ({ fileSet, ...props }) => {
 
   return (
     <div>
-      <h1 className={styles.label}>{"Видеофайл"}</h1>
+      <h1 className={styles.label}>{"Видеофайл*"}</h1>
       <div
         className={[
           styles.dropField,

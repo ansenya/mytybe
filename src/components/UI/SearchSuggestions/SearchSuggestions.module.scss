@@ -1,0 +1,29 @@
+@import "../../../variables";
+
+.container {
+  position: absolute;
+  border-radius: 6px;
+  overflow: hidden;
+  top: 50px;
+  display: none;
+  width: 400px;
+  &.opened {
+    display: flex;
+    flex-direction: column;
+  }
+}
+
+.suggestion {
+  display: flex;
+  padding-left: 10px;
+  height: 30px;
+  width: 100%;
+  background: $secondary-color; 
+  font-size: 1.2rem; 
+  color: $primary-color;
+  align-items: center;
+
+  &:hover {
+    background: $secondary-hovered;
+  }
+}

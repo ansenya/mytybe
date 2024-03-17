@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from "react";
+import React, { FC, useDeferredValue, useEffect, useState } from "react";
 import menuIcon from "../assets/menu-svgrepo-com (1) 1.svg";
 import searchIcon from "../assets/search-alt-svgrepo-com (3) 1.svg";
 import { useAppSelector } from "../hooks/redux";
@@ -8,6 +8,12 @@ import uploadIcon from "../assets/upload-svgrepo-com.svg";
 import InlineLoader from "./UI/Loader/InlineLoader";
 import { useLocation, useNavigate } from "react-router-dom";
 import PaWindow from "./ProfileActionsWindow/paWindow";
+import { Link } from "react-router-dom";
+import { useLazyGetSearchedVideosQuery } from "../store/api/serverApi";
+import useDebounce from "../hooks/useDebounce";
+import { IVideo } from "../models";
+import { useActions } from "../hooks/actions";
+import SearchSuggestions from "./UI/SearchSuggestions/SearchSuggestions";
 
 interface MainContentProps {
   isSmallScreen: boolean;
@@ -23,11 +29,39 @@ const NavbarMainContent: FC<MainContentProps> = ({
   setIsMenuShown,
 }) => {
   const { user, isLoaded, isError } = useAppSelector((state) => state.auth);
-  const [isFocused, setIsFocused] = useState<boolean>(false);
+
+  const { setIsFocused } = useActions();
+  const { isFocused } = useAppSelector((state) => state.focus);
   const [isProfile, setIsProfile] = useState<boolean>(false);
+  const [query, setQuery] = useState("");
+  const debouncedQuery = useDebounce(query, 200);
+  const [fetchSearch, { data, isLoading, error }] =
+    useLazyGetSearchedVideosQuery();
   const location = useLocation();
   const navigate = useNavigate();
 
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === "Enter") {
+      event.preventDefault();
+      navigate(`/?q=${query}`);
+    }
+  };
+
+  useEffect(() => {
+    if (debouncedQuery)
+      console.log(debouncedQuery)
+      fetchSearch({
+        searchQuery: debouncedQuery,
+        page: 0,
+        size: 5,
+        sort: "desc",
+      });
+  }, [debouncedQuery]);
+
+  useEffect(() => {
+    if (data) {
+    }
+  }, [data]);
 
   function handleSearchButton() {
     setSearchBarVisible(true);
@@ -40,20 +74,28 @@ const NavbarMainContent: FC<MainContentProps> = ({
           icon={menuIcon}
           onClick={() => setIsMenuShown(!isMenuShown)}
         />
-        <a href="/">
+        <Link to="/">
           <span>Spot</span>
-        </a>
+        </Link>
       </div>
       <div className="navbar__center">
         {!isSmallScreen ? (
-          <div className={["search__bar", isFocused ? "active" : ""].join(" ")}>
-            <img src={searchIcon} alt="иконочка))" draggable={false} />
-            <input
-              type="text"
-              spellCheck={false}
-              onFocus={() => setIsFocused(true)}
-              onBlur={() => setIsFocused(false)}
-            />
+          <div className="search__container">
+            <div
+              className={["search__bar", isFocused ? "active" : ""].join(" ")}
+            >
+              <img src={searchIcon} alt="иконочка))" draggable={false} />
+              <input
+                type="text"
+                spellCheck={false}
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={handleKeyDown}
+                onFocus={() => setIsFocused(true)}
+                onBlur={() => setTimeout(() => setIsFocused(false), 100)}
+              />
+            </div>
+            <SearchSuggestions videosSuggested={data?.content} />
           </div>
         ) : (
           <IconButton

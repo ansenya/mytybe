@@ -1,0 +1,13 @@
+@import "../../../variables";
+
+.wrapper{
+  width: 100%;
+  padding-left: 5px;
+}
+
+.message{
+  font-size: 1rem;
+  color: $error-color; 
+  font-weight: bolder; 
+  text-overflow: ellipsis;
+}

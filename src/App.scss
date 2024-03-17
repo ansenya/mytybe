@@ -53,14 +53,13 @@ body {
           height: 15px;
         }
 
-        margin: 0 6px 0 60px;
         min-height: 33px;
-        width: 400px;
+        width: 100%;
         background: $secondary-color;
         display: flex;
         padding: 0 8px;
         border: $primary-color 3px solid;
-        border-radius: 10px;
+        border-radius: 6px;
         align-items: center;
 
         input {
@@ -280,4 +279,17 @@ body {
 
 .active {
   box-shadow: 0 0 6px $primary-color;
+}
+
+.search__container {
+  @media (max-width: 992px) {
+    width: 55%;
+    max-width: none;
+    resize: horizontal;
+  }
+  width: 400px;
+  display: flex;
+  flex-direction: column;
+  margin: 0 6px 0 60px;
+  height: auto;
 }

@@ -1,28 +1,27 @@
-import React from 'react';
-import {IVideo} from "../models";
+import React, { useEffect } from "react";
+import { IVideo } from "../models";
 import VideoCard from "./UI/VideoCard";
 
 interface VideosProps {
-    categoryName: string,
-    videos: IVideo[]
+  categoryName: string;
+  videos: IVideo[];
 }
 
-const Videos = ({videos, categoryName}: VideosProps) => {
+const Videos = ({ videos, categoryName }: VideosProps) => {
 
-
-    return (
-        <div className="content__block">
-            {videos.map(video =>
-                <VideoCard
-                    id={video.id}
-                    key={video.id}
-                    thumbnail={video.thumbnail}
-                    name={video.name}
-                    channel={video.channel}
-                />
-            )}
-        </div>
-    );
+  return (
+    <div className="content__block">
+      {videos.map((video) => (
+        <VideoCard
+          id={video.id}
+          key={video.id}
+          thumbnail={video.thumbnail}
+          name={video.name}
+          channel={video.channel}
+        />
+      ))}
+    </div>
+  );
 };
 
 export default Videos;

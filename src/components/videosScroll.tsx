@@ -1,26 +1,44 @@
-import React, {useState, useEffect, useRef, useMemo} from "react";
-import { useLazyGetVideosQuery } from "../store/api/serverApi";
+import React, { useState, useEffect, useRef, useMemo } from "react";
+import {
+  useLazyGetSearchedVideosQuery,
+  useLazyGetVideosQuery,
+} from "../store/api/serverApi";
 import { IVideo } from "../models";
 import Videos from "./Videos";
 import InlineLoader from "./UI/Loader/InlineLoader";
-import { useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
+import { VideosRequest } from "../models/VideoModels";
 
 const VideoScroll = () => {
-  const {id} = useParams();
+  const { id } = useParams();
+  const { search } = useLocation();
+  const query = useMemo(() => {
+    return new URLSearchParams(search);
+  }, [search]);
   const [pageNumber, setPageNumber] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(999);
   const observer = useRef<IntersectionObserver>();
   const divRef = useRef(null);
-  const [fetchData, { data, isFetching, error }] = useLazyGetVideosQuery();
+  let useQuery;
+
+  if (query.get("q")) useQuery = useLazyGetSearchedVideosQuery;
+  else useQuery = useLazyGetVideosQuery;
+  
+  let [fetchData, { data, isFetching, error }] = useQuery();
   const [videos, setVideos] = useState<IVideo[]>([]);
 
-
   useEffect(() => {
-    fetchData({
+    let body: VideosRequest & { searchQuery?: string } = {
       page: pageNumber,
       sort: "desc",
       size: 60,
-    });
+    };
+
+    //@ts-expect-error
+    if (query.get("q")) body.searchQuery = query.get("q");
+
+    //@ts-expect-error
+    fetchData(body);
   }, [pageNumber]);
 
   useEffect(() => {
@@ -49,7 +67,10 @@ const VideoScroll = () => {
   return (
     <>
       <div>
-        <Videos videos={videos.filter((video: IVideo) => video.id !== Number(id))} categoryName="fuck" />
+        <Videos
+          videos={videos.filter((video: IVideo) => video.id !== Number(id))}
+          categoryName="fuck"
+        />
         <span style={{ color: "transparent" }}>penis</span>
       </div>
       {isFetching && <InlineLoader />}

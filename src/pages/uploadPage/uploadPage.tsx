@@ -15,6 +15,9 @@ import { IChannel } from "../../models";
 import DropFileInput from "../../components/UI/DropFileInput/DropFileInput";
 import TextArea from "../../components/UI/TextArea/TextArea";
 import ImageUploader from "../../components/UI/ImageUploader/ImageUploader";
+import ChannelsSelect from "../../components/UI/ChannelsSelect/ChannelsSelect";
+import ErrorMessage from "../../components/UI/ErrorMessage/ErrorMessage";
+import { fileValidationError, lengthValidationError } from "./validators";
 
 type UploadForm = Omit<UploadRequest, "channelId">;
 
@@ -24,34 +27,50 @@ const UploadPage = () => {
   const location = useLocation();
   const [post, { data, isLoading, isError, error }] = useUploadVideoMutation();
   const { user, isLoaded } = useAppSelector((state) => state.auth);
+
   const [videoFile, setVideoFile] = useState<File | null>(null);
-  const [thumbFile, setThumbFile] = useState<File | null>(null);
+  const [channelId, setChannelId] = useState<number>(0);
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [videoDescription, setVideoDescription] = useState<string>("");
-  const [videoName, setVideoName] = useState<string>("")
-  const channelsQuery = useGetUserChannelsQuery(user?.id || 0, {
-    skip: !isLoaded,
+  const [videoName, setVideoName] = useState<string>("");
+
+  const [errors, setErrors] = useState({
+    nameError: "",
+    descError: "",
+    videoFileError: "",
   });
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<UploadForm>();
-
-  const [selectValue, setSelectValue] = useState<[number, string]>([
-    0,
-    "Select Channel",
-  ]);
-
-  const submit: SubmitHandler<UploadForm> = (data) => {
-    post({ ...data, channelId: selectValue[0] });
-  };
 
   useEffect(() => {
     if (data) {
-      navigate(location.state?.from || "/");
+      console.log(data);
     }
   }, [data]);
+
+  const handleUpload = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const nameError = lengthValidationError(videoName, 100);
+    const descError = lengthValidationError(videoDescription, 1000);
+    const videoError = fileValidationError(videoFile, "video");
+    setErrors((prevstate) => {
+      return {
+        descError: descError,
+        nameError: nameError,
+        videoFileError: videoError,
+      };
+    });
+
+    if (descError || nameError || videoError || videoFile === null || channelId === 0) return;
+
+    const postFormData = new FormData();
+    postFormData.append("channelId", String(channelId));
+    postFormData.append("videoFile", videoFile)
+
+    if (videoName) postFormData.append("videoName", videoName);
+    if (videoDescription) postFormData.append("videoDescription", videoDescription);
+    if (imageFile) postFormData.append("imageFile", imageFile);
+
+    post(postFormData);
+  };
 
   return (
     <>
@@ -68,24 +87,48 @@ const UploadPage = () => {
             <form
               className="video__form"
               id={formId}
-              onSubmit={handleSubmit(submit)}
+              onSubmit={handleUpload}
             >
-              <TextArea
-                labelName="Название"
-                isResizble={false}
-                maxLength={100}
-                onChange={(e) => setVideoName(e.target.value)}
-                value={videoName}
-              />
-              <TextArea
-                labelName="Описание"
-                isResizble
-                maxLength={1000}
-                onChange={(e) => setVideoDescription(e.target.value)}
-                value={videoDescription}
-              />
-              <DropFileInput fileSet={setVideoFile} />
-              <ImageUploader fileSet={setThumbFile}/>
+              <div className="field__container">
+                <TextArea
+                  labelName="Название"
+                  isResizble={false}
+                  maxLength={100}
+                  onChange={(e) => setVideoName(e.target.value)}
+                  value={videoName}
+                />
+                {!!errors.nameError && <ErrorMessage msg={errors.nameError} />}
+              </div>
+
+              <div className="field__container">
+                <TextArea
+                  labelName="Описание"
+                  isResizble
+                  maxLength={1000}
+                  onChange={(e) => setVideoDescription(e.target.value)}
+                  value={videoDescription}
+                />
+                {!!errors.descError && <ErrorMessage msg={errors.descError} />}
+              </div>
+
+              <div className="field__container">
+                <DropFileInput fileSet={setVideoFile} />
+                {!!errors.videoFileError && (
+                  <ErrorMessage msg={errors.videoFileError} />
+                )}
+              </div>
+              <h1 style={{ fontSize: "1.2rem" }}>
+                Добавить изображение и выбрать канал
+              </h1>
+              <div className="bottom">
+                <ImageUploader fileSet={setImageFile} />
+                {isLoaded && (
+                  <ChannelsSelect
+                    id={user?.id || 0}
+                    setChannelId={setChannelId}
+                  />
+                )}
+              </div>
             </form>
             <div className="frame__select"></div>
           </div>
@@ -105,13 +148,4 @@ const UploadPage = () => {
   );
 };
 
-// {!!channelsQuery.data &&
-// {channelsQuery.data.content.map((channel: IChannel) => (
-//   <div
-//     className="frame__option"
-//     onClick={() => setSelectValue([channel.id, channel.name])}
-//   >
-//     {channel.name}
-//   </div>
-// ))}}
 export default UploadPage;
