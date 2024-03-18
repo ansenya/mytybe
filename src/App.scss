@@ -42,11 +42,6 @@ body {
       }
 
       .search__bar {
-        @media (max-width: 992px) {
-          width: 55%;
-          max-width: none;
-          resize: horizontal;
-        }
 
         img {
           user-select: none;
@@ -94,16 +89,16 @@ body {
       }
 
       .input-active {
-        box-shadow: 0 0 6px $primary-color;
+        box-shadow: 0 0 2px $primary-color;
       }
 
-      margin-left: 6px;
+       
       min-height: 33px;
-      flex: 1;
       display: flex;
+      width: 100%;
       padding: 0 8px;
       border: $primary-color 3px solid;
-      border-radius: 10px;
+      border-radius: 6px;
       align-items: center;
 
       input {
@@ -282,6 +277,7 @@ body {
 }
 
 .search__container {
+  position: relative;
   @media (max-width: 992px) {
     width: 55%;
     max-width: none;
@@ -292,4 +288,10 @@ body {
   flex-direction: column;
   margin: 0 6px 0 60px;
   height: auto;
+}
+
+.search__smartphone__container{
+  position: relative;
+  flex: 1;
+  margin-left: 6px;
 }

@@ -4,9 +4,9 @@
   position: absolute;
   border-radius: 6px;
   overflow: hidden;
-  top: 50px;
+  top: 38px;
   display: none;
-  width: 400px;
+  width: 100%;
   &.opened {
     display: flex;
     flex-direction: column;
@@ -18,11 +18,13 @@
   padding-left: 10px;
   height: 30px;
   width: 100%;
-  background: $secondary-color; 
-  font-size: 1.2rem; 
+  background: $secondary-color;
+  font-size: 1.2rem;
   color: $primary-color;
   align-items: center;
-
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
   &:hover {
     background: $secondary-hovered;
   }
