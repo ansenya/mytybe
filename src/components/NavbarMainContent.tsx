@@ -1,4 +1,4 @@
-import React, { FC, useDeferredValue, useEffect, useState } from "react";
+import React, {FC, useDeferredValue, useEffect, useRef, useState} from "react";
 import menuIcon from "../assets/menu-svgrepo-com (1) 1.svg";
 import searchIcon from "../assets/search-alt-svgrepo-com (3) 1.svg";
 import { useAppSelector } from "../hooks/redux";
@@ -40,9 +40,13 @@ const NavbarMainContent: FC<MainContentProps> = ({
   const location = useLocation();
   const navigate = useNavigate();
 
+  const inputRef = useRef<HTMLInputElement>(null);
+
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === "Enter") {
       event.preventDefault();
+      setIsFocused(false);
+      let penis = setTimeout(() => inputRef.current?.blur(), 100)
       navigate(`/?q=${query}`);
     }
   };
@@ -93,6 +97,7 @@ const NavbarMainContent: FC<MainContentProps> = ({
                 onKeyDown={handleKeyDown}
                 onFocus={() => setIsFocused(true)}
                 onBlur={() => setTimeout(() => setIsFocused(false), 100)}
+                ref={inputRef}
               />
             </div>
             <SearchSuggestions videosSuggested={data?.content} />

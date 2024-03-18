@@ -182,7 +182,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ source, qValues }) => {
         Number(e.target.value) * (playerRef.current?.getDuration() || 0),
       ),
     );
-    debounceSeek(1000)(Number(e.target.value));
+    debounceSeek(0)(Number(e.target.value));
   };
 
   const onMouseDown = () => {
@@ -232,6 +232,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ source, qValues }) => {
           setIsEnded(true);
           setIsPlaying(false);
         }}
+        playsInline={true}
       />
       {isLoading && (
         <div className="loader">
