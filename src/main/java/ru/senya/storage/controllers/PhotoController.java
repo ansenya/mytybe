@@ -1,4 +1,4 @@
-package ru.senya.storage.controller;
+package ru.senya.storage.controllers;
 
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -13,7 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static ru.senya.storage.controller.Utils.save;
+import static ru.senya.storage.controllers.Utils.save;
 
 @RestController
 public class PhotoController {

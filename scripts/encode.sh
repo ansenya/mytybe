@@ -42,3 +42,5 @@ if [ "$height" -ge 1080 ]; then
     ffmpeg -i "$input_video" -vf "scale='trunc(oh*a/2)*2:1080'" "vids/${filename_no_ext}_1080.mp4" 2> /dev/null
     echo "1080 finished"
 fi
+
+echo "all"

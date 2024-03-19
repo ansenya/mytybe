@@ -1,4 +1,4 @@
-package ru.senya.storage.controller;
+package ru.senya.storage.controllers;
 
 import org.springframework.web.multipart.MultipartFile;
 

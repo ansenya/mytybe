@@ -1,12 +1,14 @@
-package ru.senya.storage.controller;
+package ru.senya.storage.controllers;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Mono;
 import ru.senya.storage.confs.Log;
@@ -20,10 +22,9 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.stream.Stream;
 
-import static ru.senya.storage.controller.Utils.save;
+import static ru.senya.storage.controllers.Utils.save;
 
 @RestController
 public class VideoStreamController {
@@ -62,16 +63,25 @@ public class VideoStreamController {
     }
 
     @PostMapping("vid/upload")
-    public ResponseEntity<?> uploadVideo(@RequestParam("file") MultipartFile video, @RequestParam("uuid") String uuid, @RequestParam("type") String type) {
-        if (video.isEmpty()){
+    public ResponseEntity<?> uploadVideo(@RequestParam("file") MultipartFile video,
+                                         @RequestParam("uuid") String uuid,
+                                         @RequestParam("type") String type) {
+        if (video.isEmpty()) {
             return ResponseEntity.status(124).body("пусто");
         }
         try {
             saveVideo(video, uuid, type);
         } catch (IOException exception) {
+            sendDoneProcessing("-1", uuid);
             return ResponseEntity.status(123).body("не сохранилось");
         }
         return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("vid")
+    private void deleteVideo(HttpServletRequest request,
+                             @RequestParam(value = "filename") String fileName) {
+        System.out.println(request.getRemoteHost());
     }
 
     private void saveVideo(MultipartFile multipartFile, String uuid, String type) throws IOException {
@@ -79,16 +89,16 @@ public class VideoStreamController {
         File file = new File(path);
         save(multipartFile, file);
         new Thread(() -> {
-            encode(path);
+            encode(path, uuid);
             if (!new File(path).delete()) {
                 log.error("could not delete file: " + path);
             }
         }).start();
     }
 
-    private void encode(String filename) {
+    private void encode(String filename, String uuid) {
         try {
-            ProcessBuilder pb = new ProcessBuilder("sh",  "scripts/encode.sh", filename);
+            ProcessBuilder pb = new ProcessBuilder("sh", "scripts/encode.sh", filename);
             pb.redirectErrorStream(true);
             pb.redirectErrorStream(true);
             Process process = pb.start();
@@ -97,13 +107,32 @@ public class VideoStreamController {
             String line;
 
             while ((line = reader.readLine()) != null) {
-                System.out.println(line);
+                if (line.contains("finished")) {
+                    var q = line.split(" ")[0];
+                    try {
+                        sendQuality(q, uuid);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                } else if (line.equals("all")) {
+                    sendDoneProcessing("1", uuid);
+                }
             }
 
             process.waitFor();
         } catch (IOException | InterruptedException e) {
             log.error("encode error", e);
         }
+    }
+
+    private void sendQuality(String q, String uuid) {
+        String url = "http://main:1984/api/videos/upload/" + uuid + "/setQuality?q=" + q;
+        new RestTemplate().exchange(url, HttpMethod.POST, null, String.class);
+    }
+
+    private void sendDoneProcessing(String status, String uuid) {
+        String url = "http://main:1984/api/videos/upload/" + uuid + "/setDoneQualities?status=" + status;
+        new RestTemplate().exchange(url, HttpMethod.POST, null, String.class);
     }
 
     private String findVideoPath(String fileName, String quality) {
