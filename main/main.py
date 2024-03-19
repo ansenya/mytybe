@@ -1,4 +1,3 @@
-import os
 import threading
 from collections import OrderedDict
 
@@ -75,6 +74,7 @@ if __name__ == '__main__':
     #
     for i in not_done_list:
         create_result(i, 'mp4')
+
 
     def do_process(not_done_item):
         with semaphore:

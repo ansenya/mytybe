@@ -5,13 +5,13 @@ from torchvision import transforms
 import cv2
 from efficientnet_pytorch import EfficientNet
 import json
-import mysql.connector
 
 from moviepy.editor import VideoFileClip
 
 from sql_connect import *
 
 print(torch.cuda.is_available())
+HOST = 'localhost:1984'
 
 
 def process_video(video_path, req_id):
@@ -35,7 +35,7 @@ def process_video(video_path, req_id):
     # insert_data(req_id, str(piska))
     # set_processed(req_id, list(piska))
 
-    set_time(req_id)
+    # set_time(req_id)
 
 
 def process_ef(start, total_frames, video_path, req_id):
@@ -125,9 +125,6 @@ def process_yolo(start, total_frames, video_path, req_id):
             pass
         k += 1
 
-        # if k > 100:
-        #     break
-
         if not ret:
             break
         classes, scores, boxes = model.detect(frame, Conf_threshold, NMS_threshold)
@@ -141,66 +138,16 @@ def process_yolo(start, total_frames, video_path, req_id):
 
 
 def set_processed(req_id, tags):
-    host = "5.180.174.216"
-    user = "user"
-    password = ""
-    database = "spot"
-
-    connection = mysql.connector.connect(
-        host=host,
-        user=user,
-        password=password,
-        database=database
-    )
-
-    cursor = connection.cursor()
-
-    cursor.execute("UPDATE videos SET processed = %s WHERE path = %s",
-                   (True, req_id))
-    connection.commit()
-
-    print(req_id)
-
-    cursor.execute("SELECT id FROM videos WHERE path = %s", (req_id,))
-    result = cursor.fetchone()
-    print(result)
-
-    vid_id = int(result[0])
-
     for p in tags:
-        url = f"http://5.180.174.216:1984/api/videos/tag?tag={p}&id={vid_id}"
-        response = requests.post(url)
+        response = requests.post(f"http://{HOST}/api/videos/tag?tag={p}&id={req_id}")
         print(response.status_code)
         print(response.text)
 
-    url = f"http://5.180.174.216:1984/api/videos/done?id={vid_id}"
-    requests.post(url)
-
-    cursor.close()
-    connection.close()
+    requests.post(f"http://{HOST}/api/videos/upload/{req_id}/setProcessed")
 
 
-def set_time(req_id):
+def set_duration(req_id):
     video = VideoFileClip(f"videos/{req_id}.mp4")
     duration = video.duration
 
-    host = "5.180.174.216"
-    user = "user"
-    password = ""
-    database = "spot"
-
-    connection = mysql.connector.connect(
-        host=host,
-        user=user,
-        password=password,
-        database=database
-    )
-
-    cursor = connection.cursor()
-
-    cursor.execute("UPDATE videos SET duration = %s WHERE path = %s",
-                   (int(duration), req_id))
-    connection.commit()
-
-    cursor.close()
-    connection.close()
+    requests.post(f"http://{HOST}/api/videos/upload/{req_id}/setDuration?duration={duration}")

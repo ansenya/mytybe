@@ -1,6 +1,6 @@
 FROM python:3.8-slim
 
-# Устанавливаем необходимые пакеты для OpenCV и другие зависимости
+WORKDIR /app
 RUN apt-get update && apt-get install -y \
     libopencv-dev \
     python3-opencv \
@@ -18,8 +18,10 @@ RUN apt-get update && apt-get install -y \
     gfortran \
     && rm -rf /var/lib/apt/lists/*
 
-COPY . /app
-WORKDIR /app
+COPY . .
 RUN pip install -r requirements.txt
+RUN mkdir videos
+
+EXPOSE 8642
 
 CMD ["python3", "main/main.py"]
