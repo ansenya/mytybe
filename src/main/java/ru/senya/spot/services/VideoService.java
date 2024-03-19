@@ -1,10 +1,12 @@
 package ru.senya.spot.services;
 
+import jakarta.persistence.LockModeType;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.stereotype.Service;
 import ru.senya.spot.models.es.EsVideoModel;
 import ru.senya.spot.models.jpa.VideoModel;
@@ -65,22 +67,18 @@ public class VideoService {
     }
 
     public VideoModel findById(Long id) {
-
-//        if (System.currentTimeMillis() - lastAddedTime > 15 * 60 * 1000) {
-//            addToRedis();
-//        }
-
-//        RedisVideoModel videoModel = redisVideoRepository.findById(id).orElse(null);
-//        if (videoModel == null) {
-//            return videoRepository.findById(id).orElse(null);
-//        }
-        return modelMapper.map(videoRepository.findById(id).orElse(null), VideoModel.class);
+        var video = videoRepository.findById(id);
+        if (video.isPresent()){
+            return modelMapper.map(video, VideoModel.class);
+        }
+        return null;
     }
 
     public Optional<VideoModel> findByLink(String path) {
         return videoRepository.findByPath(path);
     }
 
+    @Lock(LockModeType.OPTIMISTIC_FORCE_INCREMENT)
     public VideoModel save(VideoModel videoModel) {
         VideoModel saved = videoRepository.save(videoModel);
         elasticVideoRepository.save(modelMapper.map(saved, EsVideoModel.class));

@@ -46,7 +46,18 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests((requests) -> requests
                         .requestMatchers(HttpMethod.OPTIONS).permitAll()
-                        .requestMatchers("auth/**", "users", "videos/tag", "videos/done", "/stream/**", "search", "videos/upload/*/setQuality").permitAll()
+                        .requestMatchers(
+                                "auth/**",
+                                "users",
+                                "videos/tag",
+                                "videos/done",
+                                "/stream/**",
+                                "search",
+                                "videos/upload/*/setQuality",
+                                "videos/upload/*/setDoneQualities",
+                                "videos/upload/*/setDuration",
+                                "videos/upload/*/setProcessed"
+                        ).permitAll()
                         .requestMatchers(HttpMethod.GET, "videos/**", "channels/**").permitAll()
                         .anyRequest().authenticated()
                 )

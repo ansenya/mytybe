@@ -13,6 +13,14 @@ services:
       - spot
     restart: always
 
+#  ai:
+#    container_name: ai
+#    image: ai
+#    ports:
+#      - "8642:8642"
+#    networks:
+#      - spot
+#    restart: always
   es:
     container_name: es
     image: arsanoshin/elastic:8.12.2

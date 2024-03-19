@@ -54,8 +54,8 @@ public class DeleteController {
         return ResponseEntity.status(401).build();
     }
 
-//    private void sendDeleteRequestToStorage(String uuid) {
-//        String url = "http://st:1984/api/videos/upload/" + uuid + "/setDoneQualities?status=" + status;
-//        new RestTemplate().exchange(url, HttpMethod.POST, null, String.class);
-//    }
+    private void sendDeleteRequestToStorage(String uuid) {
+        String url = "http://st:1984/api/videos/delete/" + uuid;
+        new RestTemplate().exchange(url, HttpMethod.POST, null, String.class);
+    }
 }

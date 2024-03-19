@@ -68,6 +68,8 @@ public class GetController {
     @GetMapping("{id}")
     public ResponseEntity<?> getOne(@PathVariable Long id,
                                     Authentication authentication) {
+        System.out.println("penis");
+
         var video = videoService.findById(id);
         if (video == null) {
             return ResponseEntity.notFound().build();
@@ -75,86 +77,25 @@ public class GetController {
 
         video.setViews(video.getViews() + 1);
         video = videoService.save(video);
+
+        if (video.isDeleted()) {
+            return ResponseEntity.notFound().build();
+        }
+
         VideoDto videoDto = modelMapper.map(video, VideoDto.class);
 
-
         if (authentication != null) {
+            System.out.println("user != null");
+            System.out.println(authentication.getName());
             var user = userRepository.findByUsername(authentication.getName());
             user.getLastViewed().add(video);
             userRepository.save(user);
             videoDto.setLikedByThisUser(video.getLikedByUser().contains(user));
             videoDto.setDislikedByThisUser(video.getDislikedByUser().contains(user));
+        } else {
+            System.out.println("user == null");
         }
 
         return ResponseEntity.ok().body(videoDto);
     }
-
-
-    @PostMapping("like/{id}")
-    public ResponseEntity<?> like(@PathVariable Long id,
-                                  Authentication authentication) {
-        VideoModel video = videoService.findById(id);
-        UserModel user = userRepository.findByUsername(authentication.getName());
-
-        if (video == null) {
-            return ResponseEntity.notFound().build();
-        }
-        if (user.getLikedVideos().contains(video)) {
-            user.getLikedVideos().remove(video);
-            video.getLikedByUser().remove(user);
-        } else {
-            user.getLikedVideos().add(video);
-            user.getDislikedVideos().remove(video);
-
-            video.getLikedByUser().add(user);
-            video.getDislikedByUser().remove(user);
-        }
-        user = userRepository.save(user);
-        video = videoService.save(video);
-        return ResponseEntity.ok(modelMapper.map(video, VideoDto.class));
-    }
-
-    @PostMapping("dislike/{id}")
-    public ResponseEntity<?> dislike(@PathVariable Long id, Authentication authentication) {
-        VideoModel video = videoService.findById(id);
-        UserModel user = userRepository.findByUsername(authentication.getName());
-
-        if (video == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        if (user.getDislikedVideos().contains(video)){
-            user.getDislikedVideos().remove(video);
-            video.getDislikedByUser().remove(user);
-        } else {
-            user.getDislikedVideos().add(video);
-            user.getLikedVideos().remove(video);
-
-            video.getDislikedByUser().add(user);
-            video.getLikedByUser().remove(user);
-        }
-
-        user = userRepository.save(user);
-        video = videoService.save(video);
-
-        return ResponseEntity.ok(modelMapper.map(video, VideoDto.class));
-    }
-
-
-    @GetMapping("{id}/likes")
-    public ResponseEntity<?> getLiked(@PathVariable Long id,
-                                      @RequestParam("page") int page,
-                                      @RequestParam(value = "pageSize", required = false, defaultValue = "10") int pageSize) {
-        VideoModel video = videoService.findById(id);
-        if (video == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        LikesDto likesDto = modelMapper.map(video, LikesDto.class);
-        likesDto.setPage(1);
-        likesDto.setPageSize(pageSize);
-
-        return ResponseEntity.ok(likesDto);
-    }
-
 }

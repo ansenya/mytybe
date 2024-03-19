@@ -22,7 +22,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("videos")
 @CrossOrigin(origins = "*")
-public class UploadUtils {
+public class UploadController {
 
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
@@ -30,9 +30,9 @@ public class UploadUtils {
     private final StorageApiUtils storageApiUtils;
     private final ProcessingUtils processingUtils;
     private final ModelMapper modelMapper = new ModelMapper();
-    private final Logger logger = LoggerFactory.getLogger(UploadUtils.class);
+    private final Logger logger = LoggerFactory.getLogger(UploadController.class);
 
-    public UploadUtils(UserRepository userRepository, ChannelRepository channelRepository, VideoService videoService, StorageApiUtils storageApiUtils, ProcessingUtils processingUtils) {
+    public UploadController(UserRepository userRepository, ChannelRepository channelRepository, VideoService videoService, StorageApiUtils storageApiUtils, ProcessingUtils processingUtils) {
         this.userRepository = userRepository;
         this.channelRepository = channelRepository;
         this.videoService = videoService;
@@ -56,29 +56,32 @@ public class UploadUtils {
         try {
             String uuid = UUID.randomUUID().toString();
             String videoContentType = Objects.requireNonNull(videoFile.getContentType()).split("/")[1];
-            String imageContentType = Objects.requireNonNull(imageFile.getContentType()).split("/")[1];
 
-            if (!storageApiUtils.sendToStorage(uuid, videoContentType, "vid", videoFile)) {
-                return ResponseEntity.status(418).body("Upload is not available (cannot save)");
-            }
-
-            if (!imageFile.isEmpty()) {
+            if (imageFile != null && !imageFile.isEmpty()) {
+                String imageContentType = Objects.requireNonNull(imageFile.getContentType()).split("/")[1];
                 storageApiUtils.sendToStorage(uuid, imageContentType, "img", imageFile);
             }
 
-//            processingUtils.processVideo(videoFile, uuid);
+            try {
+                processingUtils.processVideo(videoFile, uuid);
+            } catch (Exception e) {
+                logger.error("error while processing", e);
+            }
 
             if (videoName.isEmpty()) {
-                videoName = videoFile.getOriginalFilename().replace(".mp4", "");
+                videoName = Objects.requireNonNull(videoFile.getOriginalFilename()).replace(".mp4", "");
             }
 
             ImageModel thumbnail = createThumbnail(imageFile, uuid);
             VideoModel video = createVideoEntity(videoName, description, channelRepository.findById(channelId).orElse(null), uuid, thumbnail);
 
+            if (!storageApiUtils.sendToStorage(uuid, videoContentType, "vid", videoFile)) {
+                return ResponseEntity.status(418).body("Upload is not available (cannot save)");
+            }
+
             video = videoService.save(video);
 
             return ResponseEntity.ok(modelMapper.map(video, VideoDto.class));
-
         } catch (Exception e) {
             logger.error(e.getMessage());
             return ResponseEntity.status(451).body("Error while processing");
@@ -116,6 +119,36 @@ public class UploadUtils {
         return ResponseEntity.ok(videoService.save(video));
     }
 
+    @PostMapping("upload/{uuid}/setDuration")
+    public ResponseEntity<?> setTime(@PathVariable String uuid, @RequestParam(name = "duration") String duration) {
+        var optVideo = videoService.findByUUID(uuid);
+        if (optVideo.isEmpty()) {
+            return ResponseEntity.status(404).build();
+        }
+        var video = optVideo.get();
+
+        try {
+            video.setDuration(Long.valueOf(duration));
+        } catch (NumberFormatException e) {
+            logger.error("number format exception in time", e);
+        }
+
+        return ResponseEntity.ok(videoService.save(video));
+    }
+
+    @PostMapping("upload/{uuid}/setProcessed")
+    public ResponseEntity<?> setProcessed(@PathVariable String uuid) {
+        var optVideo = videoService.findByUUID(uuid);
+        if (optVideo.isEmpty()) {
+            return ResponseEntity.status(404).build();
+        }
+        var video = optVideo.get();
+
+        video.setProcessedAi(true);
+
+        return ResponseEntity.ok(videoService.save(video));
+    }
+
     private boolean checkVideoType(String name) {
         return name.endsWith(".mp4") || name.endsWith(".avi");
     }
@@ -129,7 +162,7 @@ public class UploadUtils {
         } else {
             return ImageModel.builder()
                     .type("th")
-                    .path(uuid + "." + Objects.requireNonNull(imageFile.getContentType()).split("/")[1])
+                    .path(uuid + "." + imageFile.getContentType().split("/")[1])
                     .build();
         }
     }
@@ -143,7 +176,10 @@ public class UploadUtils {
                 .qualities("")
                 .thumbnail(thumbnail)
                 .tags(new HashSet<>())
+                .likedByUser(new HashSet<>())
+                .dislikedByUser(new HashSet<>())
                 .streamStatus(0)
+                .version(0)
                 .build();
     }
 

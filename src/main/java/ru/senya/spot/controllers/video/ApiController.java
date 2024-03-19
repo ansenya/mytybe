@@ -54,22 +54,22 @@ public class ApiController {
     }
 
     //
-    @PostMapping("done")
-    public ResponseEntity<?> setDone(@RequestParam(value = "id", required = false) Long id) {
-        VideoModel videoModel = videoService.findById(id);
-
-        if (videoModel == null) {
-            return ResponseEntity.status(404).build();
-        }
-
-        EsVideoModel esVideoModel = modelMapper.map(videoModel, EsVideoModel.class);
-
-        esVideoModel = elasticVideoRepository.save(esVideoModel);
-
-        System.out.println(gson.toJson(esVideoModel));
-
-        return ResponseEntity.ok(esVideoModel);
-    }
+//    @PostMapping("done")
+//    public ResponseEntity<?> setDone(@RequestParam(value = "id", required = false) Long id) {
+//        VideoModel videoModel = videoService.findById(id);
+//
+//        if (videoModel == null) {
+//            return ResponseEntity.status(404).build();
+//        }
+//
+//        EsVideoModel esVideoModel = modelMapper.map(videoModel, EsVideoModel.class);
+//
+//        esVideoModel = elasticVideoRepository.save(esVideoModel);
+//
+//        System.out.println(gson.toJson(esVideoModel));
+//
+//        return ResponseEntity.ok(esVideoModel);
+//    }
 
 
     @GetMapping("eta")
