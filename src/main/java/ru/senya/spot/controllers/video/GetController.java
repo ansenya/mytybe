@@ -75,20 +75,47 @@ public class GetController {
 
         video.setViews(video.getViews() + 1);
         video = videoService.save(video);
+        VideoDto videoDto = modelMapper.map(video, VideoDto.class);
+
 
         if (authentication != null) {
             var user = userRepository.findByUsername(authentication.getName());
             user.getLastViewed().add(video);
             userRepository.save(user);
+            videoDto.setLikedByThisUser(video.getLikedByUser().contains(user));
+            videoDto.setDislikedByThisUser(video.getDislikedByUser().contains(user));
         }
 
-        return ResponseEntity.ok().body(modelMapper.map(video, VideoDto.class));
+        return ResponseEntity.ok().body(videoDto);
     }
 
 
-    @PutMapping("{id}")
-    public ResponseEntity<?> like(@PathVariable Long id, @RequestParam("like") Boolean like, Authentication
-            authentication) {
+    @PostMapping("like/{id}")
+    public ResponseEntity<?> like(@PathVariable Long id,
+                                  Authentication authentication) {
+        VideoModel video = videoService.findById(id);
+        UserModel user = userRepository.findByUsername(authentication.getName());
+
+        if (video == null) {
+            return ResponseEntity.notFound().build();
+        }
+        if (user.getLikedVideos().contains(video)) {
+            user.getLikedVideos().remove(video);
+            video.getLikedByUser().remove(user);
+        } else {
+            user.getLikedVideos().add(video);
+            user.getDislikedVideos().remove(video);
+
+            video.getLikedByUser().add(user);
+            video.getDislikedByUser().remove(user);
+        }
+        user = userRepository.save(user);
+        video = videoService.save(video);
+        return ResponseEntity.ok(modelMapper.map(video, VideoDto.class));
+    }
+
+    @PostMapping("dislike/{id}")
+    public ResponseEntity<?> dislike(@PathVariable Long id, Authentication authentication) {
         VideoModel video = videoService.findById(id);
         UserModel user = userRepository.findByUsername(authentication.getName());
 
@@ -96,11 +123,8 @@ public class GetController {
             return ResponseEntity.notFound().build();
         }
 
-        if (like) {
-            user.getLikedVideos().add(video);
+        if (user.getDislikedVideos().contains(video)){
             user.getDislikedVideos().remove(video);
-
-            video.getLikedByUser().add(user);
             video.getDislikedByUser().remove(user);
         } else {
             user.getDislikedVideos().add(video);
@@ -111,11 +135,11 @@ public class GetController {
         }
 
         user = userRepository.save(user);
-
         video = videoService.save(video);
 
         return ResponseEntity.ok(modelMapper.map(video, VideoDto.class));
     }
+
 
     @GetMapping("{id}/likes")
     public ResponseEntity<?> getLiked(@PathVariable Long id,

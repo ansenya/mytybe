@@ -105,4 +105,8 @@ public class VideoService {
         new Thread(() -> redisVideoRepository.saveAll(popular)).start();
     }
 
+
+    public Optional<VideoModel> findByUUID(String uuid){
+        return videoRepository.findByPath(uuid);
+    }
 }

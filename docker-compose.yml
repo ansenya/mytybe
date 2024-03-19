@@ -19,6 +19,8 @@ services:
     environment:
       - discovery.type=single-node
       - xpack.security.enabled=false
+    ports:
+      - "9200:9200"
     networks:
       - spot
     mem_limit: 2GB
@@ -41,10 +43,12 @@ services:
     restart: always
     networks:
       - spot
+    ports:
+      - "3306:3306"
     environment:
-      MYSQL_USER: "spot-spring"
-      MYSQL_PASSWORD: "Fsi01?$4"
-      MYSQL_DATABASE: "spot"
+      MYSQL_USER: spot-spring
+      MYSQL_PASSWORD: Fsi01?$4
+      MYSQL_DATABASE: spot
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
     volumes:
       - mysql_data:/var/lib/mysql

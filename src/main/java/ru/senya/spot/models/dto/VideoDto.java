@@ -1,7 +1,9 @@
 package ru.senya.spot.models.dto;
 
+import jakarta.persistence.ManyToMany;
 import lombok.Data;
 import ru.senya.spot.models.jpa.TagModel;
+import ru.senya.spot.models.jpa.UserModel;
 
 import java.util.Date;
 import java.util.LinkedList;
@@ -21,15 +23,25 @@ public class VideoDto {
     private String[] qualities;
     private String path;
     private ImageDto thumbnail;
-    //    private CategoryModel category;
+    private Set<UserModel> likedByUser;
+    private Set<UserModel> dislikedByUser;
+    private boolean likedByThisUser;
+    private boolean dislikedByThisUser;
     private ChannelDtoWithoutUser channel;
     private boolean explicit;
+    private boolean processedQualities;
+    private boolean processedAi;
     private Integer streamStatus;
     private Date created;
     private Date updated;
 
-//    private Set<TagModel> tags;
+    public Long getLikes() {
+        return (long) likedByUser.size();
+    }
 
+    public Long getDislikes() {
+        return (long) dislikedByUser.size();
+    }
 
     public String getThumbnail() {
         try {
@@ -50,33 +62,14 @@ public class VideoDto {
     }
 
     public void setQualities(String qualities) {
-        this.qualities = qualities.split(" ");
+        this.qualities = qualities.split(",");
     }
 
-//    public List<String> getTags() {
-//        List<String> good_tags = new LinkedList<>();
-//        for (TagModel tagModel : tags) {
-//            good_tags.add(tagModel.getEnTag());
-//            good_tags.add(tagModel.getRuTag());
-//        }
-//        return good_tags;
-//    }
+    private String getLikedByUser() {
+        return "";
+    }
+
+    private String getDislikedByUser() {
+        return "";
+    }
 }
-
-/*
-    private LinkedList<CommentDto> comments;
-
-
-    private Set<PlaylistModel> playlists;
-
-    private Set<UserDto> likedByUser;
-
-    private Set<UserModel> dislikedByUser;
-
-    private String vid_uuid;
-
-    private boolean processed;
-
-
-
- */

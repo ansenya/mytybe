@@ -75,7 +75,8 @@ public class VideoModel {
 
     private String vid_uuid;
 
-    private boolean processed = false;
+    private boolean processedQualities = false;
+    private boolean processedAi = false;
 
     private boolean small = false;
 

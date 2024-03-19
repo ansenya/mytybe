@@ -1,6 +1,8 @@
 package ru.senya.spot.controllers.video;
 
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +30,7 @@ public class UploadUtils {
     private final StorageApiUtils storageApiUtils;
     private final ProcessingUtils processingUtils;
     private final ModelMapper modelMapper = new ModelMapper();
+    private final Logger logger = LoggerFactory.getLogger(UploadUtils.class);
 
     public UploadUtils(UserRepository userRepository, ChannelRepository channelRepository, VideoService videoService, StorageApiUtils storageApiUtils, ProcessingUtils processingUtils) {
         this.userRepository = userRepository;
@@ -76,9 +79,41 @@ public class UploadUtils {
 
             return ResponseEntity.ok(modelMapper.map(video, VideoDto.class));
 
-        } catch (Exception exception) {
+        } catch (Exception e) {
+            logger.error(e.getMessage());
             return ResponseEntity.status(451).body("Error while processing");
         }
+    }
+
+
+    @PostMapping("upload/{uuid}/setQuality")
+    public ResponseEntity<?> setQuality(@PathVariable String uuid, @RequestParam(name = "q") String q) {
+        var optVideo = videoService.findByUUID(uuid);
+        if (optVideo.isEmpty()) {
+            return ResponseEntity.status(404).build();
+        }
+        var video = optVideo.get();
+
+        if (video.getQualities().isEmpty()) {
+            video.setQualities(q);
+        } else {
+            video.setQualities(video.getQualities() + ',' + q);
+        }
+
+        return ResponseEntity.ok(videoService.save(video));
+    }
+
+    @PostMapping("upload/{uuid}/setDoneQualities")
+    public ResponseEntity<?> setDoneQualities(@PathVariable String uuid, @RequestParam(name = "status") String status) {
+        var optVideo = videoService.findByUUID(uuid);
+        if (optVideo.isEmpty()) {
+            return ResponseEntity.status(404).build();
+        }
+        var video = optVideo.get();
+
+        video.setProcessedQualities(status.equals("1"));
+
+        return ResponseEntity.ok(videoService.save(video));
     }
 
     private boolean checkVideoType(String name) {
@@ -105,7 +140,7 @@ public class UploadUtils {
                 .channel(channel)
                 .description(description)
                 .path(uuid)
-                .qualities("720")
+                .qualities("")
                 .thumbnail(thumbnail)
                 .tags(new HashSet<>())
                 .streamStatus(0)

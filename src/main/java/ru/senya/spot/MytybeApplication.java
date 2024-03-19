@@ -23,7 +23,6 @@ public class MytybeApplication {
     public static String MAIN_IP="video-spot.ru";
     public static String MAIN_PORT = "1984";
     public static String STORAGE_HOST="video-spot.ru/storage";
-    public static String HLS_PORT = "8088";
 
     public static void main(String[] args) {
         SpringApplication.run(MytybeApplication.class, args);
