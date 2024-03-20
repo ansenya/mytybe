@@ -12,7 +12,7 @@ import { RegisterArgs } from "../../pages/registrationPage";
 export const serverApi = createApi({
   reducerPath: "server",
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://video-spot.ru/api",
+    baseUrl: "http://192.168.104.89:1984/api",
   }),
   endpoints: (build) => ({
     getUsers: build.query({
@@ -132,12 +132,14 @@ export const serverApi = createApi({
       },
     }),
     getVideoById: build.query<IVideo, number>({
-      query: (id) => ({
-        url: `videos/${id}`,
-        // headers: {
-        //   Authorization: `Bearer ${localStorage.getItem("jwtoken")}`,
-        // },
-      }),
+      query: (id) => {
+        const token = localStorage.getItem("jwtoken");
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+        return {
+          url: `videos/${id}`,
+          headers
+        }
+      },
     }),
   }),
 });
