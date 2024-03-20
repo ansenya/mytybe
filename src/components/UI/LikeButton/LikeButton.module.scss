@@ -1,0 +1,46 @@
+@import "../../../variables";
+
+%buttonClass {
+  display: flex;
+  border: none;
+  outline: none;
+  font-family: inherit;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 35px;
+  padding: 5px 10px 5px 10px;
+  &.active {
+    background: $primary-color;
+    &:hover {
+      background: $primary-hovered;
+    }
+  } 
+  &:hover {
+    background: $bright-plain-color;
+  }
+  background: $border-color;
+  img {
+    height: 25px;
+    width: 25px;
+  }
+  p {
+    max-width: 100px;
+    font-size: 1.1rem;
+    color: white;
+    font-weight: bolder;
+  }
+}
+
+.container {
+  display: flex;
+  align-items: center;
+  .likeButton {
+    @extend %buttonClass;
+    border-radius: 15px 0 0 15px;
+  }
+  .dislikeButton {
+    @extend %buttonClass;
+    border-radius: 0 15px 15px 0;
+  }
+}

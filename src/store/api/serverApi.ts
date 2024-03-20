@@ -57,6 +57,25 @@ export const serverApi = createApi({
         },
       }),
     }),
+
+    likeVideo: build.mutation({
+      query: (id: number) => ({
+        url: `videos/like/${id}`,
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("jwtoken")}`,
+        },
+      }),
+    }),
+    dislikeVideo: build.mutation({
+      query: (id: number) => ({
+        url: `videos/dislike/${id}`,
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("jwtoken")}`,
+        },
+      }),
+    }),
     getAuth: build.query<[IUser, IToken], void>({
       query: () => ({
         url: `auth/login`,
@@ -82,7 +101,7 @@ export const serverApi = createApi({
       PaginationResponse<IVideo>,
       VideosRequest & { searchQuery: string }
     >({
-      query: ({sort, page, size, searchQuery}) => {
+      query: ({ sort, page, size, searchQuery }) => {
         const token = localStorage.getItem("jwtoken");
         const headers = token ? { Authorization: `Bearer ${token}` } : {};
         return {
@@ -90,7 +109,7 @@ export const serverApi = createApi({
           params: {
             page,
             size,
-            sort, 
+            sort,
             q: searchQuery,
           },
           headers,
@@ -136,4 +155,6 @@ export const {
   useGetVideoByIdQuery,
   useGetUserChannelsQuery,
   useLazyGetSearchedVideosQuery,
+  useLikeVideoMutation,
+  useDislikeVideoMutation,
 } = serverApi;

@@ -28,7 +28,9 @@ const SearchSuggestions: FC<props> = ({ videosSuggested }) => {
           key={video.id}
           onClick={() => handleClick(video.name)}
         >
+          <p>
           {video.name}
+          </p>
         </div>
       ))}
     </div>

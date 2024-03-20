@@ -1,0 +1,34 @@
+@import "../../variables";
+
+.container {
+  border: 1px solid $primary-color;
+  border-radius: 6px;
+  width:100%;
+  height: 50px;
+  display: flex;
+
+
+  .link {
+    cursor: text;
+    font-family: inherit;
+    font-size: 1.2rem;
+    font-weight: bolder;
+    flex: 1;
+  }
+
+  .copyButton {
+    border: none;
+    outline: none;
+    background: $primary-color;
+    border-radius: 50%;
+    &:hover, &:focus {
+      background: $primary-hovered;
+    }
+    height: 40px;
+    img{
+      width: 25px;
+      height: 25px;
+    }
+    z-index: 1;
+  }
+}

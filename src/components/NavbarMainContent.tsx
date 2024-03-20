@@ -53,7 +53,6 @@ const NavbarMainContent: FC<MainContentProps> = ({
 
   useEffect(() => {
     if (debouncedQuery)
-      console.log(debouncedQuery)
       fetchSearch({
         searchQuery: debouncedQuery,
         page: 0,

@@ -5,18 +5,23 @@ import VideoScroll from "../../components/videosScroll";
 import { useGetVideoByIdQuery } from "../../store/api/serverApi";
 import InlineLoader from "../../components/UI/Loader/InlineLoader";
 import "./videoPage.scss";
+import { Link } from "react-router-dom";
+import ChipiChapa from "../../assets/asdf.mp4";
+import VideoDescription from "../../components/UI/VideoDescription/VideoDescription";
+import LikeButton from "../../components/UI/LikeButton/LikeButton";
+import SharePopup from "../../components/PlayerPopups/SharePopup";
 
 const VideoPage = () => {
   const { id } = useParams();
   const { data, error, isLoading } = useGetVideoByIdQuery(Number(id));
 
   useEffect(() => {
-    if (data){
-      document.title = data.name
+    if (data) {
+      document.title = data.name;
     }
     return () => {
-      document.title = "Spot"
-    }
+      document.title = "Spot";
+    };
   }, [data]);
 
   return (
@@ -26,14 +31,25 @@ const VideoPage = () => {
       ) : (
         <>
           <div className="video__content">
-          <VideoPlayer source={data?.path ?? ""} qValues={data?.qualities ?? []}  />
+            <VideoPlayer
+              source={data?.path ?? ""}
+              qValues={data?.qualities ?? []}
+              key={id}
+            />
             <div className="playing__title">
               <h1>{data.name}</h1>
             </div>
-            <div className="playing__channel">
-              <img src={data.channel.chp} className="avatar" />
-              <span>{data.channel.name}</span>
+            <div className="second__line">
+              <div className="playing__channel">
+                <img src={data.channel.chp} className="avatar" />
+                <span>{data.channel.name}</span>
+              </div>
+              <div className="playing__actions">
+                <LikeButton video={data}/>
+                <SharePopup/>
+              </div>
             </div>
+            <VideoDescription video={data} />
           </div>
           <div className="side__content">
             <VideoScroll />

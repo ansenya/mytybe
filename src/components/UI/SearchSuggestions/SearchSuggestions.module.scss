@@ -3,7 +3,6 @@
 .container {
   position: absolute;
   border-radius: 6px;
-  overflow: hidden;
   top: 38px;
   display: none;
   width: 100%;
@@ -23,9 +22,12 @@
   color: $primary-color;
   align-items: center;
   overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
   &:hover {
     background: $secondary-hovered;
+  }
+  p {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
   }
 }
