@@ -31,7 +31,7 @@ const VideoScroll = () => {
     let body: VideosRequest & { searchQuery?: string } = {
       page: pageNumber,
       sort: "desc",
-      size: 60,
+      size: 20,
     };
 
     //@ts-expect-error
@@ -40,6 +40,8 @@ const VideoScroll = () => {
     //@ts-expect-error
     fetchData(body);
   }, [pageNumber]);
+
+  
 
   useEffect(() => {
     if (isFetching || data === undefined) return;

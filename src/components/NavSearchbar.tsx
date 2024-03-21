@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useRef, useState } from "react";
+import React, { FC, useEffect, useId, useRef, useState } from "react";
 import searchIcon from "../assets/search-alt-svgrepo-com (3) 1.svg";
 import IconButton from "./UI/IconButton/IconButton";
 import arrowIcon from "../assets/arrow-back-long-svgrepo-com.svg";
@@ -16,18 +16,20 @@ interface NavSearchbarProps {
 const NavSearchbar: FC<NavSearchbarProps> = ({ setSearchBarVisible }) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const { setIsFocused } = useActions();
-  const { isFocused } = useAppSelector((state) => state.focus);
+  const { isFocused, focusTargetId } = useAppSelector((state) => state.focus);
   const [query, setQuery] = useState("");
   const debouncedQuery = useDebounce(query, 200);
   const [fetchSearch, { data, isLoading, error }] =
     useLazyGetSearchedVideosQuery();
   const navigate = useNavigate();
 
+  const mobileInputId = useId();
+
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === "Enter") {
       event.preventDefault();
-      setIsFocused(false);
-      let penis = setTimeout(() => inputRef.current?.blur(), 100);
+      setIsFocused({ isFocused: false, focusTargetId: mobileInputId });
+      inputRef.current?.blur();
       navigate(`/?q=${query}`);
     }
   };
@@ -45,6 +47,10 @@ const NavSearchbar: FC<NavSearchbarProps> = ({ setSearchBarVisible }) => {
     inputRef?.current?.focus();
   }, []);
 
+  function checkFocus() {
+    return isFocused && focusTargetId === mobileInputId;
+  }
+
   return (
     <>
       <div className="navbar">
@@ -54,9 +60,10 @@ const NavSearchbar: FC<NavSearchbarProps> = ({ setSearchBarVisible }) => {
         />
         <div className="search__smartphone__container">
           <div
-            className={["search__smartphone", isFocused ? "active" : ""].join(
-              " ",
-            )}
+            className={[
+              "search__smartphone",
+              checkFocus() ? "active" : "",
+            ].join(" ")}
           >
             <img src={searchIcon} alt="иконочка))" draggable={false} />
             <input
@@ -65,12 +72,22 @@ const NavSearchbar: FC<NavSearchbarProps> = ({ setSearchBarVisible }) => {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               onKeyDown={handleKeyDown}
-              onFocus={() => setIsFocused(true)}
-              onBlur={() => setTimeout(() => setIsFocused(false), 100)}
+              onFocus={() =>
+                setIsFocused({ isFocused: true, focusTargetId: mobileInputId })
+              }
+              onBlur={() =>
+                setIsFocused({
+                  isFocused: false,
+                  focusTargetId: mobileInputId,
+                })
+              }
               ref={inputRef}
             />
           </div>
-          <SearchSuggestions videosSuggested={data?.content} />
+          <SearchSuggestions
+            videosSuggested={data?.content}
+            currentInputId={mobileInputId}
+          />
         </div>
       </div>
     </>

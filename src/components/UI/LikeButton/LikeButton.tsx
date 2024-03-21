@@ -17,7 +17,7 @@ interface LikeButtonProps {
 }
 
 const LikeButton: FC<LikeButtonProps> = ({ video }) => {
-  const {user} = useAppSelector(state => state.auth);
+  const { user } = useAppSelector((state) => state.auth);
   const [likesCount, setLikesCount] = useState<number>(video.likes);
   const [dislikesCount, setDislikesCount] = useState<number>(video.dislikes);
   const [isLiked, setIsLiked] = useState(video.likedByThisUser);
@@ -53,6 +53,7 @@ const LikeButton: FC<LikeButtonProps> = ({ video }) => {
       <button
         onClick={() => handleLikeClick()}
         className={[styles.likeButton, isLiked ? styles.active : ""].join(" ")}
+        disabled={dislikeResp.isLoading || likeResp.isLoading}
       >
         <img src={isLiked ? likeFilledIcon : likeIcon} />
         <p>{likesCount}</p>
@@ -62,6 +63,7 @@ const LikeButton: FC<LikeButtonProps> = ({ video }) => {
         className={[styles.dislikeButton, isDisliked ? styles.active : ""].join(
           " ",
         )}
+        disabled={dislikeResp.isLoading || likeResp.isLoading}
       >
         <img src={isDisliked ? dislikeFilledIcon : dislikeIcon} />
         <p>{dislikesCount}</p>

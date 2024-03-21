@@ -45,3 +45,19 @@ export interface PaginationResponse<T> {
   first: boolean;
   empty: boolean;
 }
+
+export interface CommentRequest {
+  videoId: number;
+  sort: "desc" | "asc";
+  page: number;
+  size: number;
+  commentId?: number;
+}
+
+export interface PostCommentRequest {
+  videoId?: number;
+  commentId?: number;
+  text: string;
+  channelId?: number;
+}
+

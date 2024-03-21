@@ -1,0 +1,120 @@
+@import "../../../variables";
+
+.commentWrapper {
+  width: 100%;
+}
+
+
+.main {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 100%;
+  gap: 15px;
+  .pfp {
+    width: 35px;
+    height: 35px;
+    object-fit: cover;
+    border-radius: 50%;
+    cursor: pointer;
+    user-select: none;
+    &.smallerPfp {
+      width: 25px;
+      height: 25px;
+    }
+  }
+  .commentView {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    gap: 2px;
+    .top {
+      margin-left: 5px;
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      .link {
+        font-size: 1.2rem; 
+        color: $text-color;
+        font-weight: bolder;
+        &:hover{
+          color: lightgray;
+        }
+        &:active{
+          color: gray;
+        }
+      }
+      span {
+        color: gray;
+        font-weight: bolder;
+      }
+    }
+    .content{
+      margin-left: 5px;
+      display: flex;
+      width: 100%;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding-right: 5px; 
+      gap: 20px;
+      p{
+        color: white;
+        font-weight: 1.1rem;
+        word-break: break-all;
+      } 
+      .delete{
+        font-family: inherit;
+        outline: none;
+        border: none;
+        padding: 7px;
+        background: $delete-color;
+        color: white;
+        font-weight: bolder;
+        font-size: 13px;
+        border-radius: 15px;  
+        cursor: pointer;
+        &:hover{
+          background: $delete-hovered;
+        }
+        &:active {
+          background: $error-color;
+        }
+      }
+    }
+  }
+  .commentActions {
+    display: flex;
+    gap: 3px;
+    align-items: center;
+    p{
+      color: $text-color;
+      font-weight: bolder;
+      margin-right: 5px;
+    }
+    .actionButton {
+      padding: 8px;
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      background: $background-color;
+      color: $text-color;
+      font-family: inherit;
+      font-weight: bolder;
+      &:hover {
+        background: $border-color; 
+      }
+      &:active{
+        background: $bright-plain-color;
+      }
+      img {
+        width: 20px;
+        height: 20px;
+      }
+    }        
+  }
+}
+
+.responsesWrapper{
+  margin-left: 50px;
+}

@@ -1,18 +1,20 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { IChannel, IUser, IVideo } from "../../models";
+import { IChannel, IComment, IUser, IVideo } from "../../models";
 import { AuthCredentials, IToken } from "../../models/AuthModels";
 import {
   UploadResponse,
   VideosRequest,
   UploadRequest,
   PaginationResponse,
+  CommentRequest,
+  PostCommentRequest,
 } from "../../models/VideoModels";
 import { RegisterArgs } from "../../pages/registrationPage";
 
 export const serverApi = createApi({
   reducerPath: "server",
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://192.168.104.89:1984/api",
+    baseUrl: "http://video-spot.ru/api",
   }),
   endpoints: (build) => ({
     getUsers: build.query({
@@ -137,9 +139,59 @@ export const serverApi = createApi({
         const headers = token ? { Authorization: `Bearer ${token}` } : {};
         return {
           url: `videos/${id}`,
-          headers
-        }
+          headers,
+        };
       },
+    }),
+    getComments: build.query<PaginationResponse<IComment>, CommentRequest>({
+      query: ({ sort, page, size, videoId, commentId }) => {
+        const params: CommentRequest = {
+          page,
+          sort,
+          size,
+          videoId,
+        };
+        if (commentId) params.commentId = commentId;
+        return {
+          url: `comments`,
+          params,
+        };
+      },
+    }),
+    postComment: build.mutation<IComment, PostCommentRequest>({
+      query: ({ videoId, text, commentId }) => {
+        const params: PostCommentRequest = {
+          videoId,
+          text,
+        };
+        if (commentId) params.commentId = commentId;
+        return {
+          url: "comments/create",
+          method: "POST",
+          params,
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("jwtoken")}`,
+          },
+        };
+      },
+    }),
+    deleteCommentById: build.mutation({
+      query: (id: number) => ({
+        url: `comments/${id}`,
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("jwtoken")}`,
+        },
+      }),
+    }),
+    likeComment: build.mutation({
+      query: (id: number) => ({
+        url: `comments/like/${id}`,
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("jwtoken")}`,
+        },
+      }),
     }),
   }),
 });
@@ -159,4 +211,8 @@ export const {
   useLazyGetSearchedVideosQuery,
   useLikeVideoMutation,
   useDislikeVideoMutation,
+  useLazyGetCommentsQuery,
+  usePostCommentMutation,
+  useDeleteCommentByIdMutation,
+  useLikeCommentMutation,
 } = serverApi;

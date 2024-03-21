@@ -6,21 +6,29 @@ import styles from "./SearchSuggestions.module.scss";
 
 interface props {
   videosSuggested?: IVideo[];
+  currentInputId: string;
 }
 
-const SearchSuggestions: FC<props> = ({ videosSuggested }) => {
+const SearchSuggestions: FC<props> = ({ videosSuggested, currentInputId }) => {
   const navigate = useNavigate();
-  const {isFocused} = useAppSelector(state => state.focus)
+  const { isFocused, focusTargetId } = useAppSelector((state) => state.focus);
   const handleClick = (query: string) => {
     navigate(`/?q=${query}`);
   };
 
+  function showCondition() {
+    return (
+      videosSuggested !== undefined &&
+      isFocused &&
+      currentInputId === focusTargetId
+    );
+  }
+
   return (
     <div
-      className={[
-        styles.container,
-        videosSuggested !== undefined && isFocused ? styles.opened : "",
-      ].join(" ")}
+      className={[styles.container, showCondition() ? styles.opened : ""].join(
+        " ",
+      )}
     >
       {videosSuggested?.map((video) => (
         <div
@@ -28,9 +36,7 @@ const SearchSuggestions: FC<props> = ({ videosSuggested }) => {
           key={video.id}
           onClick={() => handleClick(video.name)}
         >
-          <p>
-          {video.name}
-          </p>
+          <p>{video.name}</p>
         </div>
       ))}
     </div>

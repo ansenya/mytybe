@@ -2,18 +2,21 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface FocusState {
   isFocused: boolean;
+  focusTargetId: string | null; 
 }
 
 const initialState: FocusState = {
-  isFocused: false
+  isFocused: false,
+  focusTargetId: null,
 };
 
 const focusSlice = createSlice({
   name: "focus",
   initialState,
   reducers: {
-    setIsFocused(state, payload: PayloadAction<boolean>) {
-      state.isFocused = payload.payload 
+    setIsFocused(state, payload: PayloadAction<FocusState>) {
+      state.isFocused = payload.payload.isFocused 
+      state.focusTargetId = payload.payload.focusTargetId
     },
   },
 });

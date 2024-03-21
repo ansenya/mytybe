@@ -1,4 +1,11 @@
-import React, {FC, useDeferredValue, useEffect, useRef, useState} from "react";
+import React, {
+  FC,
+  useDeferredValue,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+} from "react";
 import menuIcon from "../assets/menu-svgrepo-com (1) 1.svg";
 import searchIcon from "../assets/search-alt-svgrepo-com (3) 1.svg";
 import { useAppSelector } from "../hooks/redux";
@@ -31,45 +38,45 @@ const NavbarMainContent: FC<MainContentProps> = ({
   const { user, isLoaded, isError } = useAppSelector((state) => state.auth);
 
   const { setIsFocused } = useActions();
-  const { isFocused } = useAppSelector((state) => state.focus);
+  const { isFocused, focusTargetId } = useAppSelector((state) => state.focus);
   const [isProfile, setIsProfile] = useState<boolean>(false);
   const [query, setQuery] = useState("");
-  const debouncedQuery = useDebounce(query, 200);
+  const debouncedQuery = useDebounce(query, 100);
   const [fetchSearch, { data, isLoading, error }] =
     useLazyGetSearchedVideosQuery();
   const location = useLocation();
   const navigate = useNavigate();
 
   const inputRef = useRef<HTMLInputElement>(null);
+  const inputId = useId();
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === "Enter") {
+    if (event.key === "Enter" && checkFocus()) {
       event.preventDefault();
-      setIsFocused(false);
-      let penis = setTimeout(() => inputRef.current?.blur(), 100)
+      setIsFocused({ isFocused: false, focusTargetId: inputId });
+      inputRef.current?.blur();
       navigate(`/?q=${query}`);
     }
   };
 
   useEffect(() => {
-    if (debouncedQuery)
-      fetchSearch({
-        searchQuery: debouncedQuery,
-        page: 0,
-        size: 5,
-        sort: "desc",
-      });
+    fetchSearch({
+      searchQuery: debouncedQuery,
+      page: 0,
+      size: 5,
+      sort: "desc",
+    });
   }, [debouncedQuery]);
-
-  useEffect(() => {
-    if (data) {
-    }
-  }, [data]);
 
   function handleSearchButton() {
     setSearchBarVisible(true);
     setIsMenuShown(false);
   }
+
+  function checkFocus() {
+    return isFocused && focusTargetId === inputId;
+  }
+
   return (
     <>
       <div className="navbar__menu">
@@ -85,21 +92,31 @@ const NavbarMainContent: FC<MainContentProps> = ({
         {!isSmallScreen ? (
           <div className="search__container">
             <div
-              className={["search__bar", isFocused ? "active" : ""].join(" ")}
+              className={["search__bar", checkFocus() ? "active" : ""].join(
+                " ",
+              )}
             >
               <img src={searchIcon} alt="иконочка))" draggable={false} />
               <input
+                id={inputId}
                 type="text"
                 spellCheck={false}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={handleKeyDown}
-                onFocus={() => setIsFocused(true)}
-                onBlur={() => setTimeout(() => setIsFocused(false), 100)}
+                onFocus={() =>
+                  setIsFocused({ isFocused: true, focusTargetId: inputId })
+                }
+                onBlur={() =>
+                  setIsFocused({ isFocused: false, focusTargetId: inputId })
+                }
                 ref={inputRef}
               />
             </div>
-            <SearchSuggestions videosSuggested={data?.content} />
+            <SearchSuggestions
+              videosSuggested={data?.content}
+              currentInputId={inputId}
+            />
           </div>
         ) : (
           <IconButton

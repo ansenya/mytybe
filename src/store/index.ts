@@ -3,13 +3,15 @@ import {serverApi} from "./api/serverApi";
 import {setupListeners} from "@reduxjs/toolkit/query";
 import {authReducer} from "./slices/authSlice";
 import { focusReducer } from "./slices/focusSlice";
+import { commentReducer } from "./slices/commentPostSlice";
 
 
 export const store = configureStore({
     reducer: {
         [serverApi.reducerPath]: serverApi.reducer,
         auth: authReducer,
-        focus: focusReducer
+        focus: focusReducer,
+        comment: commentReducer,
     },
     middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(serverApi.middleware)
 })

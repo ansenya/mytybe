@@ -29,7 +29,6 @@
     }
 
     .playing__title {
-      overflow: hidden;
       width: 100%;
       color: white;
       height: auto;
@@ -37,10 +36,8 @@
 
       h1 {
         color: inherit;
+        word-break: break-all;
         font-size: 1.5rem;
-        white-space: nowrap;
-        text-overflow: ellipsis;
-        overflow: hidden;
       }
     }
     .second__line {

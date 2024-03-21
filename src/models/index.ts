@@ -46,3 +46,16 @@ export interface IVideo {
   dislikes: number;
   likes: number;
 }
+
+export interface IComment {
+  id: number
+  text: string
+  deleted: boolean
+  created: string
+  updated: string
+  nextComments: IComment[]
+  user: IUser
+  channel: IChannel
+  likesAmount: number,
+  likedByThisUser?: boolean,
+}

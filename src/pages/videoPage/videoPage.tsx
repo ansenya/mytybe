@@ -9,7 +9,9 @@ import { Link } from "react-router-dom";
 import ChipiChapa from "../../assets/asdf.mp4";
 import VideoDescription from "../../components/UI/VideoDescription/VideoDescription";
 import LikeButton from "../../components/UI/LikeButton/LikeButton";
-import SharePopup from "../../components/PlayerPopups/SharePopup";
+import ShareButton from "../../components/ShareButton/ShareButton";
+import CommentSection from "../../components/CommentSection/CommentSection";
+import CButton from "../../components/UI/CButton/CButton";
 
 const VideoPage = () => {
   const { id } = useParams();
@@ -46,10 +48,11 @@ const VideoPage = () => {
               </div>
               <div className="playing__actions">
                 <LikeButton video={data}/>
-                <SharePopup/>
+                <ShareButton/>
               </div>
             </div>
             <VideoDescription video={data} />
+            <CommentSection video={data}/> 
           </div>
           <div className="side__content">
             <VideoScroll />
