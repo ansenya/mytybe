@@ -16,6 +16,7 @@ import ru.senya.spot.repos.jpa.ChannelRepository;
 import ru.senya.spot.repos.jpa.ImagesRepository;
 import ru.senya.spot.repos.jpa.UserRepository;
 
+import java.util.HashSet;
 import java.util.Objects;
 
 
@@ -68,12 +69,9 @@ public class ChannelController {
             } else {
                 direction = Sort.Direction.DESC;
             }
-
             PageRequest page = PageRequest.of(pageNum, pageSize, Sort.by(direction, "created"));
             Page<ChannelModel> channelPage = channelRepository.findAll(page);
-
             Page<ChannelDto> channelDtoPage = channelPage.map(user -> modelMapper.map(user, ChannelDto.class));
-
             return ResponseEntity.ok(channelDtoPage);
         } else {
             Sort.Direction direction;
@@ -83,17 +81,12 @@ public class ChannelController {
             } else {
                 direction = Sort.Direction.DESC;
             }
-
             PageRequest page = PageRequest.of(pageNum, pageSize, Sort.by(direction, "created"));
-
-            Page<ChannelModel> channelPage = channelRepository.getAllByUserId(uid, page);
-
+            Page<ChannelModel> channelPage = channelRepository.findAllByUserId(uid, page);
             if (channelPage == null) {
                 return ResponseEntity.notFound().build();
             }
-
             Page<ChannelDto> channelDtoPage = channelPage.map(user -> modelMapper.map(user, ChannelDto.class));
-
             return ResponseEntity.ok(channelDtoPage);
         }
     }
@@ -109,6 +102,7 @@ public class ChannelController {
 
         ChannelModel channel = ChannelModel.builder()
                 .name(name)
+                .followers(new HashSet<>())
                 .user(userModel)
                 .chp(chp)
                 .build();

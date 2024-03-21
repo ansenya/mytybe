@@ -47,11 +47,24 @@ public class CommentModel {
     @JoinColumn(name = "channel_id")
     private ChannelModel channel;
 
+    @ManyToMany(mappedBy = "likedComments")
+    private Set<UserModel> likedByUser;
+
+    @ManyToMany(mappedBy = "dislikedComments")
+    private Set<UserModel> dislikedByUser;
+
     @CurrentTimestamp
     private Date created;
 
     @UpdateTimestamp
     private Date updated;
+
+    public void delete() {
+        this.deleted = true;
+        for (var comment : nextComments) {
+            comment.delete();
+        }
+    }
 
     @Override
     public int hashCode() {

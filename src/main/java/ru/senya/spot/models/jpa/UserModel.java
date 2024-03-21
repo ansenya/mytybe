@@ -56,6 +56,9 @@ public class UserModel {
     @OneToMany(mappedBy = "user")
     private Set<ChannelModel> channels = new HashSet<>();
 
+    @OneToMany(mappedBy = "user")
+    private Set<ChannelModel> followedChannels = new HashSet<>();
+
     @ManyToMany
     @JoinTable(
             name = "subscriptions",
@@ -81,6 +84,21 @@ public class UserModel {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "video_id"))
     private Set<VideoModel> dislikedVideos;
+
+    @ManyToMany
+    @JoinTable(
+            name = "comments_liked",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "comment_id"))
+    @JsonIgnore
+    private Set<CommentModel> likedComments;
+
+    @ManyToMany
+    @JoinTable(
+            name = "comments_disliked",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "comment_id"))
+    private Set<CommentModel> dislikedComments;
 
     @ManyToMany
     @JoinTable(

@@ -1,6 +1,9 @@
 package ru.senya.spot.models.dto;
 
 import lombok.Data;
+import ru.senya.spot.models.jpa.UserModel;
+
+import java.util.Set;
 
 @Data
 public class ChannelDtoWithoutUser {
@@ -9,8 +12,6 @@ public class ChannelDtoWithoutUser {
     private String name;
 
     private Integer videosAmount;
-
-    private Integer followersAmount = 0;
 
     private boolean deleted = false;
 
@@ -22,9 +23,17 @@ public class ChannelDtoWithoutUser {
 
 //    private UserDtoWithoutChannels user;
 
-//    private Set<UserModel> followers = new HashSet<>();
+    private Set<UserModel> followers;
 
     public String getChp() {
         return chp.getFalsePath();
+    }
+
+    private String getFollowers() {
+        return "";
+    }
+
+    public Integer getFollowersAmount() {
+        return followers.size();
     }
 }

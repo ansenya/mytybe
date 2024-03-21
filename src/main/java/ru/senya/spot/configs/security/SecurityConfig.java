@@ -58,7 +58,12 @@ public class SecurityConfig {
                                 "videos/upload/*/setDuration",
                                 "videos/upload/*/setProcessed"
                         ).permitAll()
-                        .requestMatchers(HttpMethod.GET, "videos/**", "channels/**").permitAll()
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "videos/**",
+                                "channels/**",
+                                "comments/**"
+                        ).permitAll()
                         .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(configurer -> configurer.jwt(jwt -> jwt.decoder(jwtDecoder())))

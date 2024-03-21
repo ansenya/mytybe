@@ -8,8 +8,10 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 import ru.senya.spot.models.dto.CommentDto;
+import ru.senya.spot.models.dto.CommentDtoWithLikeStatus;
 import ru.senya.spot.models.jpa.ChannelModel;
 import ru.senya.spot.models.jpa.CommentModel;
 import ru.senya.spot.models.jpa.UserModel;
@@ -19,6 +21,7 @@ import ru.senya.spot.repos.jpa.CommentRepository;
 import ru.senya.spot.repos.jpa.UserRepository;
 import ru.senya.spot.repos.jpa.VideoRepository;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -67,16 +70,21 @@ public class CommentController {
             if (!videoRepository.existsById(videoId)) {
                 return ResponseEntity.status(404).build();
             }
-            Page<CommentModel> commentPage = commentRepository.findAllByVideo(page, videoRepository.getReferenceById(videoId));
+            Page<CommentModel> commentPage = commentRepository.findAllByVideoAndDeletedFalse(page, videoRepository.getReferenceById(videoId));
             Page<CommentDto> commentDtoPage = commentPage.map(commentModel -> modelMapper.map(commentModel, CommentDto.class));
             return ResponseEntity.ok(commentDtoPage);
         } else {
             if (!commentRepository.existsById(commentID)) {
-                return ResponseEntity.status(404).body("comment is null");
+                return ResponseEntity.status(404).body("comment does not exist");
             }
 
             List<CommentDto> comments =
-                    commentRepository.findById(commentRepository.getReferenceById(commentID).getId()).get().getNextComments().stream().map(commentModel -> modelMapper.map(commentModel, CommentDto.class)).toList();
+                    commentRepository
+                            .findByIdAndDeletedFalse(
+                                    commentRepository.getReferenceById(commentID).getId()).get()
+                            .getNextComments()
+                            .stream()
+                            .map(commentModel -> modelMapper.map(commentModel, CommentDto.class)).toList();
 
             int fromIndex = (int) page.getOffset();
             int toIndex = Math.min((fromIndex + page.getPageSize()), comments.size());
@@ -87,24 +95,113 @@ public class CommentController {
 
 
     @GetMapping("{id}")
-    public ResponseEntity<?> getComment(@PathVariable Long id) {
-        if (id == null) {
-            return ResponseEntity.badRequest().body("id is null");
-        }
-
-        CommentModel comment = commentRepository.findById(id).orElse(null);
+    public ResponseEntity<?> getComment(@PathVariable Long id,
+                                        Authentication authentication) {
+        CommentModel comment = commentRepository.findByIdAndDeletedFalse(id).orElse(null);
 
         if (comment == null) {
             return ResponseEntity.notFound().build();
         }
+        if (authentication == null) {
+            return ResponseEntity.status(401).build();
+        }
+        if (userRepository.existsByUsername(authentication.getName())) {
+            var user = userRepository.findByUsername(authentication.getName());
+            var commentDto = modelMapper.map(comment, CommentDtoWithLikeStatus.class);
+            commentDto.setLikedByThisUser(comment.getLikedByUser().contains(userRepository.findByUsername(authentication.getName())));
+            commentDto.setDislikedByThisUser(comment.getDislikedByUser().contains(userRepository.findByUsername(authentication.getName())));
 
-        return ResponseEntity.ok(modelMapper.map(comment, CommentDto.class));
+            return ResponseEntity.ok(commentDto);
+        } else {
+            return ResponseEntity.status(404).body("user not found");
+        }
+    }
+
+    @DeleteMapping("{id}")
+    public ResponseEntity<?> deleteComment(@PathVariable Long id) {
+        CommentModel comment = commentRepository.findByIdAndDeletedFalse(id).orElse(null);
+
+        if (comment == null) {
+            return ResponseEntity.notFound().build();
+        }
+        comment.delete();
+        commentRepository.saveAll(comment.getNextComments());
+        commentRepository.save(comment);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("like/{id}")
+    public ResponseEntity<?> likeComment(@PathVariable Long id,
+                                         Authentication authentication) {
+        var optComment = commentRepository.findByIdAndDeletedFalse(id);
+
+        if (optComment.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        var comment = optComment.get();
+        UserModel user = null;
+        if (authentication != null && userRepository.existsByUsername(authentication.getName())) {
+            user = userRepository.findByUsername(authentication.getName());
+            if (comment.getLikedByUser().contains(user)) {
+                comment.getLikedByUser().remove(user);
+                user.getLikedComments().remove(comment);
+            } else {
+                comment.getLikedByUser().add(user);
+                user.getLikedComments().add(comment);
+
+                comment.getDislikedByUser().remove(user);
+                user.getDislikedComments().remove(comment);
+            }
+        } else {
+            return ResponseEntity.status(401).build();
+        }
+        commentRepository.save(comment);
+        userRepository.save(user);
+        var commentDto = modelMapper.map(comment, CommentDtoWithLikeStatus.class);
+        commentDto.setLikedByThisUser(comment.getLikedByUser().contains(userRepository.findByUsername(authentication.getName())));
+        commentDto.setDislikedByThisUser(comment.getDislikedByUser().contains(userRepository.findByUsername(authentication.getName())));
+
+        return ResponseEntity.ok().body(commentDto);
+    }
+
+    @PostMapping("dislike/{id}")
+    public ResponseEntity<?> dislikeComment(@PathVariable Long id,
+                                            Authentication authentication) {
+        var optComment = commentRepository.findByIdAndDeletedFalse(id);
+
+        if (optComment.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        var comment = optComment.get();
+        UserModel user = null;
+        if (authentication != null && userRepository.existsByUsername(authentication.getName())) {
+            user = userRepository.findByUsername(authentication.getName());
+            if (comment.getDislikedByUser().contains(user)) {
+                comment.getDislikedByUser().remove(user);
+                user.getDislikedComments().remove(comment);
+            } else {
+                comment.getDislikedByUser().add(user);
+                user.getDislikedComments().add(comment);
+
+                comment.getLikedByUser().remove(user);
+                user.getLikedComments().remove(comment);
+            }
+        } else {
+            return ResponseEntity.status(401).build();
+        }
+        commentRepository.save(comment);
+        userRepository.save(user);
+        var commentDto = modelMapper.map(comment, CommentDtoWithLikeStatus.class);
+        commentDto.setLikedByThisUser(comment.getLikedByUser().contains(userRepository.findByUsername(authentication.getName())));
+        commentDto.setDislikedByThisUser(comment.getDislikedByUser().contains(userRepository.findByUsername(authentication.getName())));
+
+        return ResponseEntity.ok().body(commentDto);
     }
 
     @PostMapping("create")
     public ResponseEntity<?> leaveComment(@RequestParam(value = "text", required = false) String text,
                                           @RequestParam(value = "commentId", required = false) Long commentId,
-                                          @RequestParam(value = "channelId", required = false) Long channelId,
                                           @RequestParam(value = "videoId", required = false) Long videoId,
                                           Authentication authentication) {
         if (text == null || text.isBlank()) {
@@ -113,11 +210,6 @@ public class CommentController {
 
         if (videoId == null && commentId == null) {
             return ResponseEntity.badRequest().body("either videoId or commentId is required");
-        }
-
-        ChannelModel channelModel = null;
-        if (channelId != null) {
-            channelModel = channelRepository.findById(channelId).orElse(null);
         }
 
         UserModel userModel = userRepository.findByUsername(authentication.getName());
@@ -136,10 +228,6 @@ public class CommentController {
                     .text(text)
                     .build();
 
-            if (channelModel != null) {
-                commentModel.setChannel(channelModel);
-            }
-
 
             videoModel.getComments().add(commentModel);
 
@@ -148,20 +236,16 @@ public class CommentController {
 
             return ResponseEntity.ok(modelMapper.map(commentModel, CommentDto.class));
         } else {
-            if (channelModel == null) {
-                return ResponseEntity.badRequest().body("channel is null");
-            }
 
-            CommentModel commentModel = commentRepository.findById(commentId).orElse(null);
+            CommentModel commentModel = commentRepository.findByIdAndDeletedFalse(commentId).orElse(null);
 
             if (commentModel == null) {
-                return ResponseEntity.badRequest().body("comment is null");
+                return ResponseEntity.status(404).body("comment does not exist");
             }
 
             CommentModel nextComment = CommentModel.builder()
                     .video(null)
                     .user(userModel)
-                    .channel(channelModel)
                     .prevComment(commentModel)
                     .text(text)
                     .build();
@@ -173,7 +257,6 @@ public class CommentController {
             commentModel = commentRepository.save(commentModel);
 
             return ResponseEntity.ok(modelMapper.map(commentModel, CommentDto.class));
-
         }
     }
 

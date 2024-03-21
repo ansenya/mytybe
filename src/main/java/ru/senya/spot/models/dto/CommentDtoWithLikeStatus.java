@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.*;
 
 @Data
-public class CommentDto {
+public class CommentDtoWithLikeStatus {
     private Long id;
 
     private String text;
@@ -21,9 +21,15 @@ public class CommentDto {
 
     private UserDtoWithoutChannels user;
 
-    public List<Long> getNextComments() {
+    private boolean likedByThisUser;
+
+    private boolean dislikedByThisUser;
+
+    public List<CommentDto> getNextComments() {
         try {
-            return nextComments.stream().sorted(Comparator.comparing(o -> o.id)).map(CommentDto::getId).toList();
+            List<CommentDto> commentDtoList = new ArrayList<>(nextComments.stream().toList());
+            commentDtoList.sort(Comparator.comparing(CommentDto::getId));
+            return commentDtoList;
         } catch (NullPointerException e) {
             return new ArrayList<>();
         }

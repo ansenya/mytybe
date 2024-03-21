@@ -51,10 +51,6 @@ public class VideoModel {
     @JsonIgnore
     private ChannelModel channel;
 
-//    @ManyToOne
-//    @JoinColumn(name = "category_id")
-//    private CategoryModel category;
-
     private String path;
 
     @ManyToMany
