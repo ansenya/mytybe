@@ -1,0 +1,115 @@
+@import "../../../variables";
+
+.commentForm {
+  width: 100%;
+}
+
+.firstLine {
+  width: 100%;
+  min-height: 35px;
+  display: flex;
+  gap: 15px;
+  align-items: flex-start;
+  margin-bottom: 10px;
+  img {
+    width: 35px;
+    height: 35px;
+    object-fit: cover;
+    border-radius: 50%;
+    cursor: pointer;
+    user-select: none;
+    &.smaller{
+      width: 25px;
+      height: 25px;
+    }
+  }
+  .areaWrapper {
+    width: 100%;
+    border-bottom: 2px solid $border-color;
+    &::after {
+      content: "";
+      display: block;
+      margin: auto;
+      width: 0;
+      height: 3px;
+      background: $primary-color;
+      transition: width 0.3s;
+      position: relative;
+      left: 0;
+      bottom: -2px;
+    }
+    &.focused {
+      &::after {
+        width: 100%;
+      }
+    }
+    textarea {
+      overflow: hidden;
+      padding-top: 4px;
+      width: 100%;
+      height: auto;
+      min-height: 21px;
+      font-size: 16px;
+      line-height: 16px;
+      font-family: inherit;
+      resize: none;
+      outline: none;
+      height: 20px;
+      border: none;
+      background: $background-color;
+      color: $text-color;
+      &::-webkit-scrollbar {
+        display: none;
+      }
+      scrollbar-width: none;
+      padding-bottom: 4px;
+    }
+  }
+}
+
+%buttonClass {
+  border: none;
+  outline: none;
+  font-family: inherit;
+  color: white;
+  font-size: 13px;
+  font-weight: bolder;
+  padding: 10px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  line-height: 13px;
+  cursor: pointer;
+}
+
+
+.secondLine {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+
+  .cancelButton {
+    @extend %buttonClass;
+    background: $border-color;
+    &:hover {
+      background: $bright-plain-color;
+    }
+    &:active {
+      background: $pressed-plain-color;
+    }
+  }
+  .submitButton {
+    @extend %buttonClass;
+    background: $primary-color;
+    &:hover {
+      background: $primary-hovered;
+    }
+    &:active {
+      background: $primary-pressed;
+    }
+    &:disabled {
+      cursor: auto;
+      background: $border-color;
+    }
+  }
+}
