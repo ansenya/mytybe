@@ -119,16 +119,20 @@ export const serverApi = createApi({
       },
     }),
     getVideos: build.query<PaginationResponse<IVideo>, VideosRequest>({
-      query: ({ sort, page, size }) => {
+      query: ({ sort, page, size, channelId }) => {
         const token = localStorage.getItem("jwtoken");
         const headers = token ? { Authorization: `Bearer ${token}` } : {};
+        const params: VideosRequest = {
+          page,
+          sort,
+          size,
+        };
+
+        if (channelId) params.channelId = channelId;
+
         return {
           url: `videos`,
-          params: {
-            page,
-            sort,
-            size,
-          },
+          params,
           headers,
         };
       },
@@ -151,10 +155,14 @@ export const serverApi = createApi({
           size,
           videoId,
         };
+
+        const token = localStorage.getItem("jwtoken");
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
         if (commentId) params.commentId = commentId;
         return {
           url: `comments`,
           params,
+          headers,
         };
       },
     }),
@@ -193,6 +201,29 @@ export const serverApi = createApi({
         },
       }),
     }),
+    follow: build.mutation({
+      query: (channelId: number) => ({
+        url: `channels/follow`,
+        method: "POST",
+        params: {
+          channelId,
+        },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("jwtoken")}`,
+        },
+      }),
+    }),
+
+    getChannelById: build.query<IChannel, number>({
+      query: (id) => {
+        const token = localStorage.getItem("jwtoken");
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+        return {
+          url: `channels/${id}`,
+          headers,
+        };
+      },
+    }),
   }),
 });
 
@@ -215,4 +246,6 @@ export const {
   usePostCommentMutation,
   useDeleteCommentByIdMutation,
   useLikeCommentMutation,
+  useGetChannelByIdQuery,
+  useFollowMutation,
 } = serverApi;

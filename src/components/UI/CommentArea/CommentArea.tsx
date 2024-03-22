@@ -19,7 +19,8 @@ interface CommentArea {
 
 const CommentArea: FC<CommentArea> = ({ commentId, videoId, extraAction }) => {
   const areaRef = useRef<HTMLTextAreaElement>(null);
-  const [comment, { data, isLoading, isError, isSuccess}] = usePostCommentMutation();
+  const [comment, { data, isLoading, isError, isSuccess }] =
+    usePostCommentMutation();
 
   const { user } = useAppSelector((state) => state.auth);
 
@@ -39,8 +40,7 @@ const CommentArea: FC<CommentArea> = ({ commentId, videoId, extraAction }) => {
   }, [isFocused]);
 
   const sendComment = () => {
-    if (value)
-    if (!value.trim()) {
+    if (!value || !/\S/.test(value)) {
       return;
     }
 
@@ -58,14 +58,19 @@ const CommentArea: FC<CommentArea> = ({ commentId, videoId, extraAction }) => {
 
     comment(body);
     setValue("");
-
-    if (extraAction) extraAction(false);
   };
 
   useEffect(() => {
-    if (isSuccess) setCommentPost({commentToResponseId: commentId || null, comment: data || null});  
-  }, [isLoading])
+    if (!isLoading && data) {
+      setCommentPost({
+        commentToResponseId: commentId || null,
+        comment: data || null,
+        toDelete: false,
+      });
 
+      if (extraAction) extraAction(false);
+    }
+  }, [isLoading]);
 
   const cancelComment = () => {
     setValue("");
@@ -149,7 +154,7 @@ const CommentArea: FC<CommentArea> = ({ commentId, videoId, extraAction }) => {
                 <button
                   className={styles.submitButton}
                   onClick={() => sendComment()}
-                  disabled={!value}
+                  disabled={!value || !/\S/.test(value)}
                 >
                   {!commentId ? "Оставить комментарий" : "Ответить"}
                 </button>

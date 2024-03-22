@@ -1,4 +1,4 @@
-import React, { FC, useMemo, useState } from "react";
+import React, { FC, useEffect, useMemo, useRef, useState } from "react";
 import { useAppSelector } from "../../../hooks/redux";
 import { IChannel, IComment, IVideo } from "../../../models";
 import CommentArea from "../../UI/CommentArea/CommentArea";
@@ -9,7 +9,12 @@ import styles from "./Comment.module.scss";
 import likeIcon from "../../../assets/like-svgrepo-com(1).svg";
 import likeFilledIcon from "../../../assets/like-svgrepo-com.svg";
 import { Link } from "react-router-dom";
-import { useDeleteCommentByIdMutation, useLikeCommentMutation } from "../../../store/api/serverApi";
+import {
+  useDeleteCommentByIdMutation,
+  useLikeCommentMutation,
+} from "../../../store/api/serverApi";
+import NotificationElement from "../../UI/Notification/Notification";
+import { useActions } from "../../../hooks/actions";
 
 interface CommentProps {
   comment: IComment;
@@ -21,10 +26,27 @@ const Comment: FC<CommentProps> = ({ comment, responseToCommentId, video }) => {
   const { user } = useAppSelector((state) => state.auth);
   const [isOpenedResponses, setIsOpenedResponses] = useState(false);
   const [isOpenedForm, setIsOpenedForm] = useState(false);
-  const [likesCount, setLikesCount] = useState<number>(comment.likesAmount);
+  const [likesCount, setLikesCount] = useState<number>(comment.likes);
 
-  const [like, {isLoading}] = useLikeCommentMutation();
+  const [like, { isLoading }] = useLikeCommentMutation();
   const [deleteComment, {}] = useDeleteCommentByIdMutation();
+
+  const [isUnauthorizedLike, setIsUnauthorizedLike] = useState(false);
+
+  const { setCommentPost } = useActions();
+
+  const [isSpreaded, setIsSpreaded] = useState(false);
+  const pRef = useRef<HTMLParagraphElement>(null);
+
+  const [showSpreadButton, setShowSpreadButton] = useState<boolean>();
+
+  useEffect(() => {
+    if (pRef.current) {
+      setShowSpreadButton(
+        pRef.current.scrollHeight !== pRef.current.clientHeight,
+      );
+    }
+  }, []);
 
   const author = useMemo(() => {
     if (!comment.user.channels) return "";
@@ -36,9 +58,13 @@ const Comment: FC<CommentProps> = ({ comment, responseToCommentId, video }) => {
   }, [video, comment]);
   const formattedDate = new Date(comment.created);
 
-  const [isLiked, setIsLiked] = useState(false); 
+  const [isLiked, setIsLiked] = useState(comment.likedByThisUser);
 
   function likeAction() {
+    if (!user) {
+      setIsUnauthorizedLike(true);
+      return;
+    }
     let operation = isLiked ? -1 : 1;
     setIsLiked((prevstate) => !prevstate);
     setLikesCount((prevstate) => prevstate + operation);
@@ -65,9 +91,28 @@ const Comment: FC<CommentProps> = ({ comment, responseToCommentId, video }) => {
             </span>
           </div>
           <div className={styles.content}>
-            <p>{comment.text}</p>
+            <div className={styles.textComment}>
+              <p ref={pRef} className={!isSpreaded ? styles.notSpreaded : ""}>
+                {comment.text}
+              </p>
+              {showSpreadButton && (
+                <span onClick={() => setIsSpreaded((prevstate) => !prevstate)}>
+                  {isSpreaded ? "свернуть" : "показать полностью"}
+                </span>
+              )}
+            </div>
             {user?.id === comment.user.id && (
-              <button className={styles.delete} onClick={() => deleteComment(comment.id)}>
+              <button
+                className={styles.delete}
+                onClick={() => {
+                  setCommentPost({
+                    commentToResponseId: responseToCommentId || null,
+                    comment: comment,
+                    toDelete: true,
+                  });
+                  deleteComment(comment.id);
+                }}
+              >
                 Удалить
               </button>
             )}
@@ -79,6 +124,12 @@ const Comment: FC<CommentProps> = ({ comment, responseToCommentId, video }) => {
               disabled={isLoading}
             >
               <img src={isLiked ? likeFilledIcon : likeIcon} />
+              <NotificationElement
+                isCalled={isUnauthorizedLike}
+                setIsCalled={setIsUnauthorizedLike}
+                text={"Требуется авторизация"}
+                isErrorStyle
+              />
             </button>
             <p>{likesCount}</p>
             {!!responseToCommentId || (
@@ -92,6 +143,7 @@ const Comment: FC<CommentProps> = ({ comment, responseToCommentId, video }) => {
           </div>
         </div>
       </div>
+
       {!!responseToCommentId || (
         <>
           <div className={styles.responsesWrapper}>
@@ -101,7 +153,7 @@ const Comment: FC<CommentProps> = ({ comment, responseToCommentId, video }) => {
                 extraAction={setIsOpenedForm}
               />
             )}
-            {comment.nextComments.length && (
+            {!!comment.nextComments.length && (
               <>
                 <ShowButton
                   onClick={() =>

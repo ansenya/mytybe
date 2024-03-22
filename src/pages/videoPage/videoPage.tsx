@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import VideoPlayer from "../../components/UI/VideoPlayer/VideoPlayer";
 import VideoScroll from "../../components/videosScroll";
@@ -16,6 +16,19 @@ import CButton from "../../components/UI/CButton/CButton";
 const VideoPage = () => {
   const { id } = useParams();
   const { data, error, isLoading } = useGetVideoByIdQuery(Number(id));
+  const [isSmallScreen, setIsSmallScreen] = useState<boolean>(
+    window.innerWidth < 1025,
+  );
+
+  function handleResize() {
+    setIsSmallScreen(window.innerWidth < 1025);
+  }
+  useEffect(() => {
+    window.addEventListener("resize", handleResize);
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   useEffect(() => {
     if (data) {
@@ -47,15 +60,16 @@ const VideoPage = () => {
                 <span>{data.channel.name}</span>
               </div>
               <div className="playing__actions">
-                <LikeButton video={data}/>
-                <ShareButton/>
+                <LikeButton video={data} />
+                <ShareButton />
               </div>
             </div>
             <VideoDescription video={data} />
-            <CommentSection video={data}/> 
+            {isSmallScreen || <CommentSection video={data} />}
           </div>
           <div className="side__content">
-            <VideoScroll />
+            <VideoScroll isSmallScreen={isSmallScreen} />
+            {isSmallScreen && <CommentSection video={data} />}
           </div>
         </>
       )}

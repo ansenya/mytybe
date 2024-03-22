@@ -30,6 +30,7 @@ export interface VideosRequest {
   sort: "desc" | "asc";
   page: number;
   size: number;
+  channelId?: number;
 }
 
 export interface PaginationResponse<T> {

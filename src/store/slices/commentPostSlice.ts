@@ -4,11 +4,13 @@ import { IComment } from "../../models";
 interface CommentPostState {
   comment: IComment | null; 
   commentToResponseId: number | null;
+  toDelete: boolean;
 }
 
 const initialState: CommentPostState = {
   comment: null,
   commentToResponseId: null,
+  toDelete: false
 };
 
 const CommentPostSlice = createSlice({
@@ -18,6 +20,7 @@ const CommentPostSlice = createSlice({
     setCommentPost(state, payload: PayloadAction<CommentPostState>) {
       state.comment = payload.payload.comment;
       state.commentToResponseId = payload.payload.commentToResponseId;
+      state.toDelete = payload.payload.toDelete;
     }
   },
 });

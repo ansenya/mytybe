@@ -29,7 +29,7 @@ const VideoDescription: FC<VideoDescriptionProps> = ({ video }) => {
       </div>
       <div className={styles.descBlock}>
         <p className={styles.descText}>
-          {!isOpened ? "ещё..." : video.description}
+          {!isOpened ? "показать описание" : video.description}
           {isOpened && (
             <>
               {"\n"}

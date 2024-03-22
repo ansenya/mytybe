@@ -2,7 +2,7 @@
 
 .NotificationBlock {
   position: fixed;
-  bottom: -100px;
+  bottom: -400px;
   left: 0;
   margin: 20px;
   background: white;
@@ -13,6 +13,7 @@
   font-weight: bolder;
   font-size: 1.1rem;
   border-radius: 8px;
+  z-index: 1000;
   &.error{
     color: $error-color;
     border: 2px solid $error-color;

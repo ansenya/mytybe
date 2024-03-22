@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useMemo } from "react";
+import React, { useState, useEffect, useRef, useMemo, FC } from "react";
 import {
   useLazyGetSearchedVideosQuery,
   useLazyGetVideosQuery,
@@ -8,8 +8,14 @@ import Videos from "./Videos";
 import InlineLoader from "./UI/Loader/InlineLoader";
 import { useLocation, useParams } from "react-router-dom";
 import { VideosRequest } from "../models/VideoModels";
+import ShowButton from "./UI/ShowButton/ShowButton";
 
-const VideoScroll = () => {
+interface VideoScrollProps {
+  isSmallScreen?: boolean;
+  channelId?: number;
+}
+
+const VideoScroll: FC<VideoScrollProps> = ({ isSmallScreen, channelId }) => {
   const { id } = useParams();
   const { search } = useLocation();
   const query = useMemo(() => {
@@ -23,7 +29,7 @@ const VideoScroll = () => {
 
   if (query.get("q")) useQuery = useLazyGetSearchedVideosQuery;
   else useQuery = useLazyGetVideosQuery;
-  
+
   let [fetchData, { data, isFetching, error }] = useQuery();
   const [videos, setVideos] = useState<IVideo[]>([]);
 
@@ -33,17 +39,19 @@ const VideoScroll = () => {
       sort: "desc",
       size: 20,
     };
+  
+
+    if (channelId) body.channelId = channelId;
 
     //@ts-expect-error
-    if (query.get("q")) body.searchQuery = query.get("q");
+    if (query.get("q")) body.searchQuery = query.get("q"); 
 
     //@ts-expect-error
     fetchData(body);
   }, [pageNumber]);
 
-  
-
   useEffect(() => {
+    if (isSmallScreen) return;
     if (isFetching || data === undefined) return;
     observer.current?.disconnect();
     observer.current = new IntersectionObserver((entries, observer) => {
@@ -76,15 +84,31 @@ const VideoScroll = () => {
         <span style={{ color: "transparent" }}>penis</span>
       </div>
       {isFetching && <InlineLoader />}
-      <div
-        style={{
-          width: "100%",
-          height: 20,
-          background: "transparent",
-          marginTop: 10,
-        }}
-        ref={divRef}
-      ></div>
+      {isSmallScreen || (
+        <div
+          style={{
+            width: "100%",
+            height: 20,
+            background: "transparent",
+            marginTop: 10,
+          }}
+          ref={divRef}
+        ></div>
+      )}
+      <br/>
+      {isSmallScreen && totalPages - 1 > pageNumber && (
+        <ShowButton
+          isWide
+          onClick={() => {
+            if (totalPages - 1 > pageNumber) {
+              setPageNumber((prevstate) => prevstate + 1);
+            }
+          }}
+          disabled={isFetching || data === undefined}
+        >
+          еще...
+        </ShowButton>
+      )}
     </>
   );
 };

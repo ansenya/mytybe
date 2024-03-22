@@ -20,18 +20,38 @@ const CommentSection: FC<CommentSectionProps> = ({ video, commentId }) => {
   const [pageNumber, setPageNumber] = useState<number>(0);
   const [totalPages, setTotalPages] = useState<number>(999);
   const observer = useRef<IntersectionObserver>();
-  const divRef = useRef(null);
+  const divRef = useRef<HTMLDivElement>(null);
 
   const [comments, setComments] = useState<IComment[]>([]);
-  const { commentToResponseId, comment } = useAppSelector(
+  const { commentToResponseId, comment, toDelete } = useAppSelector(
     (state) => state.comment,
   );
 
   useEffect(() => {
-    if (comment === null) return;
+    if (!comment) return;
+
+    if (commentToResponseId && commentId === undefined) {
+      for (let i = 0; i < comments.length; i++) {
+        if (comments[i].id === commentToResponseId){
+          let newNextComments = [commentToResponseId].concat(comments[i].nextComments);
+          let commentObject: IComment = {
+            ...comments[i],
+            nextComments: newNextComments,
+          };
+          let commentsCopy = comments.filter(com => comments[i].id !== com.id);
+          commentsCopy.splice(i, 0, commentObject);
+          setComments(commentsCopy);
+          return;
+        }
+      }
+    }
 
     if (commentToResponseId && commentToResponseId !== commentId) return;
 
+    if (toDelete) {
+      setComments(comments.filter((com) => comment.id !== com.id));
+      return;
+    }
     setComments([comment, ...comments]);
   }, [comment]);
 
@@ -39,7 +59,7 @@ const CommentSection: FC<CommentSectionProps> = ({ video, commentId }) => {
     const body: CommentRequest = {
       videoId: video.id,
       page: pageNumber,
-      size: 5,
+      size: 10,
       sort: "desc",
     };
     if (commentId !== undefined) body.commentId = commentId;
@@ -52,6 +72,7 @@ const CommentSection: FC<CommentSectionProps> = ({ video, commentId }) => {
     observer.current?.disconnect();
     observer.current = new IntersectionObserver((entries, observer) => {
       if (entries[0].isIntersecting && totalPages - 1 > pageNumber) {
+        console.log(pageNumber, totalPages);
         setPageNumber(pageNumber + 1);
       }
     });
@@ -65,7 +86,13 @@ const CommentSection: FC<CommentSectionProps> = ({ video, commentId }) => {
 
   useEffect(() => {
     if (!isFetching && data !== undefined) {
-      setComments([...comments, ...data.content]);
+      console.log(data.totalPages)
+      setComments([
+        ...comments,
+        ...data.content.filter(
+          (com) => !comments.map((comm) => comm.id).includes(com.id),
+        ),
+      ]);
       setTotalPages(data.totalPages);
     }
   }, [isFetching, data]);

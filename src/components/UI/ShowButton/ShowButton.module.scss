@@ -16,4 +16,8 @@
   &:active {
     background: $bright-plain-color;
   }
+  &.wide{
+    width: 100%;
+    font-size: 17px;
+  }
 }

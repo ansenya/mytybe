@@ -20,9 +20,10 @@ export interface IChannel {
   id: number;
   name: string;
   videosAmount: number;
-  followersAmount: number;
   deleted: boolean;
   chp: string;
+  user: IUser;
+  followersAmount: number;
 }
 
 export interface IVideo {
@@ -48,14 +49,14 @@ export interface IVideo {
 }
 
 export interface IComment {
-  id: number
-  text: string
-  deleted: boolean
-  created: string
-  updated: string
-  nextComments: IComment[]
-  user: IUser
-  channel: IChannel
-  likesAmount: number,
-  likedByThisUser?: boolean,
+  id: number;
+  text: string;
+  deleted: boolean;
+  created: string;
+  updated: string;
+  nextComments: number[];
+  user: IUser;
+  channel: IChannel;
+  likes: number;
+  likedByThisUser: boolean;
 }
