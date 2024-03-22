@@ -86,7 +86,6 @@ const CommentSection: FC<CommentSectionProps> = ({ video, commentId }) => {
 
   useEffect(() => {
     if (!isFetching && data !== undefined) {
-      console.log(data.totalPages)
       setComments([
         ...comments,
         ...data.content.filter(

@@ -132,6 +132,7 @@ const NavbarMainContent: FC<MainContentProps> = ({
             <CButton
               buttonType="primary"
               onClick={() => navigate("/login", { state: { from: location } })}
+              style={{ padding: 0 }}
             >
               Sign in
             </CButton>
@@ -140,6 +141,7 @@ const NavbarMainContent: FC<MainContentProps> = ({
               onClick={() =>
                 navigate("/register", { state: { from: location } })
               }
+              style={{ padding: 0 }}
             >
               Sign up
             </CButton>

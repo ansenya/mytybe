@@ -10,6 +10,7 @@ import NotificationElement from "../Notification/Notification";
 import InlineLoader from "../Loader/InlineLoader";
 import { useActions } from "../../../hooks/actions";
 import { IComment } from "../../../models";
+import pfp from "../../../assets/def.png";
 
 interface CommentArea {
   commentId?: number;
@@ -110,7 +111,7 @@ const CommentArea: FC<CommentArea> = ({ commentId, videoId, extraAction }) => {
         <>
           <div className={styles.firstLine}>
             <img
-              src={user?.pfp}
+              src={user?.pfp || pfp}
               className={!!commentId ? styles.smaller : ""}
               draggable={false}
             />

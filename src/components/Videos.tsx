@@ -5,9 +5,10 @@ import VideoCard from "./UI/VideoCard";
 interface VideosProps {
   categoryName: string;
   videos: IVideo[];
+  isEditable: boolean;
 }
 
-const Videos = ({ videos, categoryName }: VideosProps) => {
+const Videos = ({ videos, categoryName, isEditable }: VideosProps) => {
 
   return (
     <div className="content__block">
@@ -18,6 +19,7 @@ const Videos = ({ videos, categoryName }: VideosProps) => {
           thumbnail={video.thumbnail}
           name={video.name}
           channel={video.channel}
+          canDelete={isEditable}
         />
       ))}
     </div>

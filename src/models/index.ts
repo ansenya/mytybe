@@ -24,6 +24,8 @@ export interface IChannel {
   chp: string;
   user: IUser;
   followersAmount: number;
+  followedByThisUser?: boolean;
+  bbc?: string;
 }
 
 export interface IVideo {

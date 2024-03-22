@@ -213,7 +213,6 @@ export const serverApi = createApi({
         },
       }),
     }),
-
     getChannelById: build.query<IChannel, number>({
       query: (id) => {
         const token = localStorage.getItem("jwtoken");
@@ -223,6 +222,16 @@ export const serverApi = createApi({
           headers,
         };
       },
+    }),
+
+    deleteVideoById: build.mutation({
+      query: (id: number) => ({
+        url: `videos/${id}`,
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("jwtoken")}`,
+        },
+      }),
     }),
   }),
 });
@@ -248,4 +257,5 @@ export const {
   useLikeCommentMutation,
   useGetChannelByIdQuery,
   useFollowMutation,
+  useDeleteVideoByIdMutation,
 } = serverApi;

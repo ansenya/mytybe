@@ -13,8 +13,8 @@ interface paWindowProps{
 
 const PaWindow: FC<paWindowProps> = ({isActive, user}) => {
   return <div onClick={(e) => e.stopPropagation()} className={[styles.paWindow, isActive ? styles.active : ""].join(' ')}>
-    <NavButton to={`/user/${user.id}`} icon={profileIcon}>Profile</NavButton>
-    <NavButton to={'/logout'} icon={logoutIcon}>Logout</NavButton>
+    <NavButton to={`/user/${user.id}`} icon={profileIcon}>Профиль</NavButton>
+    <NavButton to={'/logout'} icon={logoutIcon}>Выйти</NavButton>
   </div>;
 }
 

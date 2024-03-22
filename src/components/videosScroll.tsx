@@ -13,9 +13,10 @@ import ShowButton from "./UI/ShowButton/ShowButton";
 interface VideoScrollProps {
   isSmallScreen?: boolean;
   channelId?: number;
+  isEditable?: boolean;
 }
 
-const VideoScroll: FC<VideoScrollProps> = ({ isSmallScreen, channelId }) => {
+const VideoScroll: FC<VideoScrollProps> = ({ isSmallScreen, channelId, isEditable }) => {
   const { id } = useParams();
   const { search } = useLocation();
   const query = useMemo(() => {
@@ -80,6 +81,7 @@ const VideoScroll: FC<VideoScrollProps> = ({ isSmallScreen, channelId }) => {
         <Videos
           videos={videos.filter((video: IVideo) => video.id !== Number(id))}
           categoryName="fuck"
+          isEditable={isEditable || false}
         />
         <span style={{ color: "transparent" }}>penis</span>
       </div>
