@@ -8,8 +8,8 @@ import UserPage from "./pages/userPage";
 import VideoPage from "./pages/videoPage/videoPage";
 import ChannelPage from "./pages/channelPage";
 import ErrorPage from "./pages/errorPage";
-import RegistrationPage from "./pages/registrationPage";
-import LoginPage from "./pages/loginPage";
+import RegistrationPage from "./pages/registrationPage/registrationPage";
+import LoginPage from "./pages/loginPage/loginPage";
 import RequireAuth from "./hoc/RequireAuth";
 import Logout from "./pages/logout";
 import UploadPage from "./pages/uploadPage/uploadPage"

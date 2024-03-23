@@ -28,11 +28,11 @@ const ChannelView: FC<ChannelViewProps> = ({ channel }) => {
   const followersWord = useMemo(() => {
     if (
       (followersAmount > 10 && followersAmount < 20) ||
-      [2, 3, 4].includes(followersAmount % 10)
+      [5, 6, 7, 8, 9, 0].includes(followersAmount % 10)
     )
-      return "подписчика";
+      return "подписчиков";
     if (followersAmount % 10 === 1) return "подписчик";
-    else return "подписчиков";
+    else return "подписчика";
   }, [followersAmount]);
 
   const { user } = useAppSelector((state) => state.auth);

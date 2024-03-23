@@ -308,3 +308,16 @@ body {
   width: 70%;
   margin: auto;
 }
+
+.login__content {
+  width: 65%;
+  margin: auto;
+  justify-content: center;
+  align-items: center;
+  .form{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 40px;
+  }
+}

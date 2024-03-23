@@ -4,49 +4,56 @@ import React, {
   useId,
   useState,
   forwardRef,
-  Ref
+  Ref,
+  useEffect,
 } from "react";
 import IconButton from "../IconButton/IconButton";
 import styles from "./FormField.module.scss";
 import eyeIcon from "../../../assets/eye-svgrepo-com.svg";
 import eyeSlashIcon from "../../../assets/eye-slash-svgrepo-com.svg";
+import warning from "../../../assets/warning-1-svgrepo-com.svg";
 
 interface FormFieldAdd {
-  isPassword: boolean;
-  fieldName: string;
+  isPassword?: boolean;
+  customPlaceholder: string;
+  error?: string;
 }
 
 type FormFieldProps = FormFieldAdd & InputHTMLAttributes<HTMLInputElement>;
 const FormField: FC<FormFieldProps> = forwardRef(
-  ({ fieldName, isPassword, ...props }, ref: Ref<HTMLInputElement>) => {
-    const [focused, setFocused] = useState<boolean>(false);
+  (
+    { isPassword, customPlaceholder, error, ...props },
+    ref: Ref<HTMLInputElement>,
+  ) => {
     const [isHidden, setIsHidden] = useState<boolean>(true);
-    const inputId = useId();
 
     const toCamelCase = (word: string) => word[0].toUpperCase() + word.slice(1);
 
     return (
-      <div className={styles.formField}>
-        <label htmlFor={inputId}>{toCamelCase(fieldName)}</label>
-        <div
-          className={[styles.formInput, focused ? styles.active : ""].join(" ")}
-        >
+      <div className={styles.wrapper}>
+        <div className={styles.formField}>
           <input
+            autoComplete={isHidden ? "current-password" : "off"}
             {...props}
-            ref={ref}
-            type={isHidden && isPassword ? "password" : "text"}
-            placeholder={`Enter ${toCamelCase(fieldName)}`}
-            id={inputId}
+            className={error ? styles.error : ""}
+            type={isPassword && isHidden ? "password" : "text"}
+            placeholder=""
+            spellCheck={false}
           />
-          {isPassword && (
-            <img
-              style={{ maxHeight: 20 }}
-              alt="h"
-              src={isHidden ? eyeSlashIcon : eyeIcon}
-              onClick={() => setIsHidden(!isHidden)}
-            />
-          )}
+          <div className={styles.label}>{customPlaceholder}</div>
         </div>
+        {!!error && (
+          <div className={styles.errorMessage}>
+            <img src={warning} draggable={false} />
+            <span>{error}</span>
+          </div>
+        )}
+        {isPassword && (
+          <div className={styles.showPass}>
+            <input type="checkbox" onChange={(e) => setIsHidden(prevstate => !prevstate)} />
+            <span>Показать пароль</span>
+          </div>
+        )}
       </div>
     );
   },

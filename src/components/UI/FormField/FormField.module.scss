@@ -1,50 +1,123 @@
 @import "../../../variables";
 
-.formField {
+.wrapper {
   display: flex;
   width: 100%;
   flex-direction: column;
-  justify-content: space-between;
-  align-items: start;
+  padding: 0 10px;
 
-  label {
-    font-size: 20px;
-    font-weight: bolder;
-    color: $text-color;
-    margin-bottom: 6px;
-  }
-
-  .active {
-    box-shadow: 0 0 6px $primary-color;
-  }
-  .formInput {
-    min-height: 33px;
-    width: 100%;
-    background: $secondary-color;
+  .showPass{
+    margin: 12px;
     display: flex;
-    padding: 0 0 0 4px;
-    border: $primary-color 3px solid;
-    border-radius: 10px;
     align-items: center;
+    gap: 20px;
 
-    input {
-      background: transparent;
-      color: $primary-color;
-      margin-right: 10px;
-      height: 100%;
-      width: 100%;
-      flex: 1;
-      border: none;
-      outline: none;
-      font-size: 20px;
-      font-weight: normal;
-      &::placeholder {
-        color: $primary-color;
-        opacity: 0.5;
+    span {
+      cursor: pointer;
+      color: gray;
+      font-weight: bolder;
+      font-size: 14px;
+      line-height: 14px;
+      &:hover{
+        text-decoration: underline;
       }
     }
-    img{
-      margin-right: 6px;
+    input[type="checkbox"]{
+      appearance: none;
+      -webkit-appearance: none;
+      border: 2px solid gray;
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+    }
+  }
+
+  .errorMessage {
+    margin: 8px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    span {
+      color: $error-color;
+      font-family: inherit;
+      font-size: 15px;
+      line-height: 15px;
+    }
+    img {
+      height: 15px;
+      width: 15px;
+    }
+  }
+
+  .formField {
+    width: 100%;
+    position: relative;
+    min-width: 100px;
+    overflow: hidden;
+
+    input {
+      &:-webkit-autofill,
+      &:-webkit-autofill:hover,
+      &:-webkit-autofill:active,
+      &:-webkit-autofill:focus {
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: white !important;
+      }
+      &[type="password"] {
+        letter-spacing: 1px;
+      }
+
+      font-family: inherit;
+      width: 100%;
+      box-sizing: border-box;
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      outline: none;
+      font-size: 16px;
+      line-height: 20px;
+      background: transparent;
+      border-radius: 4px;
+      color: $text-color;
+      padding: 11px 15px;
+      border: 1px solid gray;
+      transition:
+        padding 0.1s ease,
+        border 0.1 ms;
+      z-index: 5;
+      &.error {
+        border: 1px solid $error-color;
+      }
+      &:focus,
+      &:not(:placeholder-shown) {
+        border: 3px solid $primary-color;
+        padding: 9px 15px;
+        &.error {
+          border: 3px solid $error-color;
+          & + .label {
+            color: $error-color;
+          }
+        }
+        & + .label {
+          color: $primary-color;
+          transform: translate(-7px, -53px) scale(0.88);
+          z-index: 6;
+        }
+      }
+    }
+    .label {
+      position: absolute;
+      font-size: 16px;
+      color: gray;
+      padding: 0 8px;
+      margin-left: 10px;
+      transform: translateY(-31px);
+      background-color: $background-color;
+      transition: 0.2s ease;
+      pointer-events: none;
+      user-select: none;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
     }
   }
 }

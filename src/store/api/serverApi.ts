@@ -9,7 +9,7 @@ import {
   CommentRequest,
   PostCommentRequest,
 } from "../../models/VideoModels";
-import { RegisterArgs } from "../../pages/registrationPage";
+import { RegisterArgs } from "../../pages/registrationPage/registrationPage";
 
 export const serverApi = createApi({
   reducerPath: "server",
@@ -237,7 +237,7 @@ export const serverApi = createApi({
 });
 
 export const {
-  useLoginQuery,
+  useLazyLoginQuery,
   useGetAuthQuery,
   useGetUsersQuery,
   useGetUserByIdQuery,
