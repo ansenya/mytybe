@@ -41,7 +41,7 @@ const NavbarMainContent: FC<MainContentProps> = ({
   const { isFocused, focusTargetId } = useAppSelector((state) => state.focus);
   const [isProfile, setIsProfile] = useState<boolean>(false);
   const [query, setQuery] = useState("");
-  const debouncedQuery = useDebounce(query, 100);
+  const debouncedQuery = useDebounce(query, 200);
   const [fetchSearch, { data, isLoading, error }] =
     useLazyGetSearchedVideosQuery();
   const location = useLocation();

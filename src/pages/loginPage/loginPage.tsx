@@ -4,8 +4,10 @@ import { useLazyLoginQuery } from "../../store/api/serverApi";
 import { useActions } from "../../hooks/actions";
 import CButton from "../../components/UI/CButton/CButton";
 import FormField from "../../components/UI/FormField/FormField";
-import { useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { AuthCredentials } from "../../models/AuthModels";
+import styles from "./loginPage.module.scss";
+import InlineLoader from "../../components/UI/Loader/InlineLoader";
 
 const LoginPage = () => {
   const location = useLocation();
@@ -14,7 +16,7 @@ const LoginPage = () => {
 
   const { setToken, setUser, setIsError, setIsLoaded } = useActions();
 
-  const [login, { isLoading, data, isError }] = useLazyLoginQuery();
+  const [login, { isFetching, data, isError, error }] = useLazyLoginQuery();
 
   const {
     register,
@@ -23,7 +25,7 @@ const LoginPage = () => {
   } = useForm<AuthCredentials>();
 
   useEffect(() => {
-    if (!isLoading && data !== undefined) {
+    if (!isFetching && data !== undefined) {
       setToken(data[1]);
       setIsLoaded(true);
       setIsError(false);
@@ -33,25 +35,45 @@ const LoginPage = () => {
     if (isError) {
       setIsError(true);
     }
-  }, [isLoading]);
+  }, [isFetching]);
+
+  const submit: SubmitHandler<AuthCredentials> = (data) => {
+    login(data);
+  };
 
   return (
-    <div className="login__content">
-      <div className="form">
-        <h1 className="form__name">Sign in to Spot</h1>
+    <div className={styles.login}>
+      <form onSubmit={handleSubmit(submit)}>
+        <h1 className={styles.formName}>Вход</h1>
         <FormField
-          {...register("username")}
+          register={register}
+          name="username"
+          options={{
+            required: "Поле обязательно к заполнению",
+          }}
           customPlaceholder={"Имя пользователя"}
           error={errors.username?.message}
           autoComplete={"username"}
         />
         <FormField
-          {...register("password")}
+          register={register}
+          name="password"
+          options={{
+            required: "Поле обязательно к заполнению",
+          }}
           isPassword
           customPlaceholder={"Введите пароль"}
           error={errors.password?.message}
         />
-      </div>
+
+        {isError && (
+          <h3 className={styles.formError}>
+            Неправильный логин или пароль
+          </h3>
+        )}
+        {isFetching ? <InlineLoader /> : <button type="submit">Войти</button>}
+      </form>
+      <div></div>
     </div>
   );
 };

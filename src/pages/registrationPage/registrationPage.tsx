@@ -34,36 +34,6 @@ const RegistrationPage = () => {
       <form onSubmit={handleSubmit(submit)} className="form">
         <h1 className="form__name">Create an account</h1>
 
-        <FormField
-          customPlaceholder="fuck"
-          isPassword={false}
-          {...register("username", {
-            required: true,
-          })}
-        />
-
-        <FormField
-          customPlaceholder="fuck"
-          isPassword={true}
-
-          {...register("password", {
-            required: true,
-            validate: (value: string) => value.length >= 7
-          })}
-        />
-
-        <FormField
-
-          customPlaceholder="fuck"
-          isPassword={false}
-          {...register("name")}
-        />
-
-        <FormField
-          customPlaceholder="fuck"
-          isPassword={false}
-          {...register("surname")}
-        />
 
         <CButton style={{ width: "100%" }} buttonType="primary" type="submit" disabled={isLoading}>
           Sign up

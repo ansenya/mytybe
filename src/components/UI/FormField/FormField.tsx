@@ -12,27 +12,35 @@ import styles from "./FormField.module.scss";
 import eyeIcon from "../../../assets/eye-svgrepo-com.svg";
 import eyeSlashIcon from "../../../assets/eye-slash-svgrepo-com.svg";
 import warning from "../../../assets/warning-1-svgrepo-com.svg";
+import { UseFormRegister } from "react-hook-form";
 
 interface FormFieldAdd {
   isPassword?: boolean;
   customPlaceholder: string;
   error?: string;
+  register: UseFormRegister<any>;
+  options: Object;
+  name: string;
 }
 
 type FormFieldProps = FormFieldAdd & InputHTMLAttributes<HTMLInputElement>;
 const FormField: FC<FormFieldProps> = forwardRef(
   (
-    { isPassword, customPlaceholder, error, ...props },
+    { isPassword, customPlaceholder, error, register, options, name, ...props },
     ref: Ref<HTMLInputElement>,
   ) => {
     const [isHidden, setIsHidden] = useState<boolean>(true);
 
     const toCamelCase = (word: string) => word[0].toUpperCase() + word.slice(1);
 
+    const checkboxId = useId();
+    
+
     return (
       <div className={styles.wrapper}>
         <div className={styles.formField}>
           <input
+            {...register(name, options)}
             autoComplete={isHidden ? "current-password" : "off"}
             {...props}
             className={error ? styles.error : ""}
@@ -50,8 +58,12 @@ const FormField: FC<FormFieldProps> = forwardRef(
         )}
         {isPassword && (
           <div className={styles.showPass}>
-            <input type="checkbox" onChange={(e) => setIsHidden(prevstate => !prevstate)} />
-            <span>Показать пароль</span>
+            <input
+              id={checkboxId}
+              type="checkbox"
+              onChange={(e) => setIsHidden((prevstate) => !prevstate)}
+            />
+            <label htmlFor={checkboxId}>Показать пароль</label>
           </div>
         )}
       </div>
