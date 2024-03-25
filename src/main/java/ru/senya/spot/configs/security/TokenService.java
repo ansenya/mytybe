@@ -22,15 +22,29 @@ public class TokenService {
     public String generateToken(Authentication authentication) {
         Instant now = Instant.now();
         Instant expiryTime = now.plus(180, ChronoUnit.DAYS);
-        String scope = authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(" "));
+        String scope = "USER";
 
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer("self")
                 .issuedAt(now)
                 .expiresAt(expiryTime)
                 .subject(authentication.getName())
+                .claim("scope", scope)
+                .build();
+
+        return this.encoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
+    }
+
+    public String generateToken(String username) {
+        Instant now = Instant.now();
+        Instant expiryTime = now.plus(180, ChronoUnit.DAYS);
+        String scope = "USER";
+
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .issuer("self")
+                .issuedAt(now)
+                .expiresAt(expiryTime)
+                .subject(username)
                 .claim("scope", scope)
                 .build();
 

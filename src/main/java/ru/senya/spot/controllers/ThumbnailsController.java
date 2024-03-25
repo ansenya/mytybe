@@ -1,15 +1,19 @@
 package ru.senya.spot.controllers;
 
 import org.modelmapper.ModelMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import ru.senya.spot.controllers.video.StorageApiUtils;
 import ru.senya.spot.models.dto.VideoDto;
 import ru.senya.spot.models.jpa.ImageModel;
 import ru.senya.spot.repos.jpa.ImagesRepository;
 import ru.senya.spot.repos.jpa.UserRepository;
 import ru.senya.spot.services.VideoService;
+
+import java.util.Objects;
 
 
 @RestController
@@ -19,35 +23,36 @@ public class ThumbnailsController {
     final VideoService videoService;
     final UserRepository userRepository;
     final ImagesRepository imagesRepository;
+    private final StorageApiUtils storageApiUtils;
     final ModelMapper modelMapper = new ModelMapper();
 
-    public ThumbnailsController(VideoService videoService, UserRepository userRepository, ImagesRepository imagesRepository) {
+    @Autowired
+    public ThumbnailsController(VideoService videoService, UserRepository userRepository, ImagesRepository imagesRepository, StorageApiUtils storageApiUtils) {
         this.videoService = videoService;
         this.userRepository = userRepository;
         this.imagesRepository = imagesRepository;
+        this.storageApiUtils = storageApiUtils;
     }
 
-//    @PutMapping("{id}/th")
-//    public ResponseEntity<?> th(@PathVariable Long id,
-//                                @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
-//                                Authentication authentication) {
-//        var user = userRepository.findByUsername(authentication.getName());
-//        var video = videoService.findById(id);
-//
-//        if (imageFile.isEmpty()) {
-//            return ResponseEntity.badRequest().body("imageFile is null");
-//        }
-//
-//        if (video != null && video.getChannel().getUser().equals(user)) {
-//            sendToStorage(video.getPath(), Objects.requireNonNull(imageFile.getContentType()).split("/")[1], "img", imageFile);
-//        }
-//
-//        video.setThumbnail(ImageModel.builder()
-//                .type("th")
-//                .path(video.getPath() + "." + Objects.requireNonNull(imageFile.getContentType()).split("/")[1])
-//                .build());
-//
-//        video = videoService.save(video);
-//        return ResponseEntity.ok(modelMapper.map(video, VideoDto.class));
-//    }
+    @PutMapping("{id}/th")
+    public ResponseEntity<?> th(@PathVariable Long id,
+                                @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
+                                Authentication authentication) {
+        var user = userRepository.findByUsername(authentication.getName());
+        var video = videoService.findById(id);
+
+        if (imageFile.isEmpty()) {
+            return ResponseEntity.badRequest().body("imageFile is null");
+        }
+
+        if (video != null && video.getChannel().getUser().equals(user)) {
+            storageApiUtils.sendToStorage(video.getPath(), "png", "img", imageFile);
+            video.getThumbnail().setPath(video.getPath() + ".png");
+        } else {
+            return ResponseEntity.status(404).build();
+        }
+
+        video = videoService.save(video);
+        return ResponseEntity.ok(modelMapper.map(video, VideoDto.class));
+    }
 }

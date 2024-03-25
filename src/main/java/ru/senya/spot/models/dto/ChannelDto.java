@@ -13,10 +13,12 @@ public class ChannelDto {
     private String name;
 
     private Integer videosAmount;
+    private boolean followedByThisUser;
 
     private boolean deleted = false;
 
     private ImageDto chp;
+    private ImageDto bigBlackCock;
     private Set<UserModel> followers = new HashSet<>();
 
 //    private Set<VideoModel> videos = new HashSet<>();
@@ -27,6 +29,9 @@ public class ChannelDto {
 
     public String getChp() {
         return chp.getFalsePath();
+    }
+    public String getBigBlackCock() {
+        return bigBlackCock.getFalsePath();
     }
 
     private String getFollowers() {

@@ -20,9 +20,10 @@ import java.net.URL;
 @EnableElasticsearchRepositories(basePackages = "ru.senya.spot.repos.es")
 public class MytybeApplication {
 
-    public static String MAIN_IP="video-spot.ru";
+    public static String MAIN_IP = "video-spot.ru";
     public static String MAIN_PORT = "1984";
-    public static String STORAGE_HOST="video-spot.ru/storage";
+    public static String STORAGE_HOST = "video-spot.ru/storage";
+//    public static String STORAGE_HOST = "192.168.1.3:1986/storage";
 
     public static void main(String[] args) {
         SpringApplication.run(MytybeApplication.class, args);

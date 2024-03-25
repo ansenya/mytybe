@@ -14,20 +14,22 @@ public class ChannelDtoWithoutUser {
     private Integer videosAmount;
 
     private boolean deleted = false;
+    private boolean followedByThisUser;
+    private ImageDto bigBlackCock;
+
 
     private ImageDto chp;
-
-//    private Set<VideoModel> videos = new HashSet<>();
-
-//    private Set<PostModel> posts = new HashSet<>();
-
-//    private UserDtoWithoutChannels user;
 
     private Set<UserModel> followers;
 
     public String getChp() {
         return chp.getFalsePath();
     }
+
+    public String getBigBlackCock() {
+        return bigBlackCock.getFalsePath();
+    }
+
 
     private String getFollowers() {
         return "";

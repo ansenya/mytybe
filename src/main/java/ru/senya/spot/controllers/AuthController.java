@@ -15,6 +15,7 @@ import ru.senya.spot.models.jpa.UserRequest;
 import ru.senya.spot.repos.jpa.ImagesRepository;
 import ru.senya.spot.repos.jpa.UserRepository;
 
+import java.util.HashSet;
 import java.util.UUID;
 
 
@@ -65,7 +66,8 @@ public class AuthController {
 
         imagesRepository.save(pfp);
 
-        return ResponseEntity.ok(modelMapper.map(user, UserDto.class));
+        return ResponseEntity.ok().body(new Object[]{modelMapper.map(user, UserDto.class),
+                new TokenModel(tokenService.generateToken(user.getUsername()))});
     }
 
     private ResponseEntity<?> validateUserRequest(UserRequest userRequest) {
@@ -91,5 +93,6 @@ public class AuthController {
         user.setSex(userRequest.getSex());
         user.setPfp(pfp);
         user.setPublicStreamLink(String.valueOf(UUID.randomUUID()));
+        user.setLastViewed(new HashSet<>());
     }
 }

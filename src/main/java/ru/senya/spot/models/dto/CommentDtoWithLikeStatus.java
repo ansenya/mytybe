@@ -1,6 +1,8 @@
 package ru.senya.spot.models.dto;
 
+import jakarta.persistence.ManyToMany;
 import lombok.Data;
+import ru.senya.spot.models.jpa.UserModel;
 
 import java.util.*;
 
@@ -25,11 +27,29 @@ public class CommentDtoWithLikeStatus {
 
     private boolean dislikedByThisUser;
 
-    public List<CommentDto> getNextComments() {
+    private List<UserDtoWithoutChannels> likedByUser;
+
+    private List<UserDtoWithoutChannels> dislikedByUser;
+
+    private List<UserDtoWithoutChannels> getLikedByUser() {
+        return null;
+    }
+
+    private List<UserDtoWithoutChannels> getDislikedByUser() {
+        return null;
+    }
+
+    public int getLikes() {
+        return likedByUser.size();
+    }
+
+    public int getDislikes() {
+        return dislikedByUser.size();
+    }
+
+    public List<Long> getNextComments() {
         try {
-            List<CommentDto> commentDtoList = new ArrayList<>(nextComments.stream().toList());
-            commentDtoList.sort(Comparator.comparing(CommentDto::getId));
-            return commentDtoList;
+            return nextComments.stream().sorted(Comparator.comparing(CommentDto::getId)).map(CommentDto::getId).toList();
         } catch (NullPointerException e) {
             return new ArrayList<>();
         }

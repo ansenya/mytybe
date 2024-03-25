@@ -9,7 +9,7 @@ services:
     volumes:
       - ./templates:/etc/nginx/templates
     ports:
-      - "80:80"
+      - "443:443"
     environment:
       - NGINX_HOST=video-spot.ru
       - NGINX_PORT=80
@@ -46,6 +46,8 @@ services:
     volumes:
       - vids_data:/app/vids
       - imgs_data:/app/imgs
+    ports:
+      - "1986:1986"
     mem_limit: 2GB
 
   db:
@@ -59,6 +61,8 @@ services:
       MYSQL_PASSWORD: Fsi01?$4
       MYSQL_DATABASE: spot
       MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    ports:
+      - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
 

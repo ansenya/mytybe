@@ -48,6 +48,10 @@ public class ImageModel {
     @JsonIgnore
     private ChannelModel channel;
 
+    @OneToOne(mappedBy = "bigBlackCock")
+    @JsonIgnore
+    private ChannelModel bigBlackChannel;
+
     @OneToOne(mappedBy = "thumbnail")
     @JsonIgnore
     private VideoModel video;

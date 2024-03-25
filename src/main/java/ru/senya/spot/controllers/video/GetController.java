@@ -68,8 +68,6 @@ public class GetController {
     @GetMapping("{id}")
     public ResponseEntity<?> getOne(@PathVariable Long id,
                                     Authentication authentication) {
-        System.out.println("penis");
-
         var video = videoService.findById(id);
         if (video == null) {
             return ResponseEntity.notFound().build();
@@ -85,13 +83,12 @@ public class GetController {
         VideoDto videoDto = modelMapper.map(video, VideoDto.class);
 
         if (authentication != null) {
-            System.out.println("user != null");
-            System.out.println(authentication.getName());
             var user = userRepository.findByUsername(authentication.getName());
             user.getLastViewed().add(video);
             userRepository.save(user);
             videoDto.setLikedByThisUser(video.getLikedByUser().contains(user));
             videoDto.setDislikedByThisUser(video.getDislikedByUser().contains(user));
+            videoDto.getChannel().setFollowedByThisUser(video.getChannel().getFollowers().contains(user));
         } else {
             System.out.println("user == null");
         }

@@ -7,11 +7,12 @@ import org.springframework.stereotype.Repository;
 import ru.senya.spot.models.jpa.CommentModel;
 import ru.senya.spot.models.jpa.VideoModel;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface CommentRepository extends JpaRepository<CommentModel, Long> {
 
-    Page<CommentModel> findAllByVideoAndDeletedFalse(Pageable pageable, VideoModel videoModel);
+    List<CommentModel> findAllByVideoIdAndDeletedFalse(Long videoId);
     Optional<CommentModel> findByIdAndDeletedFalse(Long id);
 }

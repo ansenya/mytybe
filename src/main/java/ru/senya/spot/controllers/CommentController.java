@@ -2,17 +2,16 @@ package ru.senya.spot.controllers;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.parameters.P;
 import org.springframework.web.bind.annotation.*;
 import ru.senya.spot.models.dto.CommentDto;
 import ru.senya.spot.models.dto.CommentDtoWithLikeStatus;
-import ru.senya.spot.models.jpa.ChannelModel;
+import ru.senya.spot.models.dto.VideoDto;
 import ru.senya.spot.models.jpa.CommentModel;
 import ru.senya.spot.models.jpa.UserModel;
 import ru.senya.spot.models.jpa.VideoModel;
@@ -21,7 +20,7 @@ import ru.senya.spot.repos.jpa.CommentRepository;
 import ru.senya.spot.repos.jpa.UserRepository;
 import ru.senya.spot.repos.jpa.VideoRepository;
 
-import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 
@@ -47,16 +46,15 @@ public class CommentController {
 
 
     @GetMapping
-    public ResponseEntity<?> getAll(@RequestParam(value = "page", required = false) Integer pageNum,
+    public ResponseEntity<?> getAll(Authentication authentication,
+                                    @RequestParam(value = "page", required = false) Integer pageNum,
                                     @RequestParam(value = "size", required = false, defaultValue = "10") int pageSize,
                                     @RequestParam(value = "sort", required = false, defaultValue = "asc") String sort,
                                     @RequestParam(value = "videoId", required = false, defaultValue = "-1") Long videoId,
                                     @RequestParam(value = "commentId", required = false) Long commentID) {
-
         if (pageNum == null) {
             return ResponseEntity.badRequest().body("page is null");
         }
-
         Sort.Direction direction;
 
         if (Objects.equals(sort, "desc")) {
@@ -70,26 +68,63 @@ public class CommentController {
             if (!videoRepository.existsById(videoId)) {
                 return ResponseEntity.status(404).build();
             }
-            Page<CommentModel> commentPage = commentRepository.findAllByVideoAndDeletedFalse(page, videoRepository.getReferenceById(videoId));
-            Page<CommentDto> commentDtoPage = commentPage.map(commentModel -> modelMapper.map(commentModel, CommentDto.class));
-            return ResponseEntity.ok(commentDtoPage);
+            var comments = commentRepository.findAllByVideoIdAndDeletedFalse(videoId);
+            List<?> commentsDto;
+            if (authentication != null) {
+                commentsDto = comments.stream().map(
+                        comment -> {
+                            var dto = modelMapper.map(comment, CommentDtoWithLikeStatus.class);
+                            dto.setLikedByThisUser(comment.getLikedByUser().contains(userRepository.findByUsername(authentication.getName())));
+                            dto.setDislikedByThisUser(comment.getDislikedByUser().contains(userRepository.findByUsername(authentication.getName())));
+                            return dto;
+                        }
+                ).toList();
+            } else {
+                commentsDto = comments.stream().map(
+                        comment -> {
+                            var dto = modelMapper.map(comment, CommentDtoWithLikeStatus.class);
+                            return dto;
+                        }
+                ).toList();
+            }
+            int size = commentsDto.size();
+
+            int fromIndex = (int) page.getOffset();
+            int toIndex = Math.min((fromIndex + page.getPageSize()), commentsDto.size());
+
+            return ResponseEntity.ok(new PageImpl<>(commentsDto.subList(fromIndex, toIndex), page, size));
         } else {
             if (!commentRepository.existsById(commentID)) {
                 return ResponseEntity.status(404).body("comment does not exist");
             }
+            List<CommentDtoWithLikeStatus> comments;
+            if (authentication != null) {
+                comments =
+                        commentRepository
+                                .findByIdAndDeletedFalse(commentRepository.getReferenceById(commentID).getId()).get()
+                                .getNextComments()
+                                .stream()
+                                .map(comment -> {
+                                    var dto = modelMapper.map(comment, CommentDtoWithLikeStatus.class);
+                                    dto.setLikedByThisUser(comment.getLikedByUser().contains(userRepository.findByUsername(authentication.getName())));
+                                    dto.setDislikedByThisUser(comment.getDislikedByUser().contains(userRepository.findByUsername(authentication.getName())));
+                                    return dto;
+                                }).toList();
+            } else {
+                comments =
+                        commentRepository
+                                .findByIdAndDeletedFalse(commentRepository.getReferenceById(commentID).getId()).get()
+                                .getNextComments()
+                                .stream()
+                                .map(comment -> modelMapper.map(comment, CommentDtoWithLikeStatus.class)).toList();
+            }
 
-            List<CommentDto> comments =
-                    commentRepository
-                            .findByIdAndDeletedFalse(
-                                    commentRepository.getReferenceById(commentID).getId()).get()
-                            .getNextComments()
-                            .stream()
-                            .map(commentModel -> modelMapper.map(commentModel, CommentDto.class)).toList();
+            int size = comments.size();
 
             int fromIndex = (int) page.getOffset();
             int toIndex = Math.min((fromIndex + page.getPageSize()), comments.size());
 
-            return ResponseEntity.ok(new PageImpl<>(comments.subList(fromIndex, toIndex), page, comments.size()));
+            return ResponseEntity.ok(new PageImpl<>(comments.subList(fromIndex, toIndex), page, size));
         }
     }
 
@@ -207,34 +242,38 @@ public class CommentController {
         if (text == null || text.isBlank()) {
             return ResponseEntity.badRequest().body("text is required");
         }
-
         if (videoId == null && commentId == null) {
             return ResponseEntity.badRequest().body("either videoId or commentId is required");
         }
-
         UserModel userModel = userRepository.findByUsername(authentication.getName());
-
         if (videoId != null) {
             VideoModel videoModel = videoRepository.findById(videoId).orElse(null);
-
             if (videoModel == null) {
                 return ResponseEntity.badRequest().body("video is null");
             }
-
-
-            CommentModel commentModel = CommentModel.builder()
+            CommentModel comment = CommentModel.builder()
                     .video(videoModel)
                     .user(userModel)
+                    .likedByUser(new HashSet<>())
+                    .dislikedByUser(new HashSet<>())
                     .text(text)
                     .build();
 
+            try {
+                comment = commentRepository.save(comment);
+            } catch (DataIntegrityViolationException exception) {
+                return ResponseEntity.status(400).body("text too long");
+            }
 
-            videoModel.getComments().add(commentModel);
+            videoModel.getComments().add(comment);
 
             videoRepository.save(videoModel);
-            commentModel = commentRepository.save(commentModel);
 
-            return ResponseEntity.ok(modelMapper.map(commentModel, CommentDto.class));
+            var commentDto = modelMapper.map(comment, CommentDtoWithLikeStatus.class);
+            commentDto.setLikedByThisUser(comment.getLikedByUser().contains(userRepository.findByUsername(authentication.getName())));
+            commentDto.setDislikedByThisUser(comment.getDislikedByUser().contains(userRepository.findByUsername(authentication.getName())));
+
+            return ResponseEntity.ok(commentDto);
         } else {
 
             CommentModel commentModel = commentRepository.findByIdAndDeletedFalse(commentId).orElse(null);
@@ -247,6 +286,8 @@ public class CommentController {
                     .video(null)
                     .user(userModel)
                     .prevComment(commentModel)
+                    .likedByUser(new HashSet<>())
+                    .dislikedByUser(new HashSet<>())
                     .text(text)
                     .build();
 
@@ -256,7 +297,8 @@ public class CommentController {
 
             commentModel = commentRepository.save(commentModel);
 
-            return ResponseEntity.ok(modelMapper.map(commentModel, CommentDto.class));
+
+            return ResponseEntity.ok(modelMapper.map(nextComment, CommentDto.class));
         }
     }
 

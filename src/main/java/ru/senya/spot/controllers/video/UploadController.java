@@ -65,7 +65,7 @@ public class UploadController {
             try {
                 processingUtils.processVideo(videoFile, uuid);
             } catch (Exception e) {
-                logger.error("error while processing", e);
+                logger.error(e.getMessage());
             }
 
             if (videoName.isEmpty()) {
@@ -83,7 +83,7 @@ public class UploadController {
 
             return ResponseEntity.ok(modelMapper.map(video, VideoDto.class));
         } catch (Exception e) {
-            logger.error(e.getMessage());
+            logger.error("error", e);
             return ResponseEntity.status(451).body("Error while processing");
         }
     }
@@ -178,6 +178,7 @@ public class UploadController {
                 .tags(new HashSet<>())
                 .likedByUser(new HashSet<>())
                 .dislikedByUser(new HashSet<>())
+                .processedQualities(false)
                 .streamStatus(0)
                 .version(0)
                 .build();

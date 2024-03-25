@@ -36,6 +36,10 @@ public class ChannelModel {
     @JoinColumn(name = "image_id", referencedColumnName = "id")
     private ImageModel chp;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "big_black_cock_id", referencedColumnName = "id")
+    private ImageModel bigBlackCock;
+
     @OneToMany(mappedBy = "channel")
     private Set<VideoModel> videos = new HashSet<>();
 
