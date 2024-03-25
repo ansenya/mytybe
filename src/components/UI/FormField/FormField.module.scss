@@ -98,6 +98,10 @@
         padding 0.1s ease,
         border 0.1 ms;
       z-index: 5;
+      &::placeholder{
+        color: transparent;
+        user-select: none;
+      }
       &.error {
         border: 1px solid $error-color;
       }
@@ -113,7 +117,7 @@
         }
         & + .label {
           color: $primary-color;
-          transform: translate(-7px, -55px) scale(0.88);
+          transform: translate(-7%, -23px) scale(0.88);
           z-index: 6;
         }
       }
@@ -124,7 +128,8 @@
       color: darkgray;
       padding: 0 8px;
       margin-left: 10px;
-      transform: translateY(-32.5px);
+      // transform: translateY(-33.5px);
+      bottom: 14px;
       background-color: $background-color;
       transition: 0.2s ease;
       pointer-events: none;

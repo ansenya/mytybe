@@ -80,19 +80,19 @@ const CommentArea: FC<CommentArea> = ({ commentId, videoId, extraAction }) => {
     if (extraAction) extraAction(false);
   };
 
-  useEffect(() => {
-    if (!value && areaRef.current) {
-      areaRef.current.style.maxHeight = "26px";
-    }
-  }, [value]);
-
+  // useEffect(() => {
+  //   if (!value && areaRef.current) {
+  //     areaRef.current.style.maxHeight = "26px";
+  //   }
+  // }, [value]);
+  //
   function inputHandler() {
     if (!areaRef.current) return;
-    areaRef.current.style.height = "auto";
-    areaRef.current.style.maxHeight = `${areaRef.current.scrollHeight}px`;
-    areaRef.current.style.height = `${areaRef.current.scrollHeight}px`;
+    areaRef.current.style.height = "24px";
+    let newHeight = areaRef.current.scrollHeight;
+    areaRef.current.style.height = `${newHeight}px`;
   }
-
+  //
   useEffect(() => {
     if (areaRef.current) {
       areaRef.current.addEventListener("input", inputHandler);

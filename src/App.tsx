@@ -8,11 +8,12 @@ import UserPage from "./pages/userPage";
 import VideoPage from "./pages/videoPage/videoPage";
 import ChannelPage from "./pages/channelPage";
 import ErrorPage from "./pages/errorPage";
-import RegistrationPage from "./pages/registrationPage/registrationPage";
-import LoginPage from "./pages/loginPage/loginPage";
+import RegistrationPage from "./pages/authPages/registrationPage";
+import LoginPage from "./pages/authPages//loginPage";
 import RequireAuth from "./hoc/RequireAuth";
 import Logout from "./pages/logout";
-import UploadPage from "./pages/uploadPage/uploadPage"
+import UploadPage from "./pages/uploadPage/uploadPage";
+import BlockAuth from "./hoc/BlockAuth";
 
 import "./App.scss";
 
@@ -22,9 +23,23 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Layout></Layout>}>
           <Route index element={<VideosPage />}></Route>
-          <Route path="login" element={<LoginPage />}></Route>
-          <Route path="logout" element={<Logout/>}></Route>
-          <Route path="register" element={<RegistrationPage />}></Route>
+          <Route
+            path="login"
+            element={
+              <BlockAuth>
+                <LoginPage />
+              </BlockAuth>
+            }
+          ></Route>
+          <Route path="logout" element={<Logout />}></Route>
+          <Route
+            path="register"
+            element={
+              <BlockAuth>
+                <RegistrationPage />
+              </BlockAuth>
+            }
+          ></Route>
           <Route path="videos/upload" element={<UploadPage />}></Route>
           <Route path="channels" element={<ChannelsPage />}></Route>
           <Route path="channels/:id" element={<ChannelPage />}></Route>

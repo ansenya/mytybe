@@ -35,6 +35,7 @@ const SearchSuggestions: FC<props> = ({ videosSuggested, currentInputId }) => {
           className={styles.suggestion}
           key={video.id}
           onClick={() => handleClick(video.name)}
+          onTouchStart={() => handleClick(video.name)}
         >
           <p>{video.name}</p>
         </div>

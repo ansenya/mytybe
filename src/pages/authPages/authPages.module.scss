@@ -12,6 +12,28 @@
     align-items: center;
     gap: 27px;
 
+    .bottomLink{
+      margin-top: 5px;
+      display: flex;
+      gap: 8px;
+      span {
+        font-family: inherit;
+        color: $text-color;
+        font-weight: bolder;
+      }
+      .link{
+        font-weight: bolder;
+        font-family: inherit;
+        color: $blue-color;
+        &:hover{
+          color: $blue-hovered;
+        }
+        &:active{
+          color: $blue-clicked;
+        }
+      }
+    }
+
     .formName {
       width: 100%;
       align-self: flex-start;

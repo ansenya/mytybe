@@ -107,6 +107,7 @@ const NavbarMainContent: FC<MainContentProps> = ({
                 onFocus={() =>
                   setIsFocused({ isFocused: true, focusTargetId: inputId })
                 }
+                autoComplete="off"
                 onBlur={() =>
                   setIsFocused({ isFocused: false, focusTargetId: inputId })
                 }

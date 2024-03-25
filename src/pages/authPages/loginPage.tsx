@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useLazyLoginQuery } from "../../store/api/serverApi";
 import { useActions } from "../../hooks/actions";
 import CButton from "../../components/UI/CButton/CButton";
 import FormField from "../../components/UI/FormField/FormField";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { RegisterOptions, SubmitHandler, useForm } from "react-hook-form";
 import { AuthCredentials } from "../../models/AuthModels";
-import styles from "./loginPage.module.scss";
+import styles from "./authPages.module.scss";
 import InlineLoader from "../../components/UI/Loader/InlineLoader";
+import { Link } from "react-router-dom";
 
 const LoginPage = () => {
   const location = useLocation();
@@ -48,9 +49,11 @@ const LoginPage = () => {
         <FormField
           register={register}
           name="username"
-          options={{
-            required: "Поле обязательно к заполнению",
-          }}
+          options={
+            {
+              required: "Поле обязательно к заполнению",
+            } as RegisterOptions
+          }
           customPlaceholder={"Имя пользователя"}
           error={errors.username?.message}
           autoComplete={"username"}
@@ -58,22 +61,27 @@ const LoginPage = () => {
         <FormField
           register={register}
           name="password"
-          options={{
-            required: "Поле обязательно к заполнению",
-          }}
+          options={
+            {
+              required: "Поле обязательно к заполнению",
+            } as RegisterOptions
+          }
           isPassword
           customPlaceholder={"Введите пароль"}
           error={errors.password?.message}
         />
 
         {isError && (
-          <h3 className={styles.formError}>
-            Неправильный логин или пароль
-          </h3>
+          <h3 className={styles.formError}>Неправильный логин или пароль</h3>
         )}
         {isFetching ? <InlineLoader /> : <button type="submit">Войти</button>}
+        <div className={styles.bottomLink}>
+          <span>Нет аккаунта?</span>
+          <Link className={styles.link} to="/register">
+            Зарегистрируйтесь
+          </Link>
+        </div>
       </form>
-      <div></div>
     </div>
   );
 };

@@ -1,5 +1,5 @@
 import React from 'react';
-import {useGetUserByIdQuery, useGetUsersQuery} from "../store/api/serverApi";
+import {useGetUserByIdQuery} from "../store/api/serverApi";
 
 const UsersPage = () => {
 

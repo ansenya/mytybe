@@ -46,22 +46,19 @@
       overflow: hidden;
       padding-top: 4px;
       width: 100%;
-      height: auto;
-      min-height: 21px;
       font-size: 16px;
       line-height: 18px;
+      height: 24px;
       font-family: inherit;
       resize: none;
       outline: none;
-      height: 20px;
       border: none;
       background: $background-color;
       color: $text-color;
-      &::-webkit-scrollbar {
-        display: none;
-      }
-      scrollbar-width: none;
-      padding-bottom: 4px;
+      // &::-webkit-scrollbar {
+      //   display: none;
+      // }
+      // scrollbar-width: none;
     }
   }
 }

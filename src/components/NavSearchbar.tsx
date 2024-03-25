@@ -75,6 +75,7 @@ const NavSearchbar: FC<NavSearchbarProps> = ({ setSearchBarVisible }) => {
               onFocus={() =>
                 setIsFocused({ isFocused: true, focusTargetId: mobileInputId })
               }
+              autoComplete="off"
               onBlur={() =>
                 setIsFocused({
                   isFocused: false,

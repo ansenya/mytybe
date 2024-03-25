@@ -34,6 +34,7 @@ const FormField: FC<FormFieldProps> = forwardRef(
     const toCamelCase = (word: string) => word[0].toUpperCase() + word.slice(1);
 
     const checkboxId = useId();
+
     
 
     return (
@@ -45,7 +46,7 @@ const FormField: FC<FormFieldProps> = forwardRef(
             {...props}
             className={error ? styles.error : ""}
             type={isPassword && isHidden ? "password" : "text"}
-            placeholder=""
+            placeholder="penis"
             spellCheck={false}
           />
           <div className={styles.label}>{customPlaceholder}</div>

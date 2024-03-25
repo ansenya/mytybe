@@ -9,7 +9,7 @@ import {
   CommentRequest,
   PostCommentRequest,
 } from "../../models/VideoModels";
-import { RegisterArgs } from "../../pages/registrationPage/registrationPage";
+import { RegisterArgs } from "../../pages/authPages/registrationPage";
 
 export const serverApi = createApi({
   reducerPath: "server",
@@ -17,13 +17,9 @@ export const serverApi = createApi({
     baseUrl: "http://video-spot.ru/api",
   }),
   endpoints: (build) => ({
-    getUsers: build.query({
+    getUsers: build.query<PaginationResponse<IUser>, void>({
       query: () => ({
         url: `users`,
-        params: {
-          page: 0,
-          size: 10,
-        },
       }),
     }),
     getUserById: build.query<IUser, number>({
@@ -107,7 +103,7 @@ export const serverApi = createApi({
         const token = localStorage.getItem("jwtoken");
         const headers = token ? { Authorization: `Bearer ${token}` } : {};
         return {
-          url: `search`,
+          url: `videos/search`,
           params: {
             page,
             size,
