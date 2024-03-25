@@ -8,7 +8,7 @@ const ShareButton = () => {
 
   function handleShare() {
     setIsShared(true);
-    navigator.clipboard.writeText(window.location.href);
+    navigator.clipboard.writeText(document.location.href);
   }
 
   return (

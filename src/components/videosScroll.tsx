@@ -38,7 +38,7 @@ const VideoScroll: FC<VideoScrollProps> = ({ isSmallScreen, channelId, isEditabl
     let body: VideosRequest & { searchQuery?: string } = {
       page: pageNumber,
       sort: "desc",
-      size: 20,
+      size: 10,
     };
   
 

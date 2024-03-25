@@ -84,7 +84,7 @@ const Comment: FC<CommentProps> = ({ comment, responseToCommentId, video }) => {
         <div className={styles.commentView}>
           <div className={styles.top}>
             <Link className={styles.link} to={`user/${comment.user.id}`}>
-              {`${comment.user.name}${author}`}
+              {`${comment.user.username}${author}`}
             </Link>
             <span>
               {`${formattedDate.getDate()}.${formattedDate.getMonth()}.${formattedDate.getFullYear()}`}
