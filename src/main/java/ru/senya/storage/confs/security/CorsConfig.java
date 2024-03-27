@@ -1,4 +1,4 @@
-package ru.senya.storage.confs;
+package ru.senya.storage.confs.security;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
