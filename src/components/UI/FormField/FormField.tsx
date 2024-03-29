@@ -48,6 +48,7 @@ const FormField: FC<FormFieldProps> = forwardRef(
             type={isPassword && isHidden ? "password" : "text"}
             placeholder="penis"
             spellCheck={false}
+            
           />
           <div className={styles.label}>{customPlaceholder}</div>
         </div>

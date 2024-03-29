@@ -11,7 +11,7 @@ import dislikeIcon from "../../../assets/dislike-svgrepo-com(1).svg";
 import dislikeFilledIcon from "../../../assets/dislike-svgrepo-com.svg";
 import useDebounce from "../../../hooks/useDebounce";
 import { useAppSelector } from "../../../hooks/redux";
-import NotificationElement from "../Notification/Notification";
+import { toast } from "sonner";
 
 interface LikeButtonProps {
   video: IVideo;
@@ -29,7 +29,7 @@ const LikeButton: FC<LikeButtonProps> = ({ video }) => {
 
   function handleLikeClick() {
     if (!user) {
-      setIsUnauthorizedLike(true);
+      toast.error("Требуется авторизация")
       return;
     }
     if (isDisliked && !isLiked) {
@@ -61,12 +61,6 @@ const LikeButton: FC<LikeButtonProps> = ({ video }) => {
 
   return (
     <div className={styles.container}>
-      <NotificationElement
-        isCalled={isUnauthorizedLike}
-        setIsCalled={setIsUnauthorizedLike}
-        text={"Требуется авторизация"}
-        isErrorStyle
-      />
       <button
         onClick={() => handleLikeClick()}
         className={[styles.likeButton, isLiked ? styles.active : ""].join(" ")}

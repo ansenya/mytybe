@@ -13,8 +13,8 @@ import {
   useDeleteCommentByIdMutation,
   useLikeCommentMutation,
 } from "../../../store/api/serverApi";
-import NotificationElement from "../../UI/Notification/Notification";
 import { useActions } from "../../../hooks/actions";
+import { toast } from "sonner";
 
 interface CommentProps {
   comment: IComment;
@@ -29,7 +29,8 @@ const Comment: FC<CommentProps> = ({ comment, responseToCommentId, video }) => {
   const [likesCount, setLikesCount] = useState<number>(comment.likes);
 
   const [like, { isLoading }] = useLikeCommentMutation();
-  const [deleteComment, {}] = useDeleteCommentByIdMutation();
+  const [deleteComment, deleteMutation] = useDeleteCommentByIdMutation();
+
 
   const [isUnauthorizedLike, setIsUnauthorizedLike] = useState(false);
 
@@ -40,6 +41,7 @@ const Comment: FC<CommentProps> = ({ comment, responseToCommentId, video }) => {
 
   const [showSpreadButton, setShowSpreadButton] = useState<boolean>();
 
+
   useEffect(() => {
     if (pRef.current) {
       setShowSpreadButton(
@@ -48,21 +50,13 @@ const Comment: FC<CommentProps> = ({ comment, responseToCommentId, video }) => {
     }
   }, []);
 
-  const author = useMemo(() => {
-    if (!comment.user.channels) return "";
-    return comment.user.channels
-      .map((channel) => channel.id)
-      .includes(comment.channel.id)
-      ? "(Автор)"
-      : "";
-  }, [video, comment]);
   const formattedDate = new Date(comment.created);
 
   const [isLiked, setIsLiked] = useState(comment.likedByThisUser);
 
   function likeAction() {
     if (!user) {
-      setIsUnauthorizedLike(true);
+      toast.error("Требуется авторизация")
       return;
     }
     let operation = isLiked ? -1 : 1;
@@ -71,20 +65,24 @@ const Comment: FC<CommentProps> = ({ comment, responseToCommentId, video }) => {
     like(comment.id);
   }
 
+
+
   return (
     <div className={styles.commentWrapper}>
       <div className={styles.main}>
-        <img
-          className={[
-            styles.pfp,
-            !!responseToCommentId ? styles.smallerPfp : "",
-          ].join(" ")}
-          src={comment.user.pfp}
-        />
+        <Link className={styles.link} to={`/user/${comment.user.id}`}>
+          <img
+            className={[
+              styles.pfp,
+              !!responseToCommentId ? styles.smallerPfp : "",
+            ].join(" ")}
+            src={comment.user.pfp}
+          />
+        </Link>
         <div className={styles.commentView}>
           <div className={styles.top}>
-            <Link className={styles.link} to={`user/${comment.user.id}`}>
-              {`${comment.user.username}${author}`}
+            <Link className={styles.link} to={`/user/${comment.user.id}`}>
+              {`${comment.user.username}`}
             </Link>
             <span>
               {`${formattedDate.getDate()}.${formattedDate.getMonth()}.${formattedDate.getFullYear()}`}
@@ -124,12 +122,6 @@ const Comment: FC<CommentProps> = ({ comment, responseToCommentId, video }) => {
               disabled={isLoading}
             >
               <img src={isLiked ? likeFilledIcon : likeIcon} />
-              <NotificationElement
-                isCalled={isUnauthorizedLike}
-                setIsCalled={setIsUnauthorizedLike}
-                text={"Требуется авторизация"}
-                isErrorStyle
-              />
             </button>
             <p>{likesCount}</p>
             {!!responseToCommentId || (

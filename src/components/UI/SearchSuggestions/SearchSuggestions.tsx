@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import React, { FC, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppSelector } from "../../../hooks/redux";
 import { IVideo } from "../../../models";
@@ -12,6 +12,8 @@ interface props {
 const SearchSuggestions: FC<props> = ({ videosSuggested, currentInputId }) => {
   const navigate = useNavigate();
   const { isFocused, focusTargetId } = useAppSelector((state) => state.focus);
+  const [isHovered, setIsHovered] = useState(false);
+
   const handleClick = (query: string) => {
     navigate(`/?q=${query}`);
   };
@@ -19,8 +21,7 @@ const SearchSuggestions: FC<props> = ({ videosSuggested, currentInputId }) => {
   function showCondition() {
     return (
       videosSuggested !== undefined &&
-      isFocused &&
-      currentInputId === focusTargetId
+      ((isFocused && currentInputId === focusTargetId) || isHovered)
     );
   }
 
@@ -29,6 +30,8 @@ const SearchSuggestions: FC<props> = ({ videosSuggested, currentInputId }) => {
       className={[styles.container, showCondition() ? styles.opened : ""].join(
         " ",
       )}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
     >
       {videosSuggested?.map((video) => (
         <div

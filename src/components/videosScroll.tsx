@@ -1,8 +1,5 @@
 import React, { useState, useEffect, useRef, useMemo, FC } from "react";
-import {
-  useLazyGetSearchedVideosQuery,
-  useLazyGetVideosQuery,
-} from "../store/api/serverApi";
+import { useLazyGetVideosQuery } from "../store/api/serverApi";
 import { IVideo } from "../models";
 import Videos from "./Videos";
 import InlineLoader from "./UI/Loader/InlineLoader";
@@ -16,7 +13,11 @@ interface VideoScrollProps {
   isEditable?: boolean;
 }
 
-const VideoScroll: FC<VideoScrollProps> = ({ isSmallScreen, channelId, isEditable }) => {
+const VideoScroll: FC<VideoScrollProps> = ({
+  isSmallScreen,
+  channelId,
+  isEditable,
+}) => {
   const { id } = useParams();
   const { search } = useLocation();
   const query = useMemo(() => {
@@ -26,12 +27,8 @@ const VideoScroll: FC<VideoScrollProps> = ({ isSmallScreen, channelId, isEditabl
   const [totalPages, setTotalPages] = useState<number>(999);
   const observer = useRef<IntersectionObserver>();
   const divRef = useRef(null);
-  let useQuery;
 
-  if (query.get("q")) useQuery = useLazyGetSearchedVideosQuery;
-  else useQuery = useLazyGetVideosQuery;
-
-  let [fetchData, { data, isFetching, error }] = useQuery();
+  let [fetchData, { data, isFetching, error }] = useLazyGetVideosQuery();
   const [videos, setVideos] = useState<IVideo[]>([]);
 
   useEffect(() => {
@@ -40,14 +37,12 @@ const VideoScroll: FC<VideoScrollProps> = ({ isSmallScreen, channelId, isEditabl
       sort: "desc",
       size: 10,
     };
-  
 
     if (channelId) body.channelId = channelId;
 
     //@ts-expect-error
-    if (query.get("q")) body.searchQuery = query.get("q"); 
+    if (query.get("q")) body.searchQuery = query.get("q");
 
-    //@ts-expect-error
     fetchData(body);
   }, [pageNumber]);
 
@@ -97,7 +92,7 @@ const VideoScroll: FC<VideoScrollProps> = ({ isSmallScreen, channelId, isEditabl
           ref={divRef}
         ></div>
       )}
-      <br/>
+      <br />
       {isSmallScreen && totalPages - 1 > pageNumber && (
         <ShowButton
           isWide

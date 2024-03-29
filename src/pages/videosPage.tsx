@@ -9,7 +9,7 @@ const VideosPage = () => {
   }, [search]);
   return (
     <>
-      <VideoScroll key={query.get("q") || ""} />
+      <VideoScroll />
     </>
   );
 };

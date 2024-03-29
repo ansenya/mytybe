@@ -215,7 +215,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ source, qValues }) => {
         playing={isPlaying && !isLoading}
         onError={(error) => setIsError(true)}
         volume={volume}
-        progressInterval={100}
+        progressInterval={10}
         className="player__video"
         ref={playerRef}
         url={`${source}&q=${quality}`}

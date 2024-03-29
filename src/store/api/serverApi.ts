@@ -14,7 +14,7 @@ import { RegisterArgs } from "../../pages/authPages/registrationPage";
 export const serverApi = createApi({
   reducerPath: "server",
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://video-spot.ru/api",
+    baseUrl: "https://video-spot.ru/api",
   }),
   endpoints: (build) => ({
     getUsers: build.query<PaginationResponse<IUser>, void>({
@@ -95,41 +95,25 @@ export const serverApi = createApi({
         },
       }),
     }),
-    getSearchedVideos: build.query<
+    getVideos: build.query<
       PaginationResponse<IVideo>,
-      VideosRequest & { searchQuery: string }
+      VideosRequest & { searchQuery?: string }
     >({
-      query: ({ sort, page, size, searchQuery }) => {
+      query: ({ sort, page, size, searchQuery, channelId }) => {
         const token = localStorage.getItem("jwtoken");
-        const headers = token ? { Authorization: `Bearer ${token}` } : {};
-        return {
-          url: `videos/search`,
-          params: {
-            page,
-            size,
-            sort,
-            q: searchQuery,
-          },
-          headers,
-        };
-      },
-    }),
-    getVideos: build.query<PaginationResponse<IVideo>, VideosRequest>({
-      query: ({ sort, page, size, channelId }) => {
-        const token = localStorage.getItem("jwtoken");
-        const headers = token ? { Authorization: `Bearer ${token}` } : {};
-        const params: VideosRequest = {
+        const params: VideosRequest & { q?: string } = {
           page,
-          sort,
           size,
+          sort,
         };
 
         if (channelId) params.channelId = channelId;
-
+        if (searchQuery !== undefined) params.q = searchQuery;
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
         return {
-          url: `videos`,
-          params,
+          url: `videos${searchQuery !== undefined ? "/search" : ""}`,
           headers,
+          params,
         };
       },
     }),
@@ -238,13 +222,11 @@ export const {
   useGetUsersQuery,
   useGetUserByIdQuery,
   useLazyGetUserByIdQuery,
-  useGetVideosQuery,
   useLazyGetVideosQuery,
   useRegisterMutation,
   useUploadVideoMutation,
   useGetVideoByIdQuery,
   useGetUserChannelsQuery,
-  useLazyGetSearchedVideosQuery,
   useLikeVideoMutation,
   useDislikeVideoMutation,
   useLazyGetCommentsQuery,

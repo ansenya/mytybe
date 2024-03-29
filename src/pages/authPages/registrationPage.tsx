@@ -35,6 +35,10 @@ const RegistrationPage = () => {
 
   const usersQuery = useGetUsersQuery();
 
+  useEffect(() => {
+    usersQuery.refetch();
+  }, []);
+
   const {
     register,
     handleSubmit,
@@ -77,6 +81,10 @@ const RegistrationPage = () => {
                 value: 100,
                 message: "Имя пользователя должно быть не длинее 100 символов",
               },
+              pattern: {
+                value: /^[a-zA-Z0-9]+$/,
+                message: "Можно использовать только латинские буквы и цифры",
+              },
               validate: (fieldValue) => {
                 if (usersQuery.data) {
                   return (
@@ -98,6 +106,10 @@ const RegistrationPage = () => {
           name="password"
           options={
             {
+              pattern: {
+                value: /^[a-zA-Z0-9]+$/,
+                message: "Можно использовать только латинские буквы и цифры",
+              },
               required: "Поле обязательно к заполнению",
               maxLength: {
                 value: 100,

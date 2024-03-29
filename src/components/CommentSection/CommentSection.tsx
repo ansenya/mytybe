@@ -1,4 +1,5 @@
 import React, { FC, useEffect, useRef, useState } from "react";
+import { useActions } from "../../hooks/actions";
 import { useAppSelector } from "../../hooks/redux";
 import { IComment, IVideo } from "../../models";
 import { CommentRequest } from "../../models/VideoModels";
@@ -26,21 +27,34 @@ const CommentSection: FC<CommentSectionProps> = ({ video, commentId }) => {
   const { commentToResponseId, comment, toDelete } = useAppSelector(
     (state) => state.comment,
   );
+  const { setCommentPost } = useActions();
 
   useEffect(() => {
     if (!comment) return;
 
     if (commentToResponseId && commentId === undefined) {
       for (let i = 0; i < comments.length; i++) {
-        if (comments[i].id === commentToResponseId){
-          let newNextComments = [commentToResponseId].concat(comments[i].nextComments);
+        if (comments[i].id === commentToResponseId) {
+          let newNextComments;
+          if (toDelete) {
+            newNextComments = comments[i].nextComments.filter((comId: number)=> comId !== comment.id); 
+          } else {
+            newNextComments = [comment.id].concat(comments[i].nextComments);
+          }
           let commentObject: IComment = {
             ...comments[i],
             nextComments: newNextComments,
           };
-          let commentsCopy = comments.filter(com => comments[i].id !== com.id);
+          let commentsCopy = comments.filter(
+            (com) => comments[i].id !== com.id,
+          );
           commentsCopy.splice(i, 0, commentObject);
           setComments(commentsCopy);
+          setCommentPost({
+            commentToResponseId: null,
+            comment: null,
+            toDelete: false,
+          });
           return;
         }
       }
@@ -53,6 +67,11 @@ const CommentSection: FC<CommentSectionProps> = ({ video, commentId }) => {
       return;
     }
     setComments([comment, ...comments]);
+    setCommentPost({
+      commentToResponseId: null,
+      comment: null,
+      toDelete: false,
+    });
   }, [comment]);
 
   useEffect(() => {
@@ -72,7 +91,6 @@ const CommentSection: FC<CommentSectionProps> = ({ video, commentId }) => {
     observer.current?.disconnect();
     observer.current = new IntersectionObserver((entries, observer) => {
       if (entries[0].isIntersecting && totalPages - 1 > pageNumber) {
-        console.log(pageNumber, totalPages);
         setPageNumber(pageNumber + 1);
       }
     });

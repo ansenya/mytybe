@@ -12,10 +12,16 @@ import LikeButton from "../../components/UI/LikeButton/LikeButton";
 import ShareButton from "../../components/ShareButton/ShareButton";
 import CommentSection from "../../components/CommentSection/CommentSection";
 import CButton from "../../components/UI/CButton/CButton";
+import FollowButton from "./followButton";
 
 const VideoPage = () => {
   const { id } = useParams();
-  const { data, error, isLoading } = useGetVideoByIdQuery(Number(id));
+  const { data, error, isFetching } = useGetVideoByIdQuery(Number(id), {
+    refetchOnMountOrArgChange: true,
+  });
+
+
+
   const [isSmallScreen, setIsSmallScreen] = useState<boolean>(
     window.innerWidth < 1025,
   );
@@ -41,7 +47,7 @@ const VideoPage = () => {
 
   return (
     <div className="watchVideo" key={id}>
-      {!data || isLoading ? (
+      {!data || isFetching ? (
         <InlineLoader />
       ) : (
         <>
@@ -49,15 +55,16 @@ const VideoPage = () => {
             <VideoPlayer
               source={data?.path ?? ""}
               qValues={data?.qualities ?? []}
-              key={id}
             />
             <div className="playing__title">
               <h1>{data.name}</h1>
             </div>
             <div className="second__line">
               <div className="playing__channel">
-                <img src={data.channel.chp} className="avatar" />
-                <span>{data.channel.name}</span>
+                <Link to={`/channels/${data.channel.id}`}>
+                  <img src={data.channel.chp} className="avatar" />
+                </Link>
+                {data?.channel && <FollowButton channel={data.channel} />}
               </div>
               <div className="playing__actions">
                 <LikeButton video={data} />
@@ -69,7 +76,7 @@ const VideoPage = () => {
           </div>
           <div className="side__content">
             <VideoScroll isSmallScreen={isSmallScreen} />
-            {isSmallScreen && <CommentSection video={data} />}
+            {isSmallScreen && <CommentSection key={id} video={data} />}
           </div>
         </>
       )}

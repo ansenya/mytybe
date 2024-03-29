@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import ChannelView from "../components/ChannelView/ChannelView";
 import InlineLoader from "../components/UI/Loader/InlineLoader";
@@ -9,16 +9,23 @@ import { useGetChannelByIdQuery } from "../store/api/serverApi";
 const ChannelPage = () => {
   const { id } = useParams();
 
-  const { data, isLoading, isError } = useGetChannelByIdQuery(Number(id));
-  const { user } = useAppSelector(state => state.auth);
+  const { data, isFetching, isError } = useGetChannelByIdQuery(Number(id), {
+    refetchOnMountOrArgChange: true
+  });
+  const { user } = useAppSelector((state) => state.auth);
+
 
   return (
     <div className="channel__page">
-      {isLoading && <InlineLoader />}
-      {!!data && (
+      {!data || isFetching ? <InlineLoader /> : (
         <>
           <ChannelView channel={data} />
-          <VideoScroll channelId={data.id} isEditable={user?.id === data.user.id}/>
+          <div className="channel__videos">
+            <VideoScroll
+              channelId={data.id}
+              isEditable={user?.id === data.user.id}
+            />
+          </div>
         </>
       )}
     </div>

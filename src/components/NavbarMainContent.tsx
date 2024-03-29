@@ -16,7 +16,7 @@ import InlineLoader from "./UI/Loader/InlineLoader";
 import { useLocation, useNavigate } from "react-router-dom";
 import PaWindow from "./ProfileActionsWindow/paWindow";
 import { Link } from "react-router-dom";
-import { useLazyGetSearchedVideosQuery } from "../store/api/serverApi";
+import { useLazyGetVideosQuery } from "../store/api/serverApi";
 import useDebounce from "../hooks/useDebounce";
 import { IVideo } from "../models";
 import { useActions } from "../hooks/actions";
@@ -43,7 +43,7 @@ const NavbarMainContent: FC<MainContentProps> = ({
   const [query, setQuery] = useState("");
   const debouncedQuery = useDebounce(query, 200);
   const [fetchSearch, { data, isLoading, error }] =
-    useLazyGetSearchedVideosQuery();
+    useLazyGetVideosQuery();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -107,6 +107,7 @@ const NavbarMainContent: FC<MainContentProps> = ({
                 onFocus={() =>
                   setIsFocused({ isFocused: true, focusTargetId: inputId })
                 }
+                autoCorrect="off"
                 autoComplete="off"
                 onBlur={() =>
                   setIsFocused({ isFocused: false, focusTargetId: inputId })

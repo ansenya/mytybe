@@ -1,4 +1,4 @@
-import React, { FC, useMemo, useState } from "react";
+import React, { FC, useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useAppSelector } from "../../hooks/redux";
 import { IChannel } from "../../models";
@@ -7,9 +7,10 @@ import {
   useGetChannelByIdQuery,
 } from "../../store/api/serverApi";
 import CButton from "../UI/CButton/CButton";
-import NotificationElement from "../UI/Notification/Notification";
 import styles from "./ChannelView.module.scss";
-import bigImage from "../../assets/DSC01158_2048x.webp"
+import bigImage from "../../assets/DSC01158_2048x.webp";
+import FollowButton from "../../pages/videoPage/followButton";
+import { toast } from "sonner";
 interface ChannelViewProps {
   channel: IChannel;
 }
@@ -21,9 +22,8 @@ const ChannelView: FC<ChannelViewProps> = ({ channel }) => {
     channel.followersAmount,
   );
   const [isFollowed, setIsFollowed] = useState(
-    channel.followedByThisUser || false,
+    channel.followedByThisUser,
   );
-  const [isUnauthorized, setIsUnauthorized] = useState(false);
 
   const followersWord = useMemo(() => {
     if (
@@ -37,14 +37,16 @@ const ChannelView: FC<ChannelViewProps> = ({ channel }) => {
 
   const { user } = useAppSelector((state) => state.auth);
 
-  const [followTriggered, setFollowTriggered] = useState(false);
-
   function subscribe() {
     if (!user) {
-      setIsUnauthorized(true);
+      toast.error("Требуется авторизация");
       return;
     }
-    setFollowTriggered(true);
+    if (!isFollowed) {
+      toast.success("Подписка оформлена");
+    } else {
+      toast.info("Подписка отменена");
+    }
     let operation = isFollowed ? -1 : 1;
     setIsFollowed((prevstate) => !prevstate);
     setFollowersAmount((prevstate) => prevstate + operation);
@@ -52,28 +54,66 @@ const ChannelView: FC<ChannelViewProps> = ({ channel }) => {
   }
 
   const bannerStyles: React.CSSProperties = {
-    backgroundImage: `url(${bigImage})`,
-    width: "100%",
-    backgroundSize: "cover",
-    backgroundPosition: "69%",
-    borderRadius: 10, 
+    backgroundImage: `url(${channel.bbc ?? bigImage})`,
   };
+  const [isSpreaded, setIsSpreaded] = useState(false);
+  const pRef = useRef<HTMLParagraphElement>(null);
+
+  const [showSpreadButton, setShowSpreadButton] = useState<boolean>();
+
+  function handleResize() {
+    if (pRef.current) {
+      setShowSpreadButton(
+        pRef.current.scrollHeight !== pRef.current.clientHeight,
+      );
+    }
+  }
+
+  useEffect(() => {
+    if (pRef.current) {
+      setShowSpreadButton(
+        pRef.current.scrollHeight !== pRef.current.clientHeight,
+      );
+    }
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
 
   return (
     <>
       <div className={styles.header}>
-        <div style={bannerStyles}></div>
+        <div style={bannerStyles} className={styles.banner}></div>
         <div className={styles.channelInfo}>
           <img src={channel.chp} draggable={false} />
           <div className={styles.textInfo}>
             <div className={styles.channelName}>
               <h1>{channel.name}</h1>
+              <div className={styles.countableInfo}>
+                <span>
+                  {followersAmount} {followersWord}
+                </span>
+                |<span>{channel.videosAmount} видео</span>
+              </div>
             </div>
-            <div className={styles.countableInfo}>
-              <h2>
-                {followersAmount} {followersWord}
-              </h2>
-              <h2>{channel.videosAmount} видео</h2>
+            <div className={styles.description}>
+              <p ref={pRef} className={!isSpreaded ? styles.notSpreaded : ""}>
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam
+                lobortis orci id ante faucibus, iaculis suscipit nulla
+                porttitor. Suspendisse potenti. Etiam quis augue nisl. Donec at
+                tincidunt velit. Pellentesque libero metus, varius ac sodales
+                et, cursus vel sapien. Lorem ipsum dolor sit amet, consectetur
+                adipiscing elit. Donec ultrices magna ac massa bibendum, sed
+                ultricies nulla dignissim. Quisque tincidunt ac lacus posuere
+                convallis.
+              </p>
+              {showSpreadButton && (
+                <span onClick={() => setIsSpreaded((prevstate) => !prevstate)}>
+                  {isSpreaded ? "свернуть" : "показать полностью"}
+                </span>
+              )}
             </div>
             <div className={styles.bottom}>
               {user?.id !== channel.user.id && (
@@ -90,17 +130,6 @@ const ChannelView: FC<ChannelViewProps> = ({ channel }) => {
           </div>
         </div>
       </div>
-      <NotificationElement
-        isCalled={isUnauthorized}
-        setIsCalled={setIsUnauthorized}
-        isErrorStyle
-        text={"Требуется авторизация"}
-      />
-      <NotificationElement
-        isCalled={followTriggered}
-        setIsCalled={setFollowTriggered}
-        text={isFollowed ? "Подписка оформлена" : "Подписка отменена"}
-      />
     </>
   );
 };

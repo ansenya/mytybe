@@ -28,6 +28,7 @@ const Navbar = () => {
     }
   }, [isSmallScreen]);
 
+
   useEffect(() => {
     if (!isLoading && data) {
       setUser(data[0]);

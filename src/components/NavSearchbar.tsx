@@ -2,7 +2,7 @@ import React, { FC, useEffect, useId, useRef, useState } from "react";
 import searchIcon from "../assets/search-alt-svgrepo-com (3) 1.svg";
 import IconButton from "./UI/IconButton/IconButton";
 import arrowIcon from "../assets/arrow-back-long-svgrepo-com.svg";
-import { useLazyGetSearchedVideosQuery } from "../store/api/serverApi";
+import { useLazyGetVideosQuery } from "../store/api/serverApi";
 import useDebounce from "../hooks/useDebounce";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useActions } from "../hooks/actions";
@@ -19,8 +19,7 @@ const NavSearchbar: FC<NavSearchbarProps> = ({ setSearchBarVisible }) => {
   const { isFocused, focusTargetId } = useAppSelector((state) => state.focus);
   const [query, setQuery] = useState("");
   const debouncedQuery = useDebounce(query, 200);
-  const [fetchSearch, { data, isLoading, error }] =
-    useLazyGetSearchedVideosQuery();
+  const [fetchSearch, { data, isLoading, error }] = useLazyGetVideosQuery();
   const navigate = useNavigate();
 
   const mobileInputId = useId();

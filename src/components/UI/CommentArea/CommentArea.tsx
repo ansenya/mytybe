@@ -6,11 +6,11 @@ import {
 } from "../../../models/VideoModels";
 import { usePostCommentMutation } from "../../../store/api/serverApi";
 import styles from "./CommentArea.module.scss";
-import NotificationElement from "../Notification/Notification";
 import InlineLoader from "../Loader/InlineLoader";
 import { useActions } from "../../../hooks/actions";
 import { IComment } from "../../../models";
 import pfp from "../../../assets/def.png";
+import { toast } from "sonner";
 
 interface CommentArea {
   commentId?: number;
@@ -46,7 +46,7 @@ const CommentArea: FC<CommentArea> = ({ commentId, videoId, extraAction }) => {
     }
 
     if (user === null) {
-      setIsForbidden(true);
+      toast.error("");
       return;
     }
 
@@ -77,15 +77,16 @@ const CommentArea: FC<CommentArea> = ({ commentId, videoId, extraAction }) => {
     setValue("");
     areaRef.current?.blur();
     setIsOpened(false);
+
     if (extraAction) extraAction(false);
   };
 
-  // useEffect(() => {
-  //   if (!value && areaRef.current) {
-  //     areaRef.current.style.maxHeight = "26px";
-  //   }
-  // }, [value]);
-  //
+  useEffect(() => {
+    if (!value && areaRef.current) {
+      areaRef.current.style.height = "24px";
+    }
+  }, [value]);
+
   function inputHandler() {
     if (!areaRef.current) return;
     areaRef.current.style.height = "24px";
@@ -101,7 +102,7 @@ const CommentArea: FC<CommentArea> = ({ commentId, videoId, extraAction }) => {
     return () => {
       areaRef.current?.removeEventListener("input", inputHandler);
     };
-  }, []);
+  }, [areaRef.current]);
 
   return (
     <div className={styles.commentForm}>
@@ -162,12 +163,6 @@ const CommentArea: FC<CommentArea> = ({ commentId, videoId, extraAction }) => {
               </div>
             </>
           )}
-          <NotificationElement
-            text={"Требуется авторизация"}
-            setIsCalled={setIsForbidden}
-            isCalled={isForbidden}
-            isErrorStyle
-          />
         </>
       )}
     </div>
