@@ -1,7 +1,8 @@
 import React, { FC, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { IChannel } from "../../../models";
-import styles from "./Channel.module.scss";
+import styles from "./ChannelCard.module.scss";
+import bigImage from "../../../assets/DSC01158_2048x.webp"
 
 interface ChannelCardProps {
   channel: IChannel;
@@ -19,11 +20,11 @@ const ChannelCard: FC<ChannelCardProps> = ({ channel }) => {
   }, [channel]);
 
   const bannerStyles: React.CSSProperties = {
-    backgroundImage: `url(${channel.bbc})`,
+    backgroundImage: `url(${channel.bbc || bigImage})`,
   };
 
   return (
-    <Link to={`channels/${channel.id}`}>
+    <Link to={`/channels/${channel.id}`}>
       <div className={styles.card}>
         <div className={styles.banner} style={bannerStyles}></div>
         <div className={styles.secondLine}>

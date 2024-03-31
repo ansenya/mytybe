@@ -1,6 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { IChannel, IComment, IUser, IVideo } from "../../models";
 import { AuthCredentials, IToken } from "../../models/AuthModels";
+import { ChannelsRequest } from "../../models/ChannelModels";
 import {
   UploadResponse,
   VideosRequest,
@@ -213,6 +214,28 @@ export const serverApi = createApi({
         },
       }),
     }),
+    getChannels: build.query<
+      PaginationResponse<IChannel>,
+      ChannelsRequest & { searchQuery?: string; isSubs?: boolean }
+    >({
+      query: ({ sort, page, size, searchQuery, isSubs }) => {
+        const token = localStorage.getItem("jwtoken");
+        const params: ChannelsRequest & { q?: string } = {
+          page,
+          size,
+          sort,
+        };
+        if (searchQuery !== undefined) params.q = searchQuery;
+        console.log(searchQuery)
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+        const url = isSubs ? "users/followings" : `channels${searchQuery !== undefined ? "/search" : ""}`;
+        return {
+          url,
+          headers,
+          params,
+        };
+      },
+    }),
   }),
 });
 
@@ -236,4 +259,5 @@ export const {
   useGetChannelByIdQuery,
   useFollowMutation,
   useDeleteVideoByIdMutation,
+  useLazyGetChannelsQuery,
 } = serverApi;

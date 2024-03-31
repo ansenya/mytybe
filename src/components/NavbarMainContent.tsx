@@ -16,7 +16,10 @@ import InlineLoader from "./UI/Loader/InlineLoader";
 import { useLocation, useNavigate } from "react-router-dom";
 import PaWindow from "./ProfileActionsWindow/paWindow";
 import { Link } from "react-router-dom";
-import { useLazyGetVideosQuery } from "../store/api/serverApi";
+import {
+  useLazyGetChannelsQuery,
+  useLazyGetVideosQuery,
+} from "../store/api/serverApi";
 import useDebounce from "../hooks/useDebounce";
 import { IVideo } from "../models";
 import { useActions } from "../hooks/actions";
@@ -42,8 +45,8 @@ const NavbarMainContent: FC<MainContentProps> = ({
   const [isProfile, setIsProfile] = useState<boolean>(false);
   const [query, setQuery] = useState("");
   const debouncedQuery = useDebounce(query, 200);
-  const [fetchSearch, { data, isLoading, error }] =
-    useLazyGetVideosQuery();
+  const [fetchSearch, { data, isLoading, error }] = useLazyGetVideosQuery();
+  const [fetchChannelsSearch, chSearchQuery] = useLazyGetChannelsQuery();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -55,17 +58,28 @@ const NavbarMainContent: FC<MainContentProps> = ({
       event.preventDefault();
       setIsFocused({ isFocused: false, focusTargetId: inputId });
       inputRef.current?.blur();
-      navigate(`/?q=${query}`);
+      navigate(
+        `${location.pathname === "/channels" ? "channels" : ""}/?q=${query}`,
+      );
     }
   };
 
   useEffect(() => {
-    fetchSearch({
-      searchQuery: debouncedQuery,
-      page: 0,
-      size: 5,
-      sort: "desc",
-    });
+    if (location.pathname === "/channels") {
+      fetchChannelsSearch({
+        searchQuery: debouncedQuery,
+        page: 0,
+        size: 5,
+        sort: "desc",
+      });
+    } else {
+      fetchSearch({
+        searchQuery: debouncedQuery,
+        page: 0,
+        size: 5,
+        sort: "desc",
+      });
+    }
   }, [debouncedQuery]);
 
   function handleSearchButton() {
@@ -101,6 +115,7 @@ const NavbarMainContent: FC<MainContentProps> = ({
                 id={inputId}
                 type="text"
                 spellCheck={false}
+                placeholder={location.pathname === "/channels" ? "Поиск по каналам": "Поиск по видео"}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={handleKeyDown}
@@ -117,6 +132,7 @@ const NavbarMainContent: FC<MainContentProps> = ({
             </div>
             <SearchSuggestions
               videosSuggested={data?.content}
+              channelsSuggested={chSearchQuery.data?.content}
               currentInputId={inputId}
             />
           </div>

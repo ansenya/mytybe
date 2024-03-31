@@ -46,6 +46,7 @@ const VideoScroll: FC<VideoScrollProps> = ({
     fetchData(body);
   }, [pageNumber]);
 
+
   useEffect(() => {
     if (isSmallScreen) return;
     if (isFetching || data === undefined) return;

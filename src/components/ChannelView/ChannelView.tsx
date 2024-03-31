@@ -45,7 +45,7 @@ const ChannelView: FC<ChannelViewProps> = ({ channel }) => {
     if (!isFollowed) {
       toast.success("Подписка оформлена");
     } else {
-      toast.info("Подписка отменена");
+      toast("Подписка отменена");
     }
     let operation = isFollowed ? -1 : 1;
     setIsFollowed((prevstate) => !prevstate);

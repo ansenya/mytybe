@@ -1,3 +1,55 @@
 @import "../../../variables";
 
+.card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+  border-radius: 10px;
+  padding: 5px;
 
+  &:hover {
+    background: $border-color;
+  }
+
+  &:active {
+    background: $bright-plain-color;
+  }
+
+  .banner {
+    border-radius: 10px;
+    background-size: cover;
+    background-position: 69%;
+    aspect-ratio: 4;
+    width: 100%;
+  }
+
+  .secondLine {
+    display: flex;
+    gap: 8px;
+    img {
+      width: 35px;
+      height: 35px;
+      object-fit: cover;
+      border-radius: 50%;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .info {
+      overflow-x: hidden;
+      h1 {
+        color: $text-color;
+        font-size: 24px;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+      p {
+        font-size: 15px;
+        color: darkgray;
+        // font-weight: bolder;
+      }
+    }
+  }
+}

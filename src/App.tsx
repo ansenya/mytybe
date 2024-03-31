@@ -73,6 +73,7 @@ const App = () => {
             fontSize: 16,
             fontWeight: 600,
             padding: 10,
+            fontFamily: "inherit",
           },
         }}
       />

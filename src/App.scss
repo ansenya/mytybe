@@ -42,7 +42,6 @@ body {
       }
 
       .search__bar {
-
         img {
           user-select: none;
           height: 15px;
@@ -50,7 +49,7 @@ body {
 
         min-height: 33px;
         width: 100%;
-        background: $secondary-color;
+        background: $background-color;
         display: flex;
         padding: 0 8px;
         border: $primary-color 3px solid;
@@ -59,7 +58,7 @@ body {
 
         input {
           background: transparent;
-          color: $primary-color;
+          color: white;
           margin-left: 10px;
           height: 100%;
           width: 100%;
@@ -68,6 +67,17 @@ body {
           outline: none;
           font-size: 20px;
           font-weight: normal;
+          padding: 3px;
+          line-height: 20px;
+          &::placeholder {
+            color: white;
+            font-size: 20px;
+          }
+
+          &::-moz-placeholder {
+            color: white;
+            font-size: 20px;
+          }
 
           &::selection {
             font-size: 20px;
@@ -92,7 +102,6 @@ body {
         box-shadow: 0 0 2px $primary-color;
       }
 
-       
       min-height: 33px;
       display: flex;
       width: 100%;
@@ -103,7 +112,7 @@ body {
 
       input {
         background: transparent;
-        color: $primary-color;
+        color: white;
         margin-left: 10px;
         height: 100%;
         width: 100%;
@@ -112,6 +121,17 @@ body {
         outline: none;
         font-size: 20px;
         font-weight: normal;
+        padding: 3px;
+        line-height: 20px;
+        &::placeholder {
+          color: white;
+          font-size: 20px;
+        }
+
+        &::-moz-placeholder {
+          color: white;
+          font-size: 20px;
+        }
 
         &::selection {
           font-size: 20px;
@@ -298,20 +318,19 @@ body {
   height: auto;
 }
 
-.search__smartphone__container{
+.search__smartphone__container {
   position: relative;
   flex: 1;
   margin-left: 6px;
 }
 
-.channel__page{
+.channel__page {
   width: 100%;
   margin: auto;
   .channel__videos {
     margin: auto;
     width: 85%;
   }
-  
 }
 
 .login__content {
@@ -319,7 +338,7 @@ body {
   margin: auto;
   justify-content: center;
   align-items: center;
-  form{
+  form {
     display: flex;
     flex-direction: column;
     align-items: center;
