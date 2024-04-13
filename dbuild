@@ -1,0 +1,1 @@
+./gradlew bootJar && docker build -t arsanoshin/spot-main . && docker compose up -d && docker logs -f main
