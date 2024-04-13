@@ -23,6 +23,6 @@ public class ImageDto {
     private boolean deleted = false;
 
     public String getFalsePath() {
-        return "http://" + STORAGE_HOST + "/img?filename=" + path;
+        return STORAGE_HOST + "img?filename=" + path;
     }
 }

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import ru.senya.spot.models.dto.VideoDto;
 import ru.senya.spot.repos.es.ElasticVideoRepository;
+import ru.senya.spot.repos.jpa.CommentRepository;
 import ru.senya.spot.repos.jpa.UserRepository;
 import ru.senya.spot.services.VideoService;
 
@@ -21,13 +22,15 @@ public class DeleteController {
 
     private final VideoService videoService;
     private final UserRepository userRepository;
+    private final CommentRepository commentRepository;
     private final ElasticVideoRepository elasticVideoRepository;
 
 
     @Autowired
-    public DeleteController(VideoService videoService, UserRepository userRepository, ElasticVideoRepository elasticVideoRepository) {
+    public DeleteController(VideoService videoService, UserRepository userRepository, CommentRepository commentRepository, ElasticVideoRepository elasticVideoRepository) {
         this.videoService = videoService;
         this.userRepository = userRepository;
+        this.commentRepository = commentRepository;
         this.elasticVideoRepository = elasticVideoRepository;
     }
 
@@ -44,8 +47,12 @@ public class DeleteController {
         }
 
         var user = userRepository.findByUsername(authentication.getName());
-        if (video.getChannel().getUser().getId().equals(user.getId())) {
+        if (video.getChannel().getUser().getId().equals(user.getId()) || user.getUsername().equals("admin")) {
             video.setDeleted(true);
+            for (var comment : video.getComments()) {
+                comment.delete();
+                commentRepository.save(comment);
+            }
             videoService.save(video);
             elasticVideoRepository.deleteById(String.valueOf(video.getId()));
             return ResponseEntity.ok().build();

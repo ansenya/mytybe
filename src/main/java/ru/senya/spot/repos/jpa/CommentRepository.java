@@ -14,5 +14,8 @@ import java.util.Optional;
 public interface CommentRepository extends JpaRepository<CommentModel, Long> {
 
     List<CommentModel> findAllByVideoIdAndDeletedFalse(Long videoId);
+
     Optional<CommentModel> findByIdAndDeletedFalse(Long id);
+
+    Optional<CommentModel> findByNextComments(CommentModel comment);
 }

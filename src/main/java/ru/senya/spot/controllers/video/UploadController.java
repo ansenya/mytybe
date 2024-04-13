@@ -3,21 +3,34 @@ package ru.senya.spot.controllers.video;
 import org.modelmapper.ModelMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.core.Authentication;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+import ru.senya.spot.controllers.storage.FileUploadService;
 import ru.senya.spot.models.dto.VideoDto;
+import ru.senya.spot.models.es.EsVideoModel;
 import ru.senya.spot.models.jpa.ChannelModel;
 import ru.senya.spot.models.jpa.ImageModel;
 import ru.senya.spot.models.jpa.VideoModel;
+import ru.senya.spot.repos.es.ElasticVideoRepository;
 import ru.senya.spot.repos.jpa.ChannelRepository;
 import ru.senya.spot.repos.jpa.UserRepository;
 import ru.senya.spot.services.VideoService;
 
+import javax.swing.text.TableView;
+import java.net.URI;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.UUID;
+
+import static ru.senya.spot.MytybeApplication.SERVER_TOKEN;
+import static ru.senya.spot.MytybeApplication.STORAGE_HOST;
 
 @RestController
 @RequestMapping("videos")
@@ -26,66 +39,87 @@ public class UploadController {
 
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
+    private final ElasticVideoRepository elasticVideoRepository;
     private final VideoService videoService;
-    private final StorageApiUtils storageApiUtils;
+    private final FileUploadService storageApiUtils;
     private final ProcessingUtils processingUtils;
     private final ModelMapper modelMapper = new ModelMapper();
     private final Logger logger = LoggerFactory.getLogger(UploadController.class);
 
-    public UploadController(UserRepository userRepository, ChannelRepository channelRepository, VideoService videoService, StorageApiUtils storageApiUtils, ProcessingUtils processingUtils) {
+    public UploadController(UserRepository userRepository, ChannelRepository channelRepository, ElasticVideoRepository elasticVideoRepository, VideoService videoService, FileUploadService storageApiUtils, ProcessingUtils processingUtils) {
         this.userRepository = userRepository;
         this.channelRepository = channelRepository;
+        this.elasticVideoRepository = elasticVideoRepository;
         this.videoService = videoService;
         this.storageApiUtils = storageApiUtils;
         this.processingUtils = processingUtils;
     }
 
     @PostMapping("upload")
-    public ResponseEntity<?> upload(@RequestParam(value = "videoFile", required = false) MultipartFile videoFile,
-                                    @RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
+    public ResponseEntity<?> upload(@RequestParam(value = "imageFile", required = false) MultipartFile imageFile,
                                     @RequestParam(value = "channelId", required = false) Long channelId,
                                     @RequestParam(value = "videoName", required = false, defaultValue = "") String videoName,
                                     @RequestParam(value = "videoDescription", required = false) String description,
                                     Authentication authentication) {
 
-        var verdict = check(channelId, authentication, videoFile);
+        var verdict = check(channelId, authentication);
         if (verdict != null) {
             return verdict;
         }
 
         try {
             String uuid = UUID.randomUUID().toString();
-            String videoContentType = Objects.requireNonNull(videoFile.getContentType()).split("/")[1];
 
             if (imageFile != null && !imageFile.isEmpty()) {
                 String imageContentType = Objects.requireNonNull(imageFile.getContentType()).split("/")[1];
-                storageApiUtils.sendToStorage(uuid, imageContentType, "img", imageFile);
+                try {
+                    storageApiUtils.sendToStorage(uuid, imageContentType, "img", imageFile);
+                } catch (HttpClientErrorException e) {
+                    logger.error(e.getMessage());
+                }
             }
+//            try {
+//                processingUtils.processVideo(videoFile, uuid);
+//            } catch (Exception e) {
+//                logger.error(e.getMessage());
+//            }
 
-            try {
-                processingUtils.processVideo(videoFile, uuid);
-            } catch (Exception e) {
-                logger.error(e.getMessage());
-            }
-
-            if (videoName.isEmpty()) {
-                videoName = Objects.requireNonNull(videoFile.getOriginalFilename()).replace(".mp4", "");
-            }
-
-            ImageModel thumbnail = createThumbnail(imageFile, uuid);
-            VideoModel video = createVideoEntity(videoName, description, channelRepository.findById(channelId).orElse(null), uuid, thumbnail);
-
-            if (!storageApiUtils.sendToStorage(uuid, videoContentType, "vid", videoFile)) {
-                return ResponseEntity.status(418).body("Upload is not available (cannot save)");
-            }
+            var thumbnail = createThumbnail(imageFile, uuid);
+            var video = createVideoEntity(videoName,
+                    description,
+                    channelRepository.findById(channelId).get(),
+                    uuid,
+                    thumbnail);
 
             video = videoService.save(video);
+            try {
+                allowToUpload(uuid, authentication);
+            } catch (HttpClientErrorException e) {
+                logger.error("allow to upload error: " + e.getMessage());
+            }
 
-            return ResponseEntity.ok(modelMapper.map(video, VideoDto.class));
+            var uuidData = new HashMap<>();
+            uuidData.put("uuid", uuid);
+            return ResponseEntity.ok(new Object[]{modelMapper.map(video, VideoDto.class), uuidData});
         } catch (Exception e) {
             logger.error("error", e);
             return ResponseEntity.status(451).body("Error while processing");
         }
+    }
+
+    private void allowToUpload(String uuid, Authentication authentication) {
+        var restTemplate = new RestTemplate();
+        var url = STORAGE_HOST + "vid/allow";
+
+        var headers = new HttpHeaders();
+        headers.setBearerAuth(SERVER_TOKEN);
+
+        var body = new LinkedMultiValueMap<>();
+        body.add("uuid", uuid);
+        body.add("user", authentication.getName());
+
+        var request = new HttpEntity<>(body, headers);
+        restTemplate.exchange(url, HttpMethod.POST, request, String.class);
     }
 
 
@@ -143,6 +177,8 @@ public class UploadController {
             return ResponseEntity.status(404).build();
         }
         var video = optVideo.get();
+        var esVideo = modelMapper.map(video, EsVideoModel.class);
+        elasticVideoRepository.save(esVideo);
 
         video.setProcessedAi(true);
 
@@ -184,7 +220,7 @@ public class UploadController {
                 .build();
     }
 
-    private ResponseEntity<?> check(Long channelId, Authentication authentication, MultipartFile videoFile) {
+    private ResponseEntity<?> check(Long channelId, Authentication authentication) {
         if (channelId == null) {
             return ResponseEntity.badRequest().body("Channel ID is null");
         }
@@ -198,14 +234,6 @@ public class UploadController {
 
         if (!user.getChannels().contains(channel)) {
             return ResponseEntity.badRequest().body("User is not the owner of the channel " + channel.getName());
-        }
-
-        if (videoFile == null || videoFile.isEmpty()) {
-            return ResponseEntity.badRequest().body("Video is empty");
-        }
-
-        if (!checkVideoType(Objects.requireNonNull(videoFile.getOriginalFilename()))) {
-            return ResponseEntity.badRequest().body("Unsupported video format");
         }
 
         return null;

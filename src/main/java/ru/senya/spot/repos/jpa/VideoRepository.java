@@ -14,7 +14,10 @@ import java.util.Optional;
 @Where(clause = "deleted = false")
 public interface VideoRepository extends JpaRepository<VideoModel, Long> {
 
-    Page<VideoModel> findAllByDeletedIsFalse(@Nonnull    Pageable pageable);
+    Page<VideoModel> findAllByDeletedIsFalse(@Nonnull Pageable pageable);
+
+    List<VideoModel> findAllByDeletedIsFalse();
+
     Page<VideoModel> findAllByChannelIdAndDeletedIsFalse(Long id, Pageable pageable);
 
     Optional<VideoModel> findByPath(String path);

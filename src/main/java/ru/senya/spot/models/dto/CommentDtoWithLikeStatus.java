@@ -12,6 +12,7 @@ public class CommentDtoWithLikeStatus {
 
     private String text;
 
+
     private boolean deleted = false;
 
 

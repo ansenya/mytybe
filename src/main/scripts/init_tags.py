@@ -1,10 +1,10 @@
 import json
 import mysql.connector
 
-host = "localhost"
-user = "newuser"
-password = ""
-database = "tube"
+host = "video-spot.ru:3306"
+user = "spot-spring"
+password = "Fsi01?$4"
+database = "spot"
 
 connection = mysql.connector.connect(
     host=host,

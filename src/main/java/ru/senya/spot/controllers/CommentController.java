@@ -104,6 +104,7 @@ public class CommentController {
                                 .findByIdAndDeletedFalse(commentRepository.getReferenceById(commentID).getId()).get()
                                 .getNextComments()
                                 .stream()
+                                .filter(comment -> !comment.isDeleted())
                                 .map(comment -> {
                                     var dto = modelMapper.map(comment, CommentDtoWithLikeStatus.class);
                                     dto.setLikedByThisUser(comment.getLikedByUser().contains(userRepository.findByUsername(authentication.getName())));
@@ -116,6 +117,7 @@ public class CommentController {
                                 .findByIdAndDeletedFalse(commentRepository.getReferenceById(commentID).getId()).get()
                                 .getNextComments()
                                 .stream()
+                                .filter(comment -> !comment.isDeleted())
                                 .map(comment -> modelMapper.map(comment, CommentDtoWithLikeStatus.class)).toList();
             }
 
@@ -132,11 +134,13 @@ public class CommentController {
     @GetMapping("{id}")
     public ResponseEntity<?> getComment(@PathVariable Long id,
                                         Authentication authentication) {
-        CommentModel comment = commentRepository.findByIdAndDeletedFalse(id).orElse(null);
+        var optComment = commentRepository.findByIdAndDeletedFalse(id);
 
-        if (comment == null) {
+        if (optComment.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
+        var comment = optComment.get();
+
         if (authentication == null) {
             return ResponseEntity.status(401).build();
         }
@@ -154,11 +158,16 @@ public class CommentController {
 
     @DeleteMapping("{id}")
     public ResponseEntity<?> deleteComment(@PathVariable Long id) {
-        CommentModel comment = commentRepository.findByIdAndDeletedFalse(id).orElse(null);
+        var comment = commentRepository.findByIdAndDeletedFalse(id).orElse(null);
 
         if (comment == null) {
             return ResponseEntity.notFound().build();
         }
+        var prevComment = commentRepository.findByNextComments(comment);
+        prevComment.ifPresent(commentModel -> {
+            commentModel.getNextComments().remove(comment);
+            commentRepository.save(prevComment.get());
+        });
         comment.delete();
         commentRepository.saveAll(comment.getNextComments());
         commentRepository.save(comment);
@@ -209,7 +218,7 @@ public class CommentController {
             return ResponseEntity.notFound().build();
         }
         var comment = optComment.get();
-        UserModel user = null;
+        UserModel user;
         if (authentication != null && userRepository.existsByUsername(authentication.getName())) {
             user = userRepository.findByUsername(authentication.getName());
             if (comment.getDislikedByUser().contains(user)) {

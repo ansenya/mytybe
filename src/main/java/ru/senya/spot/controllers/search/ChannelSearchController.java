@@ -16,6 +16,7 @@ import ru.senya.spot.repos.jpa.ChannelRepository;
 import ru.senya.spot.repos.jpa.UserRepository;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 
 @RestController
 @RequestMapping("channels")
@@ -24,6 +25,8 @@ public class ChannelSearchController {
     private final ChannelRepository channelRepository;
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
+    private final HashMap<UserModel, ArrayList<String>> searchHistory = new HashMap<>();
+
 
     @Autowired
     public ChannelSearchController(ChannelRepository channelRepository, UserRepository userRepository) {
@@ -64,7 +67,33 @@ public class ChannelSearchController {
         int fromIndex = (int) pageRequest.getOffset();
         int toIndex = Math.min((fromIndex + pageRequest.getPageSize()), dtoList.size());
 
+        if (authentication != null) {
+            if (userRepository.existsByUsername(authentication.getName())) {
+                var history = searchHistory.get(user);
+                if (history != null) {
+                    if (history.size() > 4) {
+                        history.remove(0);
+                    }
+                } else {
+                    history = new ArrayList<>();
+                }
+                history.add(query);
+
+                searchHistory.put(user, history);
+            }
+        }
+
+
         return ResponseEntity.ok(new PageImpl<>(dtoList.subList(fromIndex, toIndex), pageRequest, dtoList.size()));
     }
+
+    @GetMapping("/searchHistory")
+    public ResponseEntity<?> getSearchHistory(Authentication authentication) {
+        if (authentication != null && userRepository.existsByUsername(authentication.getName())) {
+            return ResponseEntity.ok(searchHistory.get(userRepository.findByUsername(authentication.getName())));
+        }
+        return ResponseEntity.status(401).build();
+    }
+
 
 }

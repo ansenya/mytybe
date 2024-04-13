@@ -61,6 +61,9 @@ public class VideoService {
     public Page<VideoModel> findAll(Pageable pageable) {
         return videoRepository.findAllByDeletedIsFalse(pageable);
     }
+    public List<VideoModel> findAll() {
+        return videoRepository.findAllByDeletedIsFalse();
+    }
 
     public Page<VideoModel> findAllByChannelId(Long channelId, Pageable pageable) {
         return videoRepository.findAllByChannelIdAndDeletedIsFalse(channelId, pageable);

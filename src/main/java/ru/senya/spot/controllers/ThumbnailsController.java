@@ -6,14 +6,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import ru.senya.spot.controllers.video.StorageApiUtils;
+import ru.senya.spot.controllers.storage.FileUploadService;
 import ru.senya.spot.models.dto.VideoDto;
-import ru.senya.spot.models.jpa.ImageModel;
 import ru.senya.spot.repos.jpa.ImagesRepository;
 import ru.senya.spot.repos.jpa.UserRepository;
 import ru.senya.spot.services.VideoService;
-
-import java.util.Objects;
 
 
 @RestController
@@ -23,11 +20,11 @@ public class ThumbnailsController {
     final VideoService videoService;
     final UserRepository userRepository;
     final ImagesRepository imagesRepository;
-    private final StorageApiUtils storageApiUtils;
+    private final FileUploadService storageApiUtils;
     final ModelMapper modelMapper = new ModelMapper();
 
     @Autowired
-    public ThumbnailsController(VideoService videoService, UserRepository userRepository, ImagesRepository imagesRepository, StorageApiUtils storageApiUtils) {
+    public ThumbnailsController(VideoService videoService, UserRepository userRepository, ImagesRepository imagesRepository, FileUploadService storageApiUtils) {
         this.videoService = videoService;
         this.userRepository = userRepository;
         this.imagesRepository = imagesRepository;

@@ -25,6 +25,7 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import ru.senya.spot.configs.security.details.CustomUserDetailsService;
+import ru.senya.spot.env.RsaKeyProperties;
 
 @Configuration
 @EnableWebSecurity

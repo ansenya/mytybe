@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CurrentTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -27,6 +28,8 @@ public class ChannelModel {
     private Long id;
 
     private String name;
+
+    private String description;
 
     private Integer videosAmount;
 

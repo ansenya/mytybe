@@ -1,4 +1,4 @@
-package ru.senya.spot.configs.security;
+package ru.senya.spot.env;
 
 
 import org.springframework.boot.context.properties.ConfigurationProperties;

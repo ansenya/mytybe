@@ -2,8 +2,9 @@ package ru.senya.spot.controllers.video;
 
 import com.google.gson.Gson;
 import org.modelmapper.ModelMapper;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 import ru.senya.spot.models.es.EsVideoModel;
@@ -13,8 +14,11 @@ import ru.senya.spot.repos.es.ElasticVideoRepository;
 import ru.senya.spot.repos.jpa.TagRepository;
 import ru.senya.spot.services.VideoService;
 
+import static ru.senya.spot.MytybeApplication.SERVER_TOKEN;
+import static ru.senya.spot.MytybeApplication.STORAGE_HOST;
+
 @RestController
-@RequestMapping("video")
+@RequestMapping("videos")
 @CrossOrigin(origins = "*")
 public class ApiController {
 
@@ -32,15 +36,20 @@ public class ApiController {
         modelMapper = new ModelMapper();
     }
 
+
     @PostMapping("tag")
     public ResponseEntity<?> setTag(@RequestParam(value = "tag", required = false) String tag,
-                                    @RequestParam(value = "id", required = false) Long id) {
+                                    @RequestParam(value = "uuid", required = false) String uuid) {
 
         System.out.println(tag);
         TagModel tagModel = tagRepository.findByEnTag(tag);
-        VideoModel videoModel = videoService.findById(id);
+        var optVideo = videoService.findByUUID(uuid);
+        if (optVideo.isEmpty()) {
+            return ResponseEntity.status(404).build();
+        }
+        var videoModel = optVideo.get();
 
-        if (tagModel == null || videoModel == null) {
+        if (tagModel == null) {
             return ResponseEntity.status(404).build();
         }
 
