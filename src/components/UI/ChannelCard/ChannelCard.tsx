@@ -19,14 +19,10 @@ const ChannelCard: FC<ChannelCardProps> = ({ channel }) => {
     else return "подписчиков";
   }, [channel]);
 
-  const bannerStyles: React.CSSProperties = {
-    backgroundImage: `url(${channel.bbc || bigImage})`,
-  };
 
   return (
     <Link to={`/channels/${channel.id}`}>
       <div className={styles.card}>
-        <div className={styles.banner} style={bannerStyles}></div>
         <div className={styles.secondLine}>
           <img src={channel.chp} draggable={false} />
           <div className={styles.info}>

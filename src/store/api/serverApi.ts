@@ -46,11 +46,46 @@ export const serverApi = createApi({
         body: { ...registerData },
       }),
     }),
-    uploadVideo: build.mutation({
+    createVideoEntity: build.mutation({
       query: (videoData) => ({
         url: "videos/upload",
         method: "POST",
         body: videoData,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("jwtoken")}`,
+        },
+      }),
+    }),
+
+    uploadVideo: build.mutation({
+      query: (videoData) => ({
+        url: "https://video-spot.ru/storage/vid/upload",
+        method: "POST",
+        body: videoData,
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("jwtoken")}`,
+        },
+      }),
+    }),
+
+    updateUser: build.mutation<any, { id: number; userData: FormData }>({
+      query: ({ id, userData }) => {
+        return {
+          url: `users/${id}`,
+          method: "PUT",
+          body: userData,
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("jwtoken")}`,
+          },
+        };
+      },
+    }),
+
+    createChannel: build.mutation({
+      query: (channelData) => ({
+        url: "channels/create",
+        method: "POST",
+        body: channelData,
         headers: {
           Authorization: `Bearer ${localStorage.getItem("jwtoken")}`,
         },
@@ -214,6 +249,7 @@ export const serverApi = createApi({
         },
       }),
     }),
+
     getChannels: build.query<
       PaginationResponse<IChannel>,
       ChannelsRequest & { searchQuery?: string; isSubs?: boolean }
@@ -226,9 +262,10 @@ export const serverApi = createApi({
           sort,
         };
         if (searchQuery !== undefined) params.q = searchQuery;
-        console.log(searchQuery)
         const headers = token ? { Authorization: `Bearer ${token}` } : {};
-        const url = isSubs ? "users/followings" : `channels${searchQuery !== undefined ? "/search" : ""}`;
+        const url = isSubs
+          ? "users/followings"
+          : `channels${searchQuery !== undefined ? "/search" : ""}`;
         return {
           url,
           headers,
@@ -247,7 +284,7 @@ export const {
   useLazyGetUserByIdQuery,
   useLazyGetVideosQuery,
   useRegisterMutation,
-  useUploadVideoMutation,
+  useCreateVideoEntityMutation,
   useGetVideoByIdQuery,
   useGetUserChannelsQuery,
   useLikeVideoMutation,
@@ -260,4 +297,7 @@ export const {
   useFollowMutation,
   useDeleteVideoByIdMutation,
   useLazyGetChannelsQuery,
+  useUpdateUserMutation,
+  useCreateChannelMutation,
+  useUploadVideoMutation,
 } = serverApi;

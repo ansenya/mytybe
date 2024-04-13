@@ -3,6 +3,7 @@ import React, { FC, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import ChannelCard from "../../components/UI/ChannelCard/ChannelCard";
 import InlineLoader from "../../components/UI/Loader/InlineLoader";
+import ShowButton from "../../components/UI/ShowButton/ShowButton";
 import { IChannel } from "../../models";
 import { ChannelsRequest } from "../../models/ChannelModels";
 import { useLazyGetChannelsQuery } from "../../store/api/serverApi";
@@ -10,9 +11,10 @@ import styles from "./ChannelsPage.module.scss";
 
 interface ChannelsPaginationProps {
   type: string;
+  isSmallScreen?: boolean;
 }
 
-const ChannelsPagination: FC<ChannelsPaginationProps> = ({ type }) => {
+const ChannelsPagination: FC<ChannelsPaginationProps> = ({ type, isSmallScreen }) => {
   const { search } = useLocation();
   const query = useMemo(() => {
     return new URLSearchParams(search);
@@ -30,7 +32,7 @@ const ChannelsPagination: FC<ChannelsPaginationProps> = ({ type }) => {
     let body: ChannelsRequest & { searchQuery?: string; isSubs?: boolean } = {
       page: pageNumber,
       sort: "desc",
-      size: 10,
+      size: 5,
     };
 
     //@ts-expect-error
@@ -41,6 +43,7 @@ const ChannelsPagination: FC<ChannelsPaginationProps> = ({ type }) => {
   }, [pageNumber]);
 
   useEffect(() => {
+    if(isSmallScreen) return;
     if (isFetching || data === undefined) return;
     observer.current?.disconnect();
     observer.current = new IntersectionObserver((entries, observer) => {
@@ -77,15 +80,31 @@ const ChannelsPagination: FC<ChannelsPaginationProps> = ({ type }) => {
       </div>
       {isFetching && <InlineLoader />}
 
-      <div
-        style={{
-          width: "100%",
-          height: 20,
-          background: "transparent",
-          marginTop: 10,
-        }}
-        ref={divRef}
-      ></div>
+      {isSmallScreen || (
+        <div
+          style={{
+            width: "100%",
+            height: 20,
+            background: "transparent",
+            marginTop: 10,
+          }}
+          ref={divRef}
+        ></div>
+      )}
+      <br />
+      {isSmallScreen && totalPages - 1 > pageNumber && (
+        <ShowButton
+          isWide
+          onClick={() => {
+            if (totalPages - 1 > pageNumber) {
+              setPageNumber((prevstate) => prevstate + 1);
+            }
+          }}
+          disabled={isFetching || data === undefined}
+        >
+          еще...
+        </ShowButton>
+      )}
     </>
   );
 };

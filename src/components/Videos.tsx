@@ -6,12 +6,13 @@ interface VideosProps {
   categoryName: string;
   videos: IVideo[];
   isEditable: boolean;
+  isNarrow?: boolean;
 }
 
-const Videos = ({ videos, categoryName, isEditable }: VideosProps) => {
+const Videos = ({ videos, categoryName, isEditable, isNarrow }: VideosProps) => {
 
   return (
-    <div className="content__block">
+    <div className={`content__block ${isNarrow ? "narrow": ""}`}>
       {videos.map((video) => (
         <VideoCard
           id={video.id}

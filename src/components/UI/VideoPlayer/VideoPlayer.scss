@@ -7,6 +7,7 @@
   border-radius: 10px;
   display: flex;
   align-items: center;
+  cursor: none;
   @media (max-width: 1025px) {
     width: 100%;
     align-self: center;
@@ -47,9 +48,13 @@
       z-index: -1;
       pointer-events: none;
     }
+    &:hover{
+      opacity: 1;
+    }
   }
 
-  &:hover, &.paused, &:focus-within {
+  &.controls-active {
+    cursor: auto;
     .controls-container {
       opacity: 1;
     }
@@ -119,6 +124,9 @@
       background: white;
       outline: none;
       border-radius: 5px;
+      &:hover{
+        cursor: pointer;
+      }
 
       //&::-webkit-slider-runnable-track{
       //  background-color: $primary-color;

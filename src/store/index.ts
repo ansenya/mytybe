@@ -4,6 +4,7 @@ import {setupListeners} from "@reduxjs/toolkit/query";
 import {authReducer} from "./slices/authSlice";
 import { focusReducer } from "./slices/focusSlice";
 import { commentReducer } from "./slices/commentPostSlice";
+import { deletedVideosReducer } from "./slices/DeletedVideoSlice";
 
 
 export const store = configureStore({
@@ -12,6 +13,7 @@ export const store = configureStore({
         auth: authReducer,
         focus: focusReducer,
         comment: commentReducer,
+        deletedVideos: deletedVideosReducer,
     },
     middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(serverApi.middleware)
 })

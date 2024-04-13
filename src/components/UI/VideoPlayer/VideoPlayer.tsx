@@ -18,6 +18,7 @@ import RepeatIcon from "../../../assets/redo-icon-svgrepo-com.svg";
 import ChipiChapa from "../../../assets/asdf.mp4";
 import PlayerSelect from "../PlayerSelect/PlayerSelect";
 import usePlayerKeys from "../../../hooks/usePlayerKeys";
+import { Settings } from "lucide-react";
 
 interface VideoPlayerProps {
   source: string;
@@ -30,11 +31,14 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ source, qValues }) => {
 
   const [isPlaying, setIsPlaying] = useState(true);
   const [isFullScreen, setIsFullScreen] = useState(false);
-  const [volume, setVolume] = useState(1);
+  const [volume, setVolume] = useState(
+    Number(localStorage.getItem("volume")) || 1,
+  );
   const [savedVolume, setSavedVolume] = useState(1);
   const [total, setTotal] = useState("0:00");
   const [current, setCurrent] = useState("0:00");
   const [progress, setProgress] = useState(0);
+  const [savedProgress, setSavedProgress] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [playbackSpeed, setPlaybackSpeed] = useState<string>("1");
   const [isPip, setIsPip] = useState(false);
@@ -42,6 +46,8 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ source, qValues }) => {
   const [quality, setQuality] = useState<string>(
     Math.max(...qValues.map((value: string) => parseInt(value))).toString(),
   );
+
+  const [showControls, setShowControls] = useState(false);
   const [isError, setIsError] = useState<boolean>(false);
   const pValues = ["2", "1.5", "1", "0.5"];
 
@@ -118,6 +124,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ source, qValues }) => {
   function handleVolumeChange(e: React.ChangeEvent<HTMLInputElement>) {
     const newVolume = parseFloat(e.target.value);
     setVolume(newVolume);
+    localStorage.setItem("volume", String(newVolume));
   }
 
   function handlePause() {
@@ -128,6 +135,14 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ source, qValues }) => {
   const handleProgress = (state: { played: number; playedSeconds: number }) => {
     if (isLoading) return;
     setProgress(state.played);
+
+    if (savedProgress) {
+      setProgress(savedProgress);
+      playerRef.current?.seekTo(
+        savedProgress * playerRef.current?.getDuration(),
+      );
+      setSavedProgress(0);
+    }
     setIsError(false);
     setTotal(formatTime(playerRef.current?.getDuration() || 0));
     setCurrent(formatTime(state.playedSeconds));
@@ -205,11 +220,45 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ source, qValues }) => {
     e.stopPropagation();
   };
 
+  const [timer, setTimer] = useState<ReturnType<typeof setTimeout>>();
+
+  function handleMouseMove() {
+    setShowControls(true);
+    clearTimeout(timer);
+    let newTimer = setTimeout(() => {
+      setShowControls(false);
+    }, 3000);
+    setTimer(newTimer);
+  }
+
+  function handleMouseClick() {
+    handlePause();
+    setShowControls(true);
+    clearTimeout(timer);
+    let newTimer = setTimeout(() => {
+      setShowControls(false);
+    }, 3000);
+    setTimer(newTimer);
+  }
+
+  const [isMenuShown, setIsMenuShown] = useState(false);
+
+  useEffect(() => {
+    setSavedProgress(progress);
+  }, [quality]);
+
   return (
     <div
       id="player-container"
-      className={["player", !isPlaying ? "paused" : ""].join(" ")}
-      onClick={handlePause}
+      className={[
+        "player",
+        !isPlaying || showControls ? "controls-active" : "",
+      ].join(" ")}
+      onClick={handleMouseClick}
+      onTouchStart={handleMouseClick}
+      onMouseEnter={() => setShowControls(true)}
+      onMouseLeave={() => setShowControls(false)}
+      onMouseMove={handleMouseMove}
     >
       <ReactPlayer
         playing={isPlaying && !isLoading}
@@ -245,6 +294,15 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ source, qValues }) => {
         </div>
       )}
       <div className="controls-container" onClick={handleControlsClick}>
+        <PlayerSelect
+          isShown={isMenuShown}
+          setIsShown={setIsMenuShown}
+          qualitiesAvailible={qValues}
+          quality={quality}
+          playbackSpeed={playbackSpeed}
+          setPlaybackSpeed={setPlaybackSpeed}
+          setQuality={setQuality}
+        />
         <div className="timeline-container">
           <input
             type="range"
@@ -283,12 +341,12 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ source, qValues }) => {
             <div className="current">{current}</div>/
             <div className="total">{total}</div>
           </div>
-          <PlayerSelect
-            quality={quality}
-            playbackSpeed={playbackSpeed}
-            setPlaybackSpeed={setPlaybackSpeed}
-            setQuality={setQuality}
-          />
+          <button
+            className="controls__button"
+            onClick={() => setIsMenuShown((state) => !state)}
+          >
+            <Settings size={25} color={"white"} />
+          </button>
           <PlayerButton icon={PipIcon} onClick={handlePip}></PlayerButton>
           <PlayerButton
             icon={isFullScreen ? ExitIcon : FullIcon}

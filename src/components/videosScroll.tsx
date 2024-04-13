@@ -6,17 +6,20 @@ import InlineLoader from "./UI/Loader/InlineLoader";
 import { useLocation, useParams } from "react-router-dom";
 import { VideosRequest } from "../models/VideoModels";
 import ShowButton from "./UI/ShowButton/ShowButton";
+import { useAppSelector } from "../hooks/redux";
 
 interface VideoScrollProps {
   isSmallScreen?: boolean;
   channelId?: number;
   isEditable?: boolean;
+  isNarrow?: boolean;
 }
 
 const VideoScroll: FC<VideoScrollProps> = ({
   isSmallScreen,
   channelId,
   isEditable,
+  isNarrow
 }) => {
   const { id } = useParams();
   const { search } = useLocation();
@@ -30,6 +33,8 @@ const VideoScroll: FC<VideoScrollProps> = ({
 
   let [fetchData, { data, isFetching, error }] = useLazyGetVideosQuery();
   const [videos, setVideos] = useState<IVideo[]>([]);
+
+  const {deletedIds} = useAppSelector(state=>state.deletedVideos);
 
   useEffect(() => {
     let body: VideosRequest & { searchQuery?: string } = {
@@ -71,13 +76,18 @@ const VideoScroll: FC<VideoScrollProps> = ({
     }
   }, [isFetching, data]);
 
+  function filterVideos(video: IVideo) {
+    return video.id !== Number(id) && !deletedIds.includes(video.id) && video.qualities.length !== 0 ;
+  }
+
   return (
     <>
       <div>
         <Videos
-          videos={videos.filter((video: IVideo) => video.id !== Number(id))}
+          videos={videos.filter((video: IVideo) => filterVideos(video))}
           categoryName="fuck"
           isEditable={isEditable || false}
+          isNarrow={isNarrow}
         />
         <span style={{ color: "transparent" }}>penis</span>
       </div>

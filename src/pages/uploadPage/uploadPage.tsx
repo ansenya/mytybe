@@ -40,12 +40,6 @@ const UploadPage = () => {
     videoFileError: "",
   });
 
-  useEffect(() => {
-    if (data) {
-      console.log(data);
-    }
-  }, [data]);
-
   const handleUpload = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const nameError = lengthValidationError(videoName, 100);
@@ -59,14 +53,22 @@ const UploadPage = () => {
       };
     });
 
-    if (descError || nameError || videoError || videoFile === null || channelId === 0) return;
+    if (
+      descError ||
+      nameError ||
+      videoError ||
+      videoFile === null ||
+      channelId === 0
+    )
+      return;
 
     const postFormData = new FormData();
     postFormData.append("channelId", String(channelId));
-    postFormData.append("videoFile", videoFile)
+    postFormData.append("videoFile", videoFile);
 
     if (videoName) postFormData.append("videoName", videoName);
-    if (videoDescription) postFormData.append("videoDescription", videoDescription);
+    if (videoDescription)
+      postFormData.append("videoDescription", videoDescription);
     if (imageFile) postFormData.append("imageFile", imageFile);
 
     post(postFormData);
@@ -84,11 +86,7 @@ const UploadPage = () => {
             />
           </div>
           <div className="frame__content">
-            <form
-              className="video__form"
-              id={formId}
-              onSubmit={handleUpload}
-            >
+            <form className="video__form" id={formId} onSubmit={handleUpload}>
               <div className="field__container">
                 <TextArea
                   labelName="Название"
@@ -133,14 +131,6 @@ const UploadPage = () => {
             <div className="frame__select"></div>
           </div>
           <div className="frame__foot">
-            <CButton
-              type="submit"
-              form={formId}
-              buttonType="primary"
-              style={{ width: "100%" }}
-            >
-              Загрузить
-            </CButton>
           </div>
         </div>
       </div>

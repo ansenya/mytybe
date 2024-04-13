@@ -4,8 +4,7 @@ import {useGetUserByIdQuery} from "../store/api/serverApi";
 const UsersPage = () => {
 
     return (
-        <div>
-
+        <div> 
         </div>
     );
 };

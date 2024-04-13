@@ -54,7 +54,7 @@ const ChannelView: FC<ChannelViewProps> = ({ channel }) => {
   }
 
   const bannerStyles: React.CSSProperties = {
-    backgroundImage: `url(${channel.bbc ?? bigImage})`,
+    backgroundImage: `url(${channel.bigBlackCock ?? bigImage})`,
   };
   const [isSpreaded, setIsSpreaded] = useState(false);
   const pRef = useRef<HTMLParagraphElement>(null);
@@ -100,14 +100,7 @@ const ChannelView: FC<ChannelViewProps> = ({ channel }) => {
             </div>
             <div className={styles.description}>
               <p ref={pRef} className={!isSpreaded ? styles.notSpreaded : ""}>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam
-                lobortis orci id ante faucibus, iaculis suscipit nulla
-                porttitor. Suspendisse potenti. Etiam quis augue nisl. Donec at
-                tincidunt velit. Pellentesque libero metus, varius ac sodales
-                et, cursus vel sapien. Lorem ipsum dolor sit amet, consectetur
-                adipiscing elit. Donec ultrices magna ac massa bibendum, sed
-                ultricies nulla dignissim. Quisque tincidunt ac lacus posuere
-                convallis.
+                {channel.description}
               </p>
               {showSpreadButton && (
                 <span onClick={() => setIsSpreaded((prevstate) => !prevstate)}>

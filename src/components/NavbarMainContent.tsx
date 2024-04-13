@@ -24,6 +24,8 @@ import useDebounce from "../hooks/useDebounce";
 import { IVideo } from "../models";
 import { useActions } from "../hooks/actions";
 import SearchSuggestions from "./UI/SearchSuggestions/SearchSuggestions";
+import {Search} from "lucide-react";
+import { useGetSearch } from "../hooks/useGetSearch";
 
 interface MainContentProps {
   isSmallScreen: boolean;
@@ -45,8 +47,6 @@ const NavbarMainContent: FC<MainContentProps> = ({
   const [isProfile, setIsProfile] = useState<boolean>(false);
   const [query, setQuery] = useState("");
   const debouncedQuery = useDebounce(query, 200);
-  const [fetchSearch, { data, isLoading, error }] = useLazyGetVideosQuery();
-  const [fetchChannelsSearch, chSearchQuery] = useLazyGetChannelsQuery();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -59,28 +59,13 @@ const NavbarMainContent: FC<MainContentProps> = ({
       setIsFocused({ isFocused: false, focusTargetId: inputId });
       inputRef.current?.blur();
       navigate(
-        `${location.pathname === "/channels" ? "channels" : ""}/?q=${query}`,
+        `results/?q=${query}`,
       );
     }
   };
 
-  useEffect(() => {
-    if (location.pathname === "/channels") {
-      fetchChannelsSearch({
-        searchQuery: debouncedQuery,
-        page: 0,
-        size: 5,
-        sort: "desc",
-      });
-    } else {
-      fetchSearch({
-        searchQuery: debouncedQuery,
-        page: 0,
-        size: 5,
-        sort: "desc",
-      });
-    }
-  }, [debouncedQuery]);
+
+  const {channelsResult, videosResult} = useGetSearch(debouncedQuery);
 
   function handleSearchButton() {
     setSearchBarVisible(true);
@@ -115,7 +100,6 @@ const NavbarMainContent: FC<MainContentProps> = ({
                 id={inputId}
                 type="text"
                 spellCheck={false}
-                placeholder={location.pathname === "/channels" ? "Поиск по каналам": "Поиск по видео"}
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={handleKeyDown}
@@ -131,8 +115,8 @@ const NavbarMainContent: FC<MainContentProps> = ({
               />
             </div>
             <SearchSuggestions
-              videosSuggested={data?.content}
-              channelsSuggested={chSearchQuery.data?.content}
+              videosSuggested={videosResult}
+              channelsSuggested={channelsResult}
               currentInputId={inputId}
             />
           </div>

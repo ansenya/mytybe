@@ -1,6 +1,7 @@
 export const lengthValidationError = (name: string, maxLen: number) => {
   let error = "";
   if (name.length > maxLen) error = `Максимальная длина ${maxLen}`;
+  if (name.length === 0) error = "Поле обязательно к заполнению";
   return error;
 };
 

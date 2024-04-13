@@ -25,7 +25,8 @@ export interface IChannel {
   user: IUser;
   followersAmount: number;
   followedByThisUser?: boolean;
-  bbc?: string;
+  bigBlackCock?: string;
+  description?: string;
 }
 
 export interface IVideo {

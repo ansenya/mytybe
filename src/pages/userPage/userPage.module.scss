@@ -1,0 +1,82 @@
+@import "../../variables";
+
+.profile {
+  width: 80%;
+  margin: auto;
+  @media (max-width: 600px) {
+    width: 95%;
+  }
+  button {
+    border: none;
+    outline: none;
+    background: $primary-color;
+    color: white;
+    padding: 8px;
+    border-radius: 10px;
+    font-weight: bolder;
+
+    cursor: pointer;
+
+    &:hover {
+      background: $primary-hovered;
+    }
+    &:active {
+      background: $primary-pressed;
+    }
+  }
+
+  display: flex;
+  flex-direction: column;
+  gap: 25px;
+
+  .channelsHead {
+    display: flex;
+    gap: 15px;
+    h1 {
+      color: white;
+    }
+  }
+
+  .head {
+    display: flex;
+    gap: 15px;
+    width: 100%;
+    padding: 20px;
+    border-radius: 20px;
+    border: 2px solid $primary-color;
+
+    .userInfo {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      @media (max-width: 600px) {
+        flex-direction: column;
+      }
+      .name {
+        display: flex;
+        h1 {
+          color: white;
+          font-size: 50px;
+        }
+        p {
+          color: white;
+          font-size: 20px;
+          line-height: 20px;
+        }
+      }
+    }
+
+    .picture {
+      img {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border-radius: 50%;
+        cursor: pointer;
+        -webkit-user-select: none;
+        user-select: none;
+      }
+    }
+  }
+}

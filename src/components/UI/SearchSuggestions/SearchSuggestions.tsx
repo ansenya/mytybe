@@ -5,18 +5,22 @@ import { IChannel, IVideo } from "../../../models";
 import styles from "./SearchSuggestions.module.scss";
 
 interface props {
-  videosSuggested?: IVideo[];
-  channelsSuggested?: IChannel[];
+  videosSuggested: IVideo[];
+  channelsSuggested: IChannel[];
   currentInputId: string;
 }
 
-const SearchSuggestions: FC<props> = ({ videosSuggested, channelsSuggested, currentInputId }) => {
+const SearchSuggestions: FC<props> = ({
+  videosSuggested,
+  channelsSuggested,
+  currentInputId,
+}) => {
   const navigate = useNavigate();
   const { isFocused, focusTargetId } = useAppSelector((state) => state.focus);
   const [isHovered, setIsHovered] = useState(false);
 
   const handleClick = (query: string) => {
-    navigate(`${channelsSuggested?.length != 0 ?  "channels" : "/"}?q=${query}`);
+    navigate(`results?q=${query}`);
   };
 
   function showCondition() {
@@ -34,14 +38,25 @@ const SearchSuggestions: FC<props> = ({ videosSuggested, channelsSuggested, curr
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      {(videosSuggested || channelsSuggested)?.map((item: IVideo | IChannel) => (
+      {channelsSuggested.map((channel) => (
         <div
           className={styles.suggestion}
-          key={item.id}
-          onClick={() => handleClick(item.name)}
-          onTouchStart={() => handleClick(item.name)}
+          key={channel.id}
+          onClick={() => handleClick(channel.name)}
+          onTouchStart={() => handleClick(channel.name)}
         >
-          <p>{item.name}</p>
+          <img className={styles.channelAvatar} src={channel?.chp}/>
+          <p>{channel.name}</p>
+        </div>
+      ))}
+      {videosSuggested.map((video) => (
+        <div
+          className={styles.suggestion}
+          key={video.id}
+          onClick={() => handleClick(video.name)}
+          onTouchStart={() => handleClick(video.name)}
+        >
+          <p>{video.name}</p>
         </div>
       ))}
     </div>

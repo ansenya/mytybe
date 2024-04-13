@@ -8,6 +8,8 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { useActions } from "../hooks/actions";
 import { useAppSelector } from "../hooks/redux";
 import SearchSuggestions from "./UI/SearchSuggestions/SearchSuggestions";
+import { IChannel, IVideo } from "../models";
+import { useGetSearch } from "../hooks/useGetSearch";
 
 interface NavSearchbarProps {
   setSearchBarVisible: (state: boolean) => void;
@@ -33,14 +35,8 @@ const NavSearchbar: FC<NavSearchbarProps> = ({ setSearchBarVisible }) => {
     }
   };
 
-  useEffect(() => {
-    fetchSearch({
-      searchQuery: debouncedQuery,
-      page: 0,
-      size: 5,
-      sort: "desc",
-    });
-  }, [debouncedQuery]);
+  const {channelsResult, videosResult} = useGetSearch(debouncedQuery);
+
 
   useEffect(() => {
     inputRef?.current?.focus();
@@ -85,7 +81,8 @@ const NavSearchbar: FC<NavSearchbarProps> = ({ setSearchBarVisible }) => {
             />
           </div>
           <SearchSuggestions
-            videosSuggested={data?.content}
+            videosSuggested={videosResult}
+            channelsSuggested={channelsResult}
             currentInputId={mobileInputId}
           />
         </div>

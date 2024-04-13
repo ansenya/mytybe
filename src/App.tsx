@@ -4,7 +4,7 @@ import Layout from "./pages/layout";
 import VideosPage from "./pages/videosPage";
 import ChannelsPage from "./pages/channelsPage/ChannelsPage";
 import UsersPage from "./pages/usersPage";
-import UserPage from "./pages/userPage";
+import UserPage from "./pages/userPage/userPage";
 import VideoPage from "./pages/videoPage/videoPage";
 import ChannelPage from "./pages/channelPage";
 import ErrorPage from "./pages/errorPage";
@@ -12,12 +12,13 @@ import RegistrationPage from "./pages/authPages/registrationPage";
 import LoginPage from "./pages/authPages//loginPage";
 import RequireAuth from "./hoc/RequireAuth";
 import Logout from "./pages/logout";
-import UploadPage from "./pages/uploadPage/uploadPage";
+import UploadPage from "./pages/uploadPage/upPage";
 import BlockAuth from "./hoc/BlockAuth";
 
 import "./App.scss";
 import { Toaster } from "sonner";
 import SubscriptionsPage from "./pages/channelsPage/SubscriptionsPage";
+import SearchPage from "./pages/searchPage/searchPage";
 
 const App = () => {
   return (
@@ -61,7 +62,8 @@ const App = () => {
           ></Route>
           <Route path="channels/:id" element={<ChannelPage />}></Route>
           <Route path="videos/:id" element={<VideoPage />}></Route>
-          <Route path="users/:id" element={<UserPage />}></Route>
+          <Route path="user/:id" element={<UserPage />}></Route>
+          <Route path="results" element={<SearchPage/>}/>
           <Route path="*" element={<ErrorPage />}></Route>
         </Route>
       </Routes>

@@ -5,12 +5,19 @@ import settingsIcon from "../../../assets/settings-svgrepo-com.svg";
 import speedIcon from "../../../assets/speed-fill-svgrepo-com.svg";
 import hdIcon from "../../../assets/hd-svgrepo-com.svg";
 import tickIcon from "../../../assets/checkmark-svgrepo-com.svg";
+import { Settings } from "lucide-react";
+import { FastForward } from "lucide-react";
+import { Tv2 } from "lucide-react";
+import { Check } from "lucide-react";
 
 interface PlayerSelectProps {
+  qualitiesAvailible: string[];
   quality: string;
   playbackSpeed: string;
   setQuality: Function;
   setPlaybackSpeed: Function;
+  isShown: boolean;
+  setIsShown: Function;
 }
 
 interface IMenu {
@@ -18,54 +25,42 @@ interface IMenu {
 }
 
 const PlayerSelect: FC<PlayerSelectProps> = ({
+  setIsShown,
+  isShown,
+  qualitiesAvailible,
   quality,
   playbackSpeed,
   setQuality,
   setPlaybackSpeed,
 }) => {
-  const [isMenuOpened, setIsMenuOpened] = useState<boolean>(false);
   const [isQualityOpened, setIsQualityOpened] = useState<boolean>(false);
   const [isSpeedOpened, setIsSpeedOpened] = useState<boolean>(false);
   let timer: NodeJS.Timer;
 
   const handleSpeedChoice = (event: React.MouseEvent<HTMLDivElement>) => {
-    setIsMenuOpened(false);
+    setIsShown(false);
     setIsSpeedOpened(false);
     setPlaybackSpeed(event.currentTarget.dataset.value);
   };
 
   const handleQualityChoice = (event: React.MouseEvent<HTMLDivElement>) => {
-    setIsMenuOpened(false);
+    setIsShown(false);
     setIsQualityOpened(false);
     setQuality(event.currentTarget.dataset.value);
   };
-
- const handleMenuTriggered = () => {
-    setIsQualityOpened(false);
-    setIsSpeedOpened(false);
-    setIsMenuOpened(prevState => !prevState)
-  } 
 
   const menu: IMenu = {
     Разрешение: setIsQualityOpened,
     Скорость: setIsSpeedOpened,
   };
-  const qValues = ["720", "480", "360", "144"];
+  const qValues = [...qualitiesAvailible].reverse();
   const pValues = ["2", "1.5", "1", "0.5"];
 
   return (
-    <div className={styles.selectContainer}>
-      <PlayerButton
-        icon={settingsIcon}
-        onClick={handleMenuTriggered}
-      />
+    <div className={[styles.container, isShown ? styles.active : ""].join(" ")}>
       <div
-        className={[styles.options, isMenuOpened ? styles.active : ""].join(
-          " ",
-        )}
+        className={[styles.options, isShown ? styles.active : ""].join(" ")}
         onClick={(e) => e.stopPropagation()}
-        onMouseLeave={() => {isMenuOpened ? timer = setTimeout(handleMenuTriggered, 2000) : console.log("penis")}}
-        onMouseEnter={() => clearTimeout(timer)}
       >
         {!isSpeedOpened &&
           !isQualityOpened &&
@@ -75,11 +70,20 @@ const PlayerSelect: FC<PlayerSelectProps> = ({
               onClick={() => menu[option as string](true)}
               key={index}
             >
-              <div><img src={option === "Разрешение" ? hdIcon : speedIcon} /> {option}</div>
-              <span>{option === "Разрешение" ? `${quality}p` : `${playbackSpeed}x`}</span>
+              <div className={styles.name}>
+                {option === "Разрешение" ? (
+                  <Tv2 size={20} color={"white"} />
+                ) : (
+                  <FastForward size={20} color={"white"} />
+                )}
+                <div>{option}</div>
+              </div>
+              <span>
+                {option === "Разрешение" ? `${quality}p` : `${playbackSpeed}x`}
+              </span>
             </div>
           ))}
-        {isQualityOpened && 
+        {isQualityOpened &&
           qValues.map((option: string, index: number) => (
             <div
               className={[
@@ -90,7 +94,11 @@ const PlayerSelect: FC<PlayerSelectProps> = ({
               onClick={handleQualityChoice}
               key={index}
             >
-              <div>{option === quality && <img src={tickIcon}/>}</div>
+              <div>
+                {option === quality && (
+                  <Check color={"white"} size={20} strokeWidth={3} />
+                )}
+              </div>
               <span>{option}p</span>
             </div>
           ))}
@@ -105,7 +113,11 @@ const PlayerSelect: FC<PlayerSelectProps> = ({
               onClick={handleSpeedChoice}
               key={index}
             >
-              <div>{option === playbackSpeed && <img src={tickIcon}/>}</div>
+              <div>
+                {option === playbackSpeed && (
+                  <Check color={"white"} size={20} strokeWidth={3} />
+                )}
+              </div>
               <span>{option}x</span>
             </div>
           ))}

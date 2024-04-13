@@ -26,16 +26,22 @@ const TextArea: FC<TextAreaProps> = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const [inputLength, setInputLength] = useState<number>(0);
 
+  useEffect(() => {
+    if (!inputLength && areaRef.current) {
+      areaRef.current.style.height = "24px";
+    }
+  }, [inputLength]);
+
   function inputHandler() {
     if (!areaRef.current) return;
-    areaRef.current.style.height = "auto";
-    areaRef.current.style.height = `${areaRef.current.scrollHeight}px`;
-
-    setInputLength(areaRef.current?.value.length);
+    areaRef.current.style.height = "24px";
+    let newHeight = areaRef.current.scrollHeight;
+    areaRef.current.style.height = `${newHeight}px`;
   }
 
   function resizableInputHandler() {
     if (inputRef.current) setInputLength(inputRef.current?.value.length);
+    if (areaRef.current) setInputLength(areaRef.current?.value.length);
   }
 
   useEffect(() => {
@@ -67,6 +73,7 @@ const TextArea: FC<TextAreaProps> = ({
               inputLength > maxLength ? styles.tooLong : "",
             ].join(" ")}
             ref={areaRef}
+            onInput={(e) => resizableInputHandler()}
           />
         ) : (
           <input

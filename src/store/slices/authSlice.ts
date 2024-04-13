@@ -35,6 +35,9 @@ const authSlice = createSlice({
       localStorage.removeItem("jwtoken")
       return {user: null, isError: true, isLoaded: true};
     },
+    updateAvatar(state, payload: PayloadAction<{user: IUser, newPfp: string}>) {
+      state.user = {...payload.payload.user, pfp: payload.payload.newPfp}
+    }
   },
 });
 

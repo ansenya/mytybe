@@ -8,6 +8,7 @@ import React, {
 import styles from "./DropFileInput.module.scss";
 import uploadImage from "../../../assets/upload-svgrepo-com.svg";
 import tickImage from "../../../assets/tick-checkbox-svgrepo-com.svg";
+import InlineLoader from "../Loader/InlineLoader";
 
 interface FileInputAddProps {
   fileSet: Function;
@@ -59,7 +60,6 @@ const DropFileInput: FC<FormFieldProps> = ({ fileSet, ...props }) => {
 
   return (
     <div>
-      <h1 className={styles.label}>{"Видеофайл*"}</h1>
       <div
         className={[
           styles.dropField,
@@ -91,14 +91,7 @@ const DropFileInput: FC<FormFieldProps> = ({ fileSet, ...props }) => {
             </>
           ) : (
             <>
-              <img src={tickImage} alt="upload" draggable={false} />
-              <p className={styles.contentText}>
-                Загружено.
-                <span className={styles.uploadLink} onClick={cancelHandler}>
-                  {" "}
-                  отменить
-                </span>
-              </p>
+                <InlineLoader/>
             </>
           )}
         </div>
