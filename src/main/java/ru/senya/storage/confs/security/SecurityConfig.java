@@ -20,13 +20,11 @@ public class SecurityConfig {
     private final RsaKeyProperties rsaKeys;
     private final CustomUserDetailsService userDetailsService;
 
-
     @Autowired
     public SecurityConfig(RsaKeyProperties rsaKeys, CustomUserDetailsService userDetailsService) {
         this.rsaKeys = rsaKeys;
         this.userDetailsService = userDetailsService;
     }
-
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -40,7 +38,6 @@ public class SecurityConfig {
                 )
                 .oauth2ResourceServer(configurer -> configurer.jwt(jwt -> jwt.decoder(jwtDecoder())))
                 .userDetailsService(userDetailsService)
-//                .authenticationProvider(authenticationProvider())
                 .httpBasic(Customizer.withDefaults());
 
         return http.build();

@@ -20,4 +20,13 @@ public class UserService {
     public Optional<UserModel> findByUsername(String username) {
         return userRepository.findByUsername(username);
     }
+
+
+    public boolean existsByUsername(String username) {
+        return userRepository.existsByUsername(username);
+    }
+
+    public UserModel save(UserModel user) {
+        return userRepository.save(user);
+    }
 }

@@ -2,13 +2,17 @@ package ru.senya.storage.controllers;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+import ru.senya.storage.models.UserModel;
+import ru.senya.storage.service.UserService;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -21,19 +25,46 @@ import static ru.senya.storage.controllers.Utils.save;
 @RestController
 public class VideoUploadController {
     private final Logger log = LoggerFactory.getLogger(VideoUploadController.class);
+    private final UserService userService;
+
+    @Autowired
+    public VideoUploadController(UserService userService) {
+        this.userService = userService;
+    }
 
     @PostMapping("vid/allow")
     public ResponseEntity<?> allowUpload(@RequestParam("uuid") String uuid,
                                          @RequestParam("user") String username) {
-
-        return ResponseEntity.ok().build();
+        UserModel user;
+        if (userService.existsByUsername(username)) {
+            user = userService.findByUsername(username).get();
+            user.setUuids(user.getUuids() + " " + uuid);
+        } else {
+            user = UserModel.builder()
+                    .username(username)
+                    .uuids(uuid)
+                    .build();
+        }
+        user = userService.save(user);
+        return ResponseEntity.ok(user);
     }
 
     @PostMapping("vid/upload")
-    public ResponseEntity<?> uploadVideo(@RequestParam("file") MultipartFile video,
+    public ResponseEntity<?> uploadVideo(Authentication authentication,
+                                         @RequestParam("file") MultipartFile video,
                                          @RequestParam("uuid") String uuid) {
         if (video.isEmpty()) {
             return ResponseEntity.status(124).body("видео пусто");
+        }
+        var optUser = userService.findByUsername(authentication.getName());
+        if (optUser.isEmpty()) {
+            log.error("user is empty");
+            return ResponseEntity.status(401).body("you are not allowed to upload any data");
+        }
+        var user = optUser.get();
+        System.out.println(user.getUuids());
+        if (!user.getUuids().contains(uuid)) {
+            ResponseEntity.status(401).body("you are not allowed to upload any data");
         }
         try {
             saveVideo(video, uuid);
