@@ -1,0 +1,93 @@
+version: '3'
+
+services:
+  nginx:
+    image: arsanoshin/spot-nginx
+    container_name: nginx
+    networks:
+      - spot
+    volumes:
+      - ./templates:/etc/nginx/templates
+    ports:
+      - "443:443"
+    environment:
+      - NGINX_HOST=video-spot.ru
+      - NGINX_PORT=80
+    restart: always
+
+  main:
+    container_name: main
+    image: arsanoshin/spot-main
+    depends_on:
+      - es
+      - st
+      - db
+    networks:
+      - spot
+    restart: always
+
+  es:
+    container_name: es
+    image: arsanoshin/elastic:8.12.2
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+    networks:
+      - spot
+    mem_limit: 2GB
+
+  st:
+    container_name: st
+    image: arsanoshin/spot-storage
+    networks:
+      - spot
+    volumes:
+      - vids_data:/app/vids
+      - imgs_data:/app/imgs
+    mem_limit: 2GB
+
+  db:
+    image: mysql:8.3.0
+    container_name: db
+    restart: always
+    networks:
+      - spot
+    environment:
+      MYSQL_USER: spot-spring
+      MYSQL_PASSWORD: Fsi01?$4
+      MYSQL_DATABASE: spot
+      MYSQL_ALLOW_EMPTY_PASSWORD: "yes"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  front:
+    image: arsanoshin/spot-front
+    container_name: front
+    environment:
+      - WDS_SOCKET_PORT=443
+    networks:
+      - spot
+    restart: always
+
+
+volumes:
+  nginx_data:
+  mysql_data:
+  vids_data:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: './vids_data'
+  imgs_data:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: './imgs_data'
+
+
+
+networks:
+  spot:
+    driver: bridge
