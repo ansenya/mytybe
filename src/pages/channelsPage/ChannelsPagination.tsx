@@ -14,7 +14,10 @@ interface ChannelsPaginationProps {
   isSmallScreen?: boolean;
 }
 
-const ChannelsPagination: FC<ChannelsPaginationProps> = ({ type, isSmallScreen }) => {
+const ChannelsPagination: FC<ChannelsPaginationProps> = ({
+  type,
+  isSmallScreen,
+}) => {
   const { search } = useLocation();
   const query = useMemo(() => {
     return new URLSearchParams(search);
@@ -26,7 +29,6 @@ const ChannelsPagination: FC<ChannelsPaginationProps> = ({ type, isSmallScreen }
 
   let [fetchData, { data, isFetching, error }] = useLazyGetChannelsQuery();
   const [channels, setChannels] = useState<IChannel[]>([]);
-
 
   useEffect(() => {
     let body: ChannelsRequest & { searchQuery?: string; isSubs?: boolean } = {
@@ -43,7 +45,7 @@ const ChannelsPagination: FC<ChannelsPaginationProps> = ({ type, isSmallScreen }
   }, [pageNumber]);
 
   useEffect(() => {
-    if(isSmallScreen) return;
+    if (isSmallScreen) return;
     if (isFetching || data === undefined) return;
     observer.current?.disconnect();
     observer.current = new IntersectionObserver((entries, observer) => {
@@ -58,6 +60,10 @@ const ChannelsPagination: FC<ChannelsPaginationProps> = ({ type, isSmallScreen }
       observer.current?.disconnect();
     };
   }, [isFetching, totalPages]);
+
+  useEffect(() => {
+    setPageNumber(0);
+  }, [query.get("q")]);
 
   useEffect(() => {
     if (!isFetching && data !== undefined) {

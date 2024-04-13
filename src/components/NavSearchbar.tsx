@@ -31,7 +31,7 @@ const NavSearchbar: FC<NavSearchbarProps> = ({ setSearchBarVisible }) => {
       event.preventDefault();
       setIsFocused({ isFocused: false, focusTargetId: mobileInputId });
       inputRef.current?.blur();
-      navigate(`/?q=${query}`);
+      navigate(`results/?q=${query}`);
     }
   };
 

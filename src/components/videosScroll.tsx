@@ -19,7 +19,7 @@ const VideoScroll: FC<VideoScrollProps> = ({
   isSmallScreen,
   channelId,
   isEditable,
-  isNarrow
+  isNarrow,
 }) => {
   const { id } = useParams();
   const { search } = useLocation();
@@ -34,7 +34,7 @@ const VideoScroll: FC<VideoScrollProps> = ({
   let [fetchData, { data, isFetching, error }] = useLazyGetVideosQuery();
   const [videos, setVideos] = useState<IVideo[]>([]);
 
-  const {deletedIds} = useAppSelector(state=>state.deletedVideos);
+  const { deletedIds } = useAppSelector((state) => state.deletedVideos);
 
   useEffect(() => {
     let body: VideosRequest & { searchQuery?: string } = {
@@ -50,7 +50,6 @@ const VideoScroll: FC<VideoScrollProps> = ({
 
     fetchData(body);
   }, [pageNumber]);
-
 
   useEffect(() => {
     if (isSmallScreen) return;
@@ -76,8 +75,16 @@ const VideoScroll: FC<VideoScrollProps> = ({
     }
   }, [isFetching, data]);
 
+  useEffect(() => {
+    setPageNumber(0);
+  }, [query.get("q")]);
+
   function filterVideos(video: IVideo) {
-    return video.id !== Number(id) && !deletedIds.includes(video.id) && video.qualities.length !== 0 ;
+    return (
+      video.id !== Number(id) &&
+      !deletedIds.includes(video.id) &&
+      video.qualities.length !== 0
+    );
   }
 
   return (
@@ -88,6 +95,7 @@ const VideoScroll: FC<VideoScrollProps> = ({
           categoryName="fuck"
           isEditable={isEditable || false}
           isNarrow={isNarrow}
+          key={query.get("q")}
         />
         <span style={{ color: "transparent" }}>penis</span>
       </div>
