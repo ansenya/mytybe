@@ -42,7 +42,7 @@ const ChannelsPagination: FC<ChannelsPaginationProps> = ({
     body.isSubs = type === "subscriptions";
 
     fetchData(body);
-  }, [pageNumber]);
+  }, [pageNumber, query.get("q")]);
 
   useEffect(() => {
     if (isSmallScreen) return;
@@ -61,13 +61,19 @@ const ChannelsPagination: FC<ChannelsPaginationProps> = ({
     };
   }, [isFetching, totalPages]);
 
+  const [changedQuery, setChangedQuery] = useState(false);
   useEffect(() => {
-    setPageNumber(0);
+    setChangedQuery(true);
   }, [query.get("q")]);
 
   useEffect(() => {
     if (!isFetching && data !== undefined) {
-      setChannels([...channels, ...data.content]);
+      if (changedQuery) {
+        setChannels([...data.content]);
+        setChangedQuery(false);
+      } else {
+        setChannels([...channels, ...data.content]);
+      }
       setTotalPages(data.totalPages);
     }
   }, [isFetching, data]);

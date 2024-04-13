@@ -49,7 +49,8 @@ const VideoScroll: FC<VideoScrollProps> = ({
     if (query.get("q")) body.searchQuery = query.get("q");
 
     fetchData(body);
-  }, [pageNumber]);
+    
+  }, [pageNumber, query.get("q")]);
 
   useEffect(() => {
     if (isSmallScreen) return;
@@ -70,13 +71,20 @@ const VideoScroll: FC<VideoScrollProps> = ({
 
   useEffect(() => {
     if (!isFetching && data !== undefined) {
-      setVideos([...videos, ...data.content]);
+      if (changedQuery) {
+        setVideos([...data.content]);
+        setChangedQuery(false);
+      } else {
+        setVideos([...videos, ...data.content]);
+      }
       setTotalPages(data.totalPages);
     }
   }, [isFetching, data]);
 
+  const [changedQuery, setChangedQuery] = useState(false);
+
   useEffect(() => {
-    setPageNumber(0);
+    setChangedQuery(true);
   }, [query.get("q")]);
 
   function filterVideos(video: IVideo) {
@@ -95,7 +103,6 @@ const VideoScroll: FC<VideoScrollProps> = ({
           categoryName="fuck"
           isEditable={isEditable || false}
           isNarrow={isNarrow}
-          key={query.get("q")}
         />
         <span style={{ color: "transparent" }}>penis</span>
       </div>
