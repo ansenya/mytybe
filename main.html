@@ -7,26 +7,88 @@
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 </head>
 <body>
-<video id="video" controls></video>
+
+<input type="file" id="fileInput">
+<button onclick="startUpload()">Загрузить файл</button>
 
 <script>
-    var video = document.getElementById('video');
-    var videoSrc = 'http://localhost:8080/hls/1080p.m3u8';  // Путь к вашему master playlist
+    function startUpload() {
+        const fileInput = document.getElementById('fileInput');
+        const file = fileInput.files[0];
+        if (file) {
+            uploadFile(file);
+        } else {
+            console.log('Файл не выбран');
+        }
+    }
 
-    if (Hls.isSupported()) {
-        var hls = new Hls();
-        hls.loadSource(videoSrc);
-        hls.attachMedia(video);
-        hls.on(Hls.Events.MANIFEST_PARSED, function() {
-            video.play();
-        });
-    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        // Поддержка HLS нативно (например, в Safari)
-        video.src = videoSrc;
-        video.addEventListener('loadedmetadata', function() {
-            video.play();
-        });
+    async function uploadFile(file) {
+        const chunkSize = 1024 * 1024; // Размер части
+        const totalChunks = Math.ceil(file.size / chunkSize);
+
+        for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
+            const start = chunkIndex * chunkSize;
+            const end = Math.min(start + chunkSize, file.size);
+
+            const chunk = file.slice(start, end);
+            const formData = new FormData();
+            formData.append('file', chunk);
+            formData.append('chunkIndex', chunkIndex);
+            formData.append('totalChunks', totalChunks);
+            formData.append('fileName', file.name);
+
+            try {
+                const response = await fetch('http://localhost:8080/upload', {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (!response.ok) {
+                    throw new Error('Ошибка загрузки');
+                }
+
+                // Рассчитываем и выводим прогресс
+                const progress = Math.round(((chunkIndex + 1) / totalChunks) * 100);
+                console.log(`Прогресс загрузки: ${progress}%`);
+            } catch (error) {
+                console.error('Загрузка прервана:', error);
+                break;
+            }
+        }
+
+        console.log('Файл успешно загружен');
     }
 </script>
+</body>
+</html>
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HLS Video Player</title>
+    <link href="https://vjs.zencdn.net/7.11.4/video-js.css" rel="stylesheet" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+        video {
+            width: 80%;
+            max-width: 800px;
+        }
+    </style>
+</head>
+<body>
+<h1>HLS Video Player</h1>
+<video id="videoPlayer" class="video-js vjs-default-skin" controls preload="auto" data-setup="{}">
+    <source id="videoSource" src="http://localhost:8080/videos/be975131-3061-47c0-83af-23fe6fc5ccc3.m3u8?quality=480" type="application/vnd.apple.mpegurl">
+    Ваш браузер не поддерживает видео.
+</video>
+
+<script src="https://vjs.zencdn.net/7.11.4/video.min.js"></script>
+
 </body>
 </html>
