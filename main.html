@@ -38,7 +38,7 @@
             formData.append('fileName', file.name);
 
             try {
-                const response = await fetch('http://localhost:8080/upload', {
+                const response = await fetch('http://video-spot.ru:8081/videos/upload', {
                     method: 'POST',
                     body: formData,
                 });
@@ -84,7 +84,7 @@
 <body>
 <h1>HLS Video Player</h1>
 <video id="videoPlayer" class="video-js vjs-default-skin" controls preload="auto" data-setup="{}">
-    <source id="videoSource" src="http://localhost:8080/videos/be975131-3061-47c0-83af-23fe6fc5ccc3.m3u8?quality=480" type="application/vnd.apple.mpegurl">
+    <source id="videoSource" src="https://video-spot.ru/storage/videos/4fc2c161-6a92-4cbb-86fb-eb47c22b6e7e.m3u8?quality=480" type="application/vnd.apple.mpegurl">
     Ваш браузер не поддерживает видео.
 </video>
 
