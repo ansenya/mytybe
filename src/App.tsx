@@ -12,7 +12,7 @@ import RegistrationPage from "./pages/authPages/registrationPage";
 import LoginPage from "./pages/authPages//loginPage";
 import RequireAuth from "./hoc/RequireAuth";
 import Logout from "./pages/logout";
-import UploadPage from "./pages/uploadPage/upPage";
+import UploadPage from "./pages/uploadPage/uploadPage";
 import BlockAuth from "./hoc/BlockAuth";
 
 import "./App.scss";
@@ -49,7 +49,7 @@ const App = () => {
             path="videos/upload"
             element={
               <RequireAuth>
-                <UploadPage />
+                <UploadPage/>
               </RequireAuth>
             }
           ></Route>

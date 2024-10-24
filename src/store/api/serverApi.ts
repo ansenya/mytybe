@@ -11,11 +11,13 @@ import {
   PostCommentRequest,
 } from "../../models/VideoModels";
 import { RegisterArgs } from "../../pages/authPages/registrationPage";
+import {BaseQueryArg} from "@reduxjs/toolkit/dist/query/baseQueryTypes";
 
 export const serverApi = createApi({
   reducerPath: "server",
   baseQuery: fetchBaseQuery({
-    baseUrl: process.env.REACT_APP_API_BASE_URL || "https://video-spot.ru/api",
+    // baseUrl: process.env.API_BASE_URL || "https://video-spot.ru/api",
+    baseUrl: process.env.API_BASE_URL || "http://localhost:1984/api",
   }),
   endpoints: (build) => ({
     getUsers: build.query<PaginationResponse<IUser>, void>({
@@ -47,21 +49,25 @@ export const serverApi = createApi({
       }),
     }),
     createVideoEntity: build.mutation({
-      query: (videoData) => ({
-        url: "videos/upload",
-        method: "POST",
-        body: videoData,
+      query: ({ title, description, channelId }: { title: string, description: string, channelId: string }) => ({
+        url: 'videos/create',
+        method: 'POST',
+        params: {
+          videoName: title,
+          videoDescription: description,
+          channelId: channelId,
+        },
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("jwtoken")}`,
+          Authorization: `Bearer ${localStorage.getItem('jwtoken')}`,
         },
       }),
     }),
 
     uploadVideo: build.mutation({
-      query: (videoData) => ({
-        url: "https://video-spot.ru/storage/vid/upload",
+      query: (formData) => ({
+        url: "http://localhost:8080/videos/upload",
         method: "POST",
-        body: videoData,
+        body: formData,
         headers: {
           Authorization: `Bearer ${localStorage.getItem("jwtoken")}`,
         },

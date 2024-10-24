@@ -1,141 +1,165 @@
-import React, { useId, useState, useEffect } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
-import "./uploadPage.scss";
-import closeIcon from "../../assets/arrow-to-right-svgrepo-com.svg";
-import IconButton from "../../components/UI/IconButton/IconButton";
-import CButton from "../../components/UI/CButton/CButton";
-import {
-  useGetUserChannelsQuery,
-  useUploadVideoMutation,
-} from "../../store/api/serverApi";
-import { useAppSelector } from "../../hooks/redux";
-import { SubmitHandler, useForm } from "react-hook-form";
-import { PaginationResponse, UploadRequest } from "../../models/VideoModels";
-import { IChannel } from "../../models";
-import DropFileInput from "../../components/UI/DropFileInput/DropFileInput";
-import TextArea from "../../components/UI/TextArea/TextArea";
-import ImageUploader from "../../components/UI/ImageUploader/ImageUploader";
-import ChannelsSelect from "../../components/UI/ChannelsSelect/ChannelsSelect";
-import ErrorMessage from "../../components/UI/ErrorMessage/ErrorMessage";
-import { fileValidationError, lengthValidationError } from "./validators";
+import React, {useState} from 'react';
+import './uploadPage.scss';
+import './uploadPage.module.scss';
+import {useCreateVideoEntityMutation} from "../../store/api/serverApi";
 
-type UploadForm = Omit<UploadRequest, "channelId">;
+const UploadPage: React.FC = () => {
+    const [videoFile, setVideoFile] = useState<File | null>(null);
+    const [imageFile, setImageFile] = useState<File | null>(null);
+    const [isUploading, setIsUploading] = useState(false);
+    const [progress, setProgress] = useState(0);
+    const [title, setTitle] = useState('');
+    const [description, setDescription] = useState('');
+    const [videoId, setVideoId] = useState<string | null>(null); // Store video ID
+    const [createVideoEntity, { isLoading }] = useCreateVideoEntityMutation();
 
-const UploadPage = () => {
-  const formId = useId();
-  const navigate = useNavigate();
-  const location = useLocation();
-  const [post, { data, isLoading, isError, error }] = useUploadVideoMutation();
-  const { user, isLoaded } = useAppSelector((state) => state.auth);
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0] || null;
+        if (e.target.id === "video-upload") {
+            setVideoFile(file);
+        } else if (e.target.id === "image_uploads") {
+            setImageFile(file);
+        }
+    };
 
-  const [videoFile, setVideoFile] = useState<File | null>(null);
-  const [channelId, setChannelId] = useState<number>(0);
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [videoDescription, setVideoDescription] = useState<string>("");
-  const [videoName, setVideoName] = useState<string>("");
+    // Create video entry on the server
+    const handleCreateVideo = async () => {
+        const channelId = "1"; // Specify your channel ID
+        const videoData = { title, description, channelId };
 
-  const [errors, setErrors] = useState({
-    nameError: "",
-    descError: "",
-    videoFileError: "",
-  });
+        try {
+            const response = await createVideoEntity(videoData).unwrap();
+            const video = response[0]
+            const uuid = response[1].uuid
+            console.log(video)
+            console.log(uuid)
 
-  const handleUpload = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const nameError = lengthValidationError(videoName, 100);
-    const descError = lengthValidationError(videoDescription, 1000);
-    const videoError = fileValidationError(videoFile, "video");
-    setErrors((prevstate) => {
-      return {
-        descError: descError,
-        nameError: nameError,
-        videoFileError: videoError,
-      };
-    });
+            await uploadFile(videoFile!, uuid)
+            // You might want to handle the response here, such as setting the video ID
+        } catch (error) {
+            console.error('Failed to create video metadata:', error);
+            // Handle error accordingly
+        }
+    };
 
-    if (
-      descError ||
-      nameError ||
-      videoError ||
-      videoFile === null ||
-      channelId === 0
-    )
-      return;
+    // Upload video chunks to the server
+    const uploadFile = async (file: File, uuid: string) => {
+        const chunkSize = 1024 * 1024; // 1MB chunks
+        const totalChunks = Math.ceil(file.size / chunkSize);
+        setIsUploading(true);
+        setProgress(0);
 
-    const postFormData = new FormData();
-    postFormData.append("channelId", String(channelId));
-    postFormData.append("videoFile", videoFile);
+        for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
+            const start = chunkIndex * chunkSize;
+            const end = Math.min(start + chunkSize, file.size);
+            const chunk = file.slice(start, end);
+            const formData = new FormData();
+            formData.append('file', chunk);
+            formData.append('chunkIndex', chunkIndex.toString());
+            formData.append('totalChunks', totalChunks.toString());
+            formData.append('fileName', uuid);
+            formData.append('videoId', videoId || ''); // Send video ID for associating the chunks
 
-    if (videoName) postFormData.append("videoName", videoName);
-    if (videoDescription)
-      postFormData.append("videoDescription", videoDescription);
-    if (imageFile) postFormData.append("imageFile", imageFile);
+            try {
+                const response = await fetch('http://localhost:8080/videos/upload', {
+                    method: 'POST',
+                    body: formData,
+                });
 
-    post(postFormData);
-  };
+                if (!response.ok) {
+                    throw new Error('Upload error');
+                }
 
-  return (
-    <>
-      <div className="overlay">
-        <div className="frame">
-          <div className="frame__head">
-            <h1>Загрузить видео</h1>
-            <IconButton
-              onClick={() => navigate(location.state?.from || "/")}
-              icon={closeIcon}
-            />
-          </div>
-          <div className="frame__content">
-            <form className="video__form" id={formId} onSubmit={handleUpload}>
-              <div className="field__container">
-                <TextArea
-                  labelName="Название"
-                  isResizble={false}
-                  maxLength={100}
-                  onChange={(e) => setVideoName(e.target.value)}
-                  value={videoName}
+                const newProgress = Math.round(((chunkIndex + 1) / totalChunks) * 100);
+                setProgress(newProgress); // Update progress bar
+
+            } catch (error) {
+                console.error('Upload interrupted:', error);
+                setIsUploading(false);
+                return;
+            }
+        }
+
+        console.log('File successfully uploaded');
+        setIsUploading(false);
+    };
+
+    // Handle the create video and upload steps
+    const handleUpload = async () => {
+        await handleCreateVideo(); // First, create the video
+
+        // if (!videoId && videoFile) {
+        //   await createVideo(); // First, create the video
+        // }
+
+        // if (videoFile && videoId) {
+        //   uploadFile(videoFile); // Then upload the video file chunks
+        // }
+    };
+
+    return (
+        <div className="video-upload">
+            <h1>Upload Video</h1>
+
+            {/* Video creation form */}
+            <div className="create-video-form">
+                <input
+                    type="text"
+                    placeholder="Video Title"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
                 />
-                {!!errors.nameError && <ErrorMessage msg={errors.nameError} />}
-              </div>
-
-              <div className="field__container">
-                <TextArea
-                  labelName="Описание"
-                  isResizble
-                  maxLength={1000}
-                  onChange={(e) => setVideoDescription(e.target.value)}
-                  value={videoDescription}
+                <textarea
+                    placeholder="Video Description"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
                 />
-                {!!errors.descError && <ErrorMessage msg={errors.descError} />}
-              </div>
+            </div>
 
-              <div className="field__container">
-                <DropFileInput fileSet={setVideoFile} />
-                {!!errors.videoFileError && (
-                  <ErrorMessage msg={errors.videoFileError} />
-                )}
-              </div>
-              <h1 style={{ fontSize: "1.2rem" }}>
-                Добавить изображение и выбрать канал
-              </h1>
-              <div className="bottom">
-                <ImageUploader fileSet={setImageFile} />
-                {isLoaded && (
-                  <ChannelsSelect
-                    id={user?.id || 0}
-                    setChannelId={setChannelId}
-                  />
-                )}
-              </div>
-            </form>
-            <div className="frame__select"></div>
-          </div>
-          <div className="frame__foot">
-          </div>
+            <div className="forms">
+                {/* Video file input */}
+                <label htmlFor="video-upload" className="custom-file-upload">
+                    {videoFile ? videoFile.name : 'Upload Video'}
+                </label>
+                <input
+                    type="file"
+                    id="video-upload"
+                    accept="video/*"
+                    onChange={handleFileChange}
+                    style={{display: 'none'}}
+                />
+
+                {/* Image file input */}
+                <label htmlFor="image_uploads" className="custom-file-upload">
+                    {imageFile ? imageFile.name : 'Upload Image'}
+                </label>
+                <input
+                    type="file"
+                    id="image_uploads"
+                    name="image_uploads"
+                    accept=".jpg, .jpeg, .png"
+                    onChange={handleFileChange}
+                    style={{display: 'none'}}
+                />
+            </div>
+
+            {/* Upload button */}
+            <button
+                onClick={handleUpload}
+                disabled={isUploading || !videoFile || !title || !description}
+            >
+                {isUploading ? 'Uploading...' : 'Create and Upload'}
+            </button>
+
+            {/* Progress bar */}
+            {isUploading && (
+                <div className="progress-bar-container">
+                    <div className="progress-bar" style={{width: `${progress}%`}}/>
+                    <div className="progress-text">{progress}% Uploaded</div>
+                </div>
+            )}
         </div>
-      </div>
-    </>
-  );
+    );
 };
 
 export default UploadPage;
