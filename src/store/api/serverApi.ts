@@ -15,7 +15,8 @@ import { RegisterArgs } from "../../pages/authPages/registrationPage";
 export const serverApi = createApi({
   reducerPath: "server",
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://video-spot.ru/api",
+    // baseUrl: "https://video-spot.ru/api",
+    baseUrl: "http://localhost:1984/api",
   }),
   endpoints: (build) => ({
     getUsers: build.query<PaginationResponse<IUser>, void>({

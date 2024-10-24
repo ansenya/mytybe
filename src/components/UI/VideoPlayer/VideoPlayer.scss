@@ -13,6 +13,21 @@
     align-self: center;
   }
 
+  .title-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    padding: 10px 15px;
+    color: white;
+    font-size: 1.1rem;
+    font-weight: bold;
+    z-index: 2;
+
+    opacity: 0;
+    transition: opacity 150ms ease-in-out;
+  }
+
   .loader {
     position: absolute;
     top: calc(50% - 20px);
@@ -48,14 +63,14 @@
       z-index: -1;
       pointer-events: none;
     }
-    &:hover{
-      opacity: 1;
-    }
   }
 
   &.controls-active {
     cursor: auto;
     .controls-container {
+      opacity: 1;
+    }
+    .title-container{
       opacity: 1;
     }
   }
@@ -144,7 +159,6 @@
 
       }
 
-
       &::-moz-range-thumb{
         -moz-appearance: none;
         appearance: none;
@@ -167,21 +181,9 @@
         height: 15px;
       }
 
-
-
-
-
       &:hover{
         height: 100%;
       }
     }
-
-
   }
-
-
-
-
-
-
 }

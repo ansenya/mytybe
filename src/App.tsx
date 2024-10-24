@@ -19,11 +19,13 @@ import "./App.scss";
 import { Toaster } from "sonner";
 import SubscriptionsPage from "./pages/channelsPage/SubscriptionsPage";
 import SearchPage from "./pages/searchPage/searchPage";
+import FrameVideoPage from "./pages/frameVideoPage/frameVideoPage";
 
 const App = () => {
   return (
     <>
       <Routes>
+          <Route path="frame_videos/:id" element={<FrameVideoPage />}></Route>
         <Route path="/" element={<Layout></Layout>}>
           <Route index element={<VideosPage />}></Route>
           <Route
