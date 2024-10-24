@@ -25,16 +25,11 @@ interface VideoPlayerProps {
     frame?: boolean
 }
 
-interface Quality {
-    quality: string;
-    url: string;
-}
-
 const VideoPlayer: React.FC<VideoPlayerProps> = ({video, frame}) => {
     const playerRef = useRef<ReactPlayer>(null);
     const lineRef = useRef<HTMLInputElement>(null);
 
-    const [isPlaying, setIsPlaying] = useState(true);
+    const [isPlaying, setIsPlaying] = useState(false);
     const [isFullScreen, setIsFullScreen] = useState(false);
     const [volume, setVolume] = useState(
         Number(localStorage.getItem("volume")) || 1,
@@ -44,16 +39,16 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({video, frame}) => {
     const [current, setCurrent] = useState("0:00");
     const [progress, setProgress] = useState(0);
     const [savedProgress, setSavedProgress] = useState(0);
-    const [isLoading, setIsLoading] = useState(true);
     const [playbackSpeed, setPlaybackSpeed] = useState<string>("1");
     const [isPip, setIsPip] = useState(false);
     const [isEnded, setIsEnded] = useState(false);
+    const [isReady, setIsReady] = useState(false);
     const [qualities, setQualities] = useState<string[]>([]);
-    const [quality, setQuality] = useState<string>(
-        Math.max(...video.qualities.map((value: string) => parseInt(value))).toString(),
-    );
+    const [quality, setQuality] = useState<string>("");
+    const [timer, setTimer] = useState<ReturnType<typeof setTimeout>>();
     const [showControls, setShowControls] = useState(false);
     const [isError, setIsError] = useState<boolean>(false);
+    const [isMenuShown, setIsMenuShown] = useState(false);
 
     const {
         isPlayPressed,
@@ -76,6 +71,15 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({video, frame}) => {
         isBackwardPressed,
         isFullscreenPressed,
     ]);
+
+    useEffect(() => {
+        fetchQualitiesFromMasterPlaylist()
+            .then(() => {
+                console.log(qualities)
+                console.log(quality)
+            }
+        );
+    }, []);
 
     const seekForward = () => {
         if (playerRef.current)
@@ -132,11 +136,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({video, frame}) => {
 
     function handlePause() {
         setIsPlaying((prevState) => !prevState);
-        setIsLoading(false);
+        setIsEnded(false)
     }
 
       const handleProgress = (state: { played: number; playedSeconds: number }) => {
-        // if (isLoading) return;
         setProgress(state.played);
         if (savedProgress) {
             setProgress(savedProgress);
@@ -152,8 +155,12 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({video, frame}) => {
 
     function setPlayIcon() {
         if (isEnded) return RepeatIcon;
-
-        return !isPlaying ? PlayIcon : PauseIcon;
+        if (!isPlaying) {
+            return PlayIcon;
+        }
+        if (isPlaying) {
+            return PauseIcon
+        }
     }
 
     useEffect(() => {
@@ -162,7 +169,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({video, frame}) => {
         };
 
         document.addEventListener("fullscreenchange", handleFullscreenChange);
-
         return () => {
             document.removeEventListener("fullscreenchange", handleFullscreenChange);
         };
@@ -198,30 +204,11 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({video, frame}) => {
             formatTime(newProgress * (playerRef.current?.getDuration() || 0)),
         );
 
-        // Pause the video when seeking
-        setIsPlaying(false);
-
-        // Use debounceSeek to seek to the new time
         debounceSeek(0)(newProgress);
-
-        // Resume playing after a delay, if desired (e.g., 300ms)
-        setTimeout(() => {
-            if (!isLoading) {
-                setIsPlaying(true); // Set the video back to playing state
-            }
-        }, 200);
     };
-
-
-    const handlePip = () => {
-        setIsPip(true);
-    };
-
     const handleControlsClick = (e: React.MouseEvent) => {
         e.stopPropagation();
     };
-
-    const [timer, setTimer] = useState<ReturnType<typeof setTimeout>>();
 
     function handleMouseMove() {
         setShowControls(true);
@@ -242,34 +229,17 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({video, frame}) => {
         setTimer(newTimer);
     }
 
-    const [isMenuShown, setIsMenuShown] = useState(false);
-    const [isMuted, setIsMuted] = useState(true)
-
     useEffect(() => {
         setSavedProgress(progress);
     }, [quality]);
 
-    const [videoKey, setVideoKey] = useState(0);  // ключ для сброса компонента
-
-    const reloadVideo = () => {
-        setIsError(false);
-        setIsPlaying(false);
-        setIsLoading(true);
-        setVideoKey(prevKey => prevKey + 1);  // обновляем ключ, чтобы перезагрузить плеер
-    };
-
-    useEffect(() => {
-        fetchQualitiesFromMasterPlaylist();
-    }, []);
 
     const fetchQualitiesFromMasterPlaylist = async () => {
         try {
             const response = await axios.get(video.path);
             const masterPlaylist = response.data;
 
-
             const parsedQualities = parseQualities(masterPlaylist);
-            console.log(parsedQualities);
             setQualities(parsedQualities);
 
             if (parsedQualities.length > 0) setQuality(parsedQualities[parsedQualities.length - 1]);
@@ -291,6 +261,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({video, frame}) => {
 
         return foundQualities;
     };
+
     return (
         <div
             id="player-container"
@@ -303,27 +274,15 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({video, frame}) => {
             onMouseEnter={() => setShowControls(true)}
             onMouseLeave={() => setShowControls(false)}
             onMouseMove={handleMouseMove}>
-                {/*{isError && <div>Error occurred. <button onClick={reloadVideo}>Retry</button></div>}*/}
-                {!isError && (
+                {!isError && (qualities.length !== 0) && (
                     <ReactPlayer
-                        key={videoKey}
                         className="player__video"
                         url={`${video.path}?quality=${quality}`}
-                        playing={isPlaying && !isLoading}
-                        onBufferEnd={() => {
-                            console.log('Buffer ended');
-                            setIsLoading(false);
-                        }}
-                        onBuffer={() => {
-                            console.log('Buffering');
-                            setIsLoading(true);
-                        }}
+                        playing={isPlaying && isReady && !isError}
                         onReady={() => {
-                            console.log("Ready");
-                            setIsLoading(false);
+                            setIsReady(true);
                         }}
                         onPlay={() => {
-                            if (isLoading) return;
                             setIsPlaying(true);
                         }}
                         onPause={() => {
@@ -331,27 +290,25 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({video, frame}) => {
                         }}
                         onError={(error) => {
                             console.error('Error:', error);
-                            if (error.name !== 'AbortError') {
-                                setIsError(true);
-                            }
+                            setIsError(true);
                         }}
                         onEnded={() => {
-                            setIsPlaying(false);
+                            setIsEnded(true);
                         }}
                         onProgress={handleProgress}
                         playbackRate={Number(playbackSpeed)}
-                        progressInterval={10}
+                        progressInterval={5}
                         pip={isPip}
                         onDisablePIP={() => setIsPip(false)}
                         ref={playerRef}
-                        muted={isMuted}
+                        muted={volume === 0}
                         controls={false}
                         width="100%"
                         height="auto"
                     />
                 )}
 
-            {isLoading && (
+            {!isReady && (
                 <div className="loader">
                     <Loader/>
                 </div>
@@ -372,38 +329,6 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({video, frame}) => {
                     </p>
                 </div>)
             }
-            <div className="controls-container" onClick={handleControlsClick}>
-                    <PlayerSelect
-                        isShown={isMenuShown}
-                        setIsShown={setIsMenuShown}
-                        qualitiesAvailible={video.qualities}
-                        quality={quality}
-                        playbackSpeed={playbackSpeed}
-                        setPlaybackSpeed={setPlaybackSpeed}
-                        setQuality={setQuality}
-                    />
-                    <div className="controls">
-                        <PlayerButton
-                            icon={setPlayIcon()}
-                            onClick={handlePause}
-                        ></PlayerButton>
-                        <div className="volume-container">
-                            <PlayerButton
-                                icon={setVolumeIcon()}
-                                onClick={() => handleMute()}
-                            ></PlayerButton>
-                            <input
-                                type="range"
-                                min="0"
-                                max="1"
-                                step="0.01"
-                                value={volume}
-                                onChange={handleVolumeChange}
-                                className="volume-slider"
-                            />
-                        </div>
-                    </div>
-            </div>
             <div className="controls-container" onClick={handleControlsClick}>
                 <PlayerSelect
                     isShown={isMenuShown}
@@ -455,7 +380,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({video, frame}) => {
                         onClick={() => setIsMenuShown((state) => !state)}>
                         <Settings size={25} color={"white"}/>
                     </button>
-                    <PlayerButton icon={PipIcon} onClick={handlePip}></PlayerButton>
+                    <PlayerButton icon={PipIcon} onClick={() => setIsPip(true)}/>
                     <PlayerButton
                         icon={isFullScreen ? ExitIcon : FullIcon}
                         onClick={handleFullScreen}

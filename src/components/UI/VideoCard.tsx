@@ -31,57 +31,56 @@ const VideoCard = ({
 
   useEffect(() => {
     if (data) {
-      
     } 
   }, [isLoading])
 
   return (
-    <div className="video" onClick={() => navigate(`/videos/${id}`)}>
-      <DeleteModal
-        active={showModal}
-        setActive={setShowModal}
-        id={id}
-        deleteAction={deleteAction}
-      />
-      {canDelete && (
-        <button
-          className="video__delete"
-          onClick={(e) => {
-            setShowModal(true);
-            e.stopPropagation()
-          }}
-        >
-          <Trash2 size={20} color={"white"} />
-        </button>
-      )}
-      <img
-        src={thumbnail}
-        className="video__thumbnail"
-        draggable={false}
-        loading="eager"
-      />
-      <div className="video__name">
-        <img
-          src={channel.chp}
-          className="avatar"
-          draggable={false}
-          onClick={(e) => {
-            e.stopPropagation();
-            navigate(`/channels/${channel.id}`);
-          }}
-        />
-        <div>
-          <span className="title">{name}</span>
-          <Link
-            to={`/channels/${channel.id}`}
-            onClick={(e) => e.stopPropagation()}
-            className="channel__name"
-          >
-            {channel.name}
-          </Link>
-        </div>
+      <div className="video" onClick={() => navigate(`/videos/${id}`)}>
+          <DeleteModal
+              active={showModal}
+              setActive={setShowModal}
+              id={id}
+              deleteAction={deleteAction}
+          />
+          {canDelete && (
+              <button
+                  className="video__delete"
+                  onClick={(e) => {
+                      setShowModal(true);
+                      e.stopPropagation()
+                  }}
+              >
+                  <Trash2 size={20} color={"white"}/>
+              </button>
+          )}
+          <img
+              src={thumbnail}
+              className="video__thumbnail"
+              draggable={false}
+              loading="lazy"
+          />
+          <div className="video__name">
+              <img
+                  src={channel.chp}
+                  className="avatar"
+                  draggable={false}
+                  onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/channels/${channel.id}`);
+                  }}
+              />
+              <div>
+                  <span className="title">{name}</span>
+                  <Link
+                      to={`/channels/${channel.id}`}
+                      onClick={(e) => e.stopPropagation()}
+                      className="channel__name"
+                  >
+                      {channel.name}
+                  </Link>
+              </div>
+          </div>
       </div>
-    </div>
   );
 };
 
