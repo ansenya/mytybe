@@ -9,11 +9,11 @@ image="$1"
 filename=$(basename -- "$image")
 filename_no_ext="${filename%.*}"
 
-output="${filename_no_ext}.webp"
+output="images/${filename_no_ext}.webp"
 
-if cwebp -q 70 "$image" -o "images/$output"; then
-    echo "Photo converted successfully: $output"
+if convert "$image" -resize x486 - | cwebp -q 40 - -o "$output"; then
+    echo "Photo resized and converted successfully: $output"
 else
-    echo "Error: Failed to convert photo."
+    echo "Error: Failed to resize and convert photo."
     exit 1
 fi
