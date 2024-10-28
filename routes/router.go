@@ -10,8 +10,8 @@ func SetupRouter() *gin.Engine {
 	router := gin.Default()
 	router.Use(cors.Default())
 
-	router.POST("/videos/upload", controllers.UploadChunkHandler)
-	router.GET("/videos/:video", controllers.SegmentHandler)
+	router.POST("/upload", controllers.UploadChunkHandler)
+	router.GET("/:uuid", controllers.ImagesHandler)
 
 	return router
 }

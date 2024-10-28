@@ -1,6 +1,6 @@
 module storage
 
-go 1.23.0
+go 1.22.7
 
 require (
 	github.com/bytedance/sonic v1.12.3 // indirect

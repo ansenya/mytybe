@@ -5,20 +5,19 @@ import (
 	"os/exec"
 )
 
-func ProcessVideo(path string) {
+func MakeWebp(path string) {
 	cmd := exec.Command("sh", "script.sh", path)
 
-	output, err := cmd.CombinedOutput()
+	_, err := cmd.CombinedOutput()
 	if err != nil {
-		log.Println(err)
+		log.Println("failed to convert to webp!", err)
 		return
 	}
-	log.Println(string(output))
 
 	cmd = exec.Command("rm", path)
-	output, err = cmd.CombinedOutput()
+	_, err = cmd.CombinedOutput()
 	if err != nil {
-		log.Println(err)
+		log.Println("failed to delete original fail!", err)
 		return
 	}
 }

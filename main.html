@@ -23,7 +23,7 @@
     }
 
     async function uploadFile(file) {
-        const chunkSize = 1024 * 1024; // Размер части
+        const chunkSize = 1024 * 512; // Размер части
         const totalChunks = Math.ceil(file.size / chunkSize);
 
         for (let chunkIndex = 0; chunkIndex < totalChunks; chunkIndex++) {
@@ -35,10 +35,10 @@
             formData.append('file', chunk);
             formData.append('chunkIndex', chunkIndex);
             formData.append('totalChunks', totalChunks);
-            formData.append('fileName', file.name);
+            formData.append('uuid', "12341827");
 
             try {
-                const response = await fetch('http://video-spot.ru:8081/videos/upload', {
+                const response = await fetch('http://localhost:8080/images/upload', {
                     method: 'POST',
                     body: formData,
                 });

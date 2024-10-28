@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	err := os.MkdirAll(controllers.VIDEOS_DIR, os.ModePerm)
+	err := os.MkdirAll(controllers.DATA_DIR, os.ModePerm)
 	if err != nil {
 		panic("Failed to create upload directory")
 	}

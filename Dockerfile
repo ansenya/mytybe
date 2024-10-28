@@ -11,7 +11,7 @@ RUN go build -o /build
 FROM alpine:latest
 
 RUN apk update && \
-    apk add --no-cache ffmpeg
+    apk add --no-cache libwebp libwebp-tools
 
 COPY --from=builder /build /app/build
 COPY script.sh /app
